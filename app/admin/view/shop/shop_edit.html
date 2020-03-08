@@ -120,30 +120,25 @@
                 </div> 
             </div>
 
-            <div class="layui-form-item img">
-                <label for="img_url" class="layui-form-label"><span class="x-red">*</span>商品图片</label>
-                <div class="layui-input-inline">
-                  <input name="img_url" id="img_url" placeholder="图片地址" value="{$shop.cover}" class="layui-input" />
-                </div>
-                <div class="layui-input-inline" style="width: auto;">
+            <div class="layui-form-item"> 
+                <label class="layui-form-label"><span class="x-red">*</span>封面</label> 
+                <div class="layui-input-inline"> 
                     <div class="layui-upload">
-                        <button type="button" class="layui-btn" id="img">上传图片</button>
-                        <button type="button" class="layui-btn" id="show_img">查看图片</button>
-                    </div>
+                        <button type="button" class="layui-btn" id="cover">上传图片</button>
+                        <div class="layui-upload-list">
+                            <img class="layui-upload-img" id="coverImg" src="__UPLOADS__/{$shop.cover}">
+                            <p id="coverText"></p>
+                        </div>
+                    </div>  
                 </div>
                 <div class="layui-form-mid layui-word-aux">
-                    <span class="x-red">*</span>请选择商品图片...
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <div class="layui-upload-list" style="margin-left:66px">
-                    <img class="layui-upload-img" src="__UPLOADS__/shop/{$shop.cover}" id="up_imgs" /><span id="up_text"></span>
+                    <span class="x-red">*</span>请选择商品封面
                 </div>
             </div>
 
             <div class="layui-form-item">
                 <label for="price" class="layui-form-label">
-                    <span class="x-red">*</span>商品相册
+                    <span class="x-red">*</span>图片
                 </label>
                 <div class="layui-input-block">
                     <div class="layui-upload">
@@ -195,12 +190,12 @@
                     <span class="x-red">*</span>状态
                 </label>
                 <div class="layui-input-block">
-                    <if condition="$shop.shelf eq 1">
-                        <input type="radio" name="shelf" value="1" title="上架" checked="">
-                        <input type="radio" name="shelf" value="0" title="下架">
+                    <if condition="$shop.is_available eq 1">
+                        <input type="radio" name="status" value="1" title="上架" checked="">
+                        <input type="radio" name="status" value="0" title="下架">
                     <else />
-                        <input type="radio" name="shelf" value="1" title="上架">
-                        <input type="radio" name="shelf" value="0" title="下架" checked="">
+                        <input type="radio" name="status" value="1" title="上架">
+                        <input type="radio" name="status" value="0" title="下架" checked="">
                     </if>
                 </div>
             </div>
@@ -238,13 +233,38 @@ layui.use(['form','layer','upload'], function(){
     });
 
     //普通图片上传
-    <include file="public/uploads" />
+    var uploadInst = upload.render({
+        elem: '#cover'
+        ,url: "{:url('admin/Shop/shop_upload_img')}"
+        ,before: function(obj){
+            //预读本地文件示例，不支持ie8
+            obj.preview(function(index, file, result){
+                $('#coverImg').attr('src', result); //图片链接（base64）
+            });
+        }
+        ,done: function(res){
+            //如果上传失败
+            if(res.code > 0){
+                return layer.msg('上传失败');
+            }
+            $('.cover').val(res.img);
+            //上传成功
+        }
+        ,error: function(){
+            //演示失败状态，并实现重传
+            var demoText = $('#coverText');
+            demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+            demoText.find('.demo-reload').on('click', function(){
+                uploadInst.upload();
+            });
+        }
+    });
 
     //多文件列表示例
     var demoListView = $('#demoList')
         ,uploadListIns = upload.render({
         elem: '#testList'
-        ,url: "{:url('commo/files/uploads_img')}"
+        ,url: "{:url('admin/Shop/shop_upload_img')}"
         ,accept: 'file'
         ,multiple: true
         ,auto: false

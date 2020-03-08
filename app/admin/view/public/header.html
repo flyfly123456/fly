@@ -73,12 +73,7 @@
             </li>
             <li class="layui-nav-item"><a href="javascript:;">
                 <if condition="$admin_info.img_url">
-                    <if condition="($admin_info.img_url eq 'woman.png') OR ($admin_info.img_url eq 'man.png')">
-                        <img class="layui-nav-img userAvatar" width="35" height="35" src="__UPLOADS__/header/{$admin_info.img_url}" />
-                    <else />
-                        <img class="layui-nav-img userAvatar" width="35" height="35" src="__UPLOADS__/header/{$admin_info.id}/{$admin_info.img_url}" />
-                    </if>
-                    
+                    <img class="layui-nav-img userAvatar" width="35" height="35" src="__UPLOADS__/{$admin_info.img_url}" />
                 <else />
                     <img class="layui-nav-img userAvatar" width="35" height="35" src="__AIMG__/face.jpg" />
                 </if>{$admin_name}</a>
@@ -99,14 +94,9 @@
     <div class="admin-header-lock" id="lock-box" style="display:none;">
         <div class="admin-header-lock-img">
             <if condition="$admin_info.img_url">
-                <if condition="($admin_info.img_url eq 'woman.png') OR ($admin_info.img_url eq 'man.png')">
-                    <img src="__UPLOADS__/header/{$admin_info.img_url}" />
-                <else />
-                    <img src="__UPLOADS__/header/{$admin_info.id}/{$admin_info.img_url}" />
-                </if>
-                
+                <img src="__UPLOADS__/{$admin_info.img_url}" />
             <else />
-                <img src="__UPLOADS__/header/face.jpg" />
+                <img src="__AIMG__/face.jpg" />
             </if>
         </div>
         <div class="admin-header-lock-name" id="lockUserName">欢迎使用{$web_info.web_name}系统</div>

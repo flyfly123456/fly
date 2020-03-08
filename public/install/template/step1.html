@@ -402,6 +402,26 @@
                                             ?>
                                         </tr>
                                         <tr>
+                                            <td>./ueditor</td>
+                                            <td>可写</td>
+                                            <td>
+                                                <?php
+                                                    if(is_writable('../ueditor')){
+                                                        echo "可写";
+                                                    }else{
+                                                        echo "不可写";
+                                                    }
+                                                ?>
+                                            </td>
+                                            <?php
+                                                if(is_writable('../ueditor')){
+                                                    echo "<td class='path'>√</td>";
+                                                }else{
+                                                    echo "<td>×</td>";
+                                                } 
+                                            ?>
+                                        </tr>
+                                        <tr>
                                             <td>./data</td>
                                             <td>可写</td>
                                             <td>
@@ -446,7 +466,7 @@ layui.use(['element','layer'], function(){
 });
 
 function nex_step(){
-    if($(".path").size()!=17){
+    if($(".path").size()!=18){
 
         layer.alert('您的配置或权限不符合要求',{icon: 2,title:'系统提示'});
 

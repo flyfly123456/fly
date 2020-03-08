@@ -53,7 +53,7 @@
             </form>
         </div>
         
-        <table class="layui-table" lay-data="{height:'full-100', cellMinWidth: 80, url:'role_resource_list_info', toolbar:'#demoTable', page:true, id:'idTest',initSort: {field:'id', type:'desc'}}" lay-filter="role_resource">
+        <table class="layui-table" lay-data="{height:'full-100', cellMinWidth: 80, url:'role_resource_info', toolbar:'#demoTable', page:true, id:'idTest',initSort: {field:'id', type:'desc'}}" lay-filter="role_resource">
             <thead>
                 <tr>
                     <th lay-data="{type:'checkbox', fixed: 'left'}"></th>
@@ -216,7 +216,7 @@
                 }
                 console.log(post)
                 $.ajax({
-                    url: "{:url('admin/Admin/role_resource_list_info')}",
+                    url: "{:url('admin/Admin/role_resource_info')}",
                     type: 'POST',
                     dataType: 'json',
                     data: post,

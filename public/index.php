@@ -24,6 +24,7 @@ if(version_compare(PHP_VERSION,'5.5.0','<'))
 error_reporting(E_ERROR | E_WARNING | E_PARSE);//报告运行时错误
 
 //检测是否已安装flyfly系统
+
 if(is_dir("./install/") && !file_exists("./install/install.lock")){
 	
 	// 组装安装url

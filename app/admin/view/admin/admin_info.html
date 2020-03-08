@@ -100,43 +100,33 @@
                     </if>
                 </div> 
             </div> 
-            
-            <div class="layui-form-item img">
-                <label for="img_url" class="layui-form-label"><span class="x-red">*</span>头像</label>
-                <div class="layui-input-inline">
-                    <if condition="($admin_info.img_url eq 'woman.png') OR ($admin_info.img_url eq 'man.png')">
-                        <input name="img_url" id="img_url" placeholder="图片地址" value="header/{$admin_info.img_url}" class="layui-input" />
-                    <else />
-                        <input name="img_url" id="img_url" placeholder="图片地址" value="header/{$admin_info.id}/{$admin_info.img_url}" class="layui-input" />
-                    </if>
-                  
-                </div>
-                <div class="layui-input-inline" style="width: auto;">
-                    <div class="layui-upload">
-                        <button type="button" class="layui-btn" id="img">上传图片</button>
-                        <button type="button" class="layui-btn" id="show_img">查看图片</button>
-                    </div>
-                </div>
-                <div class="layui-form-mid layui-word-aux">
-                    <span class="x-red">*</span>请选择头像图片...
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <div class="layui-upload-list" style="margin-left:66px">
-                    <if condition="($admin_info.img_url eq 'woman.png') OR ($admin_info.img_url eq 'man.png')">
-                        <img class="layui-upload-img" src="__UPLOADS__/header/{$admin_info.img_url}" id="up_imgs" />
-                    <else />
-                        <img class="layui-upload-img" src="__UPLOADS__/header/{$admin_info.id}/{$admin_info.img_url}" id="up_imgs" />
-                    </if>
-                    <span id="up_text"></span>
-                </div>
+            <div class="layui-form-item"> 
+                <label class="layui-form-label"><span class="x-red">*</span>头像</label> 
+                <div class="layui-input-inline"> 
+                    <input name="img_url" lay-verify="required" id="img_url" placeholder="头像地址" value="{$admin_info.img_url}" class="layui-input" /> 
+                </div> 
+                <div class="layui-input-inline" style="width: auto;"> 
+                    <div class="layui-upload"> 
+                        <button type="button" class="layui-btn" id="up_header">上传头像</button>
+                        <button type="button" class="layui-btn" id="view_header_img">查看头像</button> 
+                    </div> 
+                </div> 
+                <div class="layui-form-mid layui-word-aux"> 
+                    <span class="x-red">*</span>选择图片后系统会自动上传头像
+                </div> 
+            </div> 
+            <div class="layui-form-item"> 
+                <div class="layui-upload-list" style="margin-left:66px"> 
+                    <img class="layui-upload-img" id="up_imgs" /> 
+                    <span id="up_text"></span> 
+                </div> 
             </div>
             <div class="layui-form-item layui-form-text"> 
                 <label class="layui-form-label">备注</label> 
                 <div class="layui-input-block"> 
                     <textarea name="remark" placeholder="请输入内容" class="layui-textarea">{$admin_info.remark}</textarea> 
                 </div> 
-            </div>
+            </div> 
             <div class="layui-form-item">
                 <label for="sen_info" class="layui-form-label">
                 </label>
@@ -167,8 +157,41 @@
             }
         });
 
-        //普通图片上传
-        <include file="public/uploads" />
+        var uploadInst = upload.render({
+            elem: '#up_header'
+            ,url: "{:url('admin/Admin/up_photos')}"
+            ,auto: true
+            // ,bindAction: '#sen_img'
+            ,before: function(obj){
+            //预读本地文件示例，不支持ie8
+            obj.preview(function(index, file, result){
+                $('#up_imgs').attr('src', result); //图片链接（base64）
+            });
+            layer.msg('头像上传中...');
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg('上传失败！');
+                }
+
+                // console.log(res)
+                
+                $("input[name=img_url]").val(res.img);
+                //上传成功
+                setTimeout(function(){
+                    layer.msg('头像上传成功...');
+                },1000)
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#up_text');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-danger demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
               
         //监听提交
         form.on('submit(edit)', function(data){
@@ -185,7 +208,7 @@
                     console.log(res)
                     //called when successful
                     if(res.status=="1"){
-                        layer.confirm(res.msg+'，请重新登入',{icon: 6, title:'系统提示'},function(index){
+                        layer.confirm(res.msg,{icon: 3, title:'提示'},function(index){
                             parent.window.location="{:url('admin/Login/logout')}";
                         });
                     

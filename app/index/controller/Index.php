@@ -4,7 +4,6 @@ use \think\Controller;
 use \think\Db;
 use \think\Request;
 use \think\Session;
-use app\index\model\Article;
 
 class Index extends Base
 {
@@ -72,8 +71,8 @@ class Index extends Base
 
         $rest=Db::name('cate')->where('is_available=1 and pid=0')->select();//查询所有一级分类
 
-        $shop=Db::name('shop')->where(['is_available'=>1,'shelf'=>1])->select();//查询所有商品
-        $hot=Db::name('shop')->where(['is_available'=>1,'shelf'=>1,'is_hot'=>1])->select();//查询所有商品
+        $shop=Db::name('shop')->where('is_available=1')->select();//查询所有商品
+        $hot=Db::name('shop')->where('is_available=1 and is_hot=1')->select();//查询所有商品
 
         foreach ($rest as $key => $value) {
             
@@ -87,17 +86,12 @@ class Index extends Base
                 if($value['id']==$v['cate_id']){
                     array_push($rest[$key]['children'], $v);
                 }
-
-                
             }
 
             foreach ($hot as $kh => $vh) {
-
                 if($value['id']==$vh['cate_id']){
                     array_push($rest[$key]['hot'], $vh);
                 }
-
-                
             }
 
             foreach ($list2 as $k2 => $v2) {
@@ -125,6 +119,11 @@ class Index extends Base
             
         }
 
+        // echo "<pre>";
+        //     print_r($rest);
+        // echo "</pre>";
+        // exit;
+
         $userinfo=Session::get('user');
 
         //查询轮播
@@ -132,19 +131,14 @@ class Index extends Base
 
         //抢购活动
         $buy=Db::name('ad')->where(['is_available'=>1,'position_id'=>3])->select();
-
-        //查询文章
-        $article=Article::select();
-
+        
         $this->assign('cate',$list);
         $this->assign('shop',$rest);
         $this->assign('userinfo',$userinfo);
         $this->assign('ad',$ad);
         $this->assign('buy',$buy);
-        $this->assign('article',$article);
         
         return $this->fetch('index');
     }
-
 
 }

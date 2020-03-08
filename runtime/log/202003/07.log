@@ -1,0 +1,412 @@
+---------------------------------------------------------------
+[ 2020-03-07T15:47:07+08:00 ] 127.0.0.1 GET www.flyfly.com/
+[运行时间：0.470027s] [吞吐率：2.13req/s] [内存消耗：1,814.74kb] [文件加载：49]
+[ info ] [ LANG ] D:\phpstudy_pro\WWW\flyfly\thinkphp\lang\zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => '',
+    1 => NULL,
+    2 => NULL,
+  ),
+)
+[ info ] [ HEADER ] array (
+  'accept-language' => 'zh-CN,zh;q=0.9',
+  'accept-encoding' => 'gzip, deflate',
+  'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+  'user-agent' => 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36',
+  'upgrade-insecure-requests' => '1',
+  'connection' => 'keep-alive',
+  'host' => 'www.flyfly.com',
+  'content-length' => '',
+  'content-type' => '',
+)
+[ info ] [ PARAM ] array (
+)
+[ info ] [ SESSION ] INIT array (
+  'id' => '',
+  'var_session_id' => '',
+  'prefix' => 'think',
+  'type' => '',
+  'auto_start' => true,
+)
+[ info ] [ LOG ] INIT File
+[ error ] [2]count(): Parameter must be an array or an object that implements Countable[D:\phpstudy_pro\WWW\flyfly\app\index\controller\Base.php:77]
+---------------------------------------------------------------
+[ 2020-03-07T16:03:10+08:00 ] 127.0.0.1 GET www.flyfly.com/admin
+[运行时间：0.103005s] [吞吐率：9.71req/s] [内存消耗：2,044.11kb] [文件加载：50]
+[ info ] [ LANG ] D:\phpstudy_pro\WWW\flyfly\thinkphp\lang\zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'admin',
+    1 => NULL,
+    2 => NULL,
+  ),
+)
+[ info ] [ HEADER ] array (
+  'cookie' => 'PHPSESSID=s6b5pbk6r1ktvgtl3usmh134jl',
+  'accept-language' => 'zh-CN,zh;q=0.9',
+  'accept-encoding' => 'gzip, deflate',
+  'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+  'user-agent' => 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36',
+  'upgrade-insecure-requests' => '1',
+  'cache-control' => 'max-age=0',
+  'connection' => 'keep-alive',
+  'host' => 'www.flyfly.com',
+  'content-length' => '',
+  'content-type' => '',
+)
+[ info ] [ PARAM ] array (
+)
+[ info ] [ SESSION ] INIT array (
+  'id' => '',
+  'var_session_id' => '',
+  'prefix' => 'think',
+  'type' => '',
+  'auto_start' => true,
+)
+[ info ] [ VIEW ] ../app/admin/view/public\dispatch_jump.html [ array (
+  0 => 'code',
+  1 => 'msg',
+  2 => 'data',
+  3 => 'url',
+  4 => 'wait',
+) ]
+[ info ] [ LOG ] INIT File
+---------------------------------------------------------------
+[ 2020-03-07T16:03:14+08:00 ] 127.0.0.1 GET www.flyfly.com/admin/login/index
+[运行时间：0.191011s] [吞吐率：5.24req/s] [内存消耗：2,294.91kb] [文件加载：55]
+[ info ] [ LANG ] D:\phpstudy_pro\WWW\flyfly\thinkphp\lang\zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'admin',
+    1 => 'login',
+    2 => 'index',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'cookie' => 'PHPSESSID=s6b5pbk6r1ktvgtl3usmh134jl',
+  'accept-language' => 'zh-CN,zh;q=0.9',
+  'accept-encoding' => 'gzip, deflate',
+  'referer' => 'http://www.flyfly.com/admin',
+  'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+  'user-agent' => 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36',
+  'upgrade-insecure-requests' => '1',
+  'connection' => 'keep-alive',
+  'host' => 'www.flyfly.com',
+  'content-length' => '',
+  'content-type' => '',
+)
+[ info ] [ PARAM ] array (
+)
+[ info ] [ DB ] INIT mysql
+[ info ] [ RUN ] app\admin\controller\Login->index[ D:\phpstudy_pro\WWW\flyfly\app\admin\controller\Login.php ]
+[ info ] [ SESSION ] INIT array (
+  'id' => '',
+  'var_session_id' => '',
+  'prefix' => 'think',
+  'type' => '',
+  'auto_start' => true,
+)
+[ info ] [ VIEW ] ../app/admin/view/login\index.html [ array (
+  0 => 'remember_info',
+) ]
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.046003s ] mysql:host=127.0.0.1;port=3306;dbname=flyfly;charset=utf8
+[ sql ] [ SQL ] set @@sql_mode='' [ RunTime:0.003000s ]
+---------------------------------------------------------------
+[ 2020-03-07T16:03:14+08:00 ] 127.0.0.1 GET www.flyfly.com/captcha
+[运行时间：0.174010s] [吞吐率：5.75req/s] [内存消耗：1,391.71kb] [文件加载：37]
+[ info ] [ LANG ] D:\phpstudy_pro\WWW\flyfly\thinkphp\lang\zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'method',
+  'method' => 
+  array (
+    0 => '\\think\\captcha\\CaptchaController',
+    1 => 'index',
+  ),
+  'var' => 
+  array (
+  ),
+)
+[ info ] [ HEADER ] array (
+  'cookie' => 'PHPSESSID=s6b5pbk6r1ktvgtl3usmh134jl',
+  'accept-language' => 'zh-CN,zh;q=0.9',
+  'accept-encoding' => 'gzip, deflate',
+  'referer' => 'http://www.flyfly.com/admin/login/index',
+  'accept' => 'image/webp,image/apng,image/*,*/*;q=0.8',
+  'user-agent' => 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36',
+  'connection' => 'keep-alive',
+  'host' => 'www.flyfly.com',
+  'content-length' => '',
+  'content-type' => '',
+)
+[ info ] [ PARAM ] array (
+  'id' => NULL,
+)
+[ info ] [ RUN ] think\captcha\CaptchaController->index[ D:\phpstudy_pro\WWW\flyfly\vendor\topthink\think-captcha\src\CaptchaController.php ]
+[ info ] [ SESSION ] INIT array (
+  'id' => '',
+  'var_session_id' => '',
+  'prefix' => 'think',
+  'type' => '',
+  'auto_start' => true,
+)
+[ info ] [ LOG ] INIT File
+---------------------------------------------------------------
+[ 2020-03-07T16:03:52+08:00 ] 127.0.0.1 GET www.flyfly.com/admin/login/index
+[运行时间：0.105006s] [吞吐率：9.52req/s] [内存消耗：2,154.86kb] [文件加载：53]
+[ info ] [ LANG ] D:\phpstudy_pro\WWW\flyfly\thinkphp\lang\zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'admin',
+    1 => 'login',
+    2 => 'index',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'cookie' => 'PHPSESSID=s6b5pbk6r1ktvgtl3usmh134jl',
+  'accept-language' => 'zh-CN,zh;q=0.9',
+  'accept-encoding' => 'gzip, deflate',
+  'referer' => 'http://www.flyfly.com/admin',
+  'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+  'user-agent' => 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36',
+  'upgrade-insecure-requests' => '1',
+  'cache-control' => 'max-age=0',
+  'connection' => 'keep-alive',
+  'host' => 'www.flyfly.com',
+  'content-length' => '',
+  'content-type' => '',
+)
+[ info ] [ PARAM ] array (
+)
+[ info ] [ DB ] INIT mysql
+[ info ] [ RUN ] app\admin\controller\Login->index[ D:\phpstudy_pro\WWW\flyfly\app\admin\controller\Login.php ]
+[ info ] [ SESSION ] INIT array (
+  'id' => '',
+  'var_session_id' => '',
+  'prefix' => 'think',
+  'type' => '',
+  'auto_start' => true,
+)
+[ info ] [ VIEW ] ../app/admin/view/login\index.html [ array (
+  0 => 'remember_info',
+) ]
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.010000s ] mysql:host=127.0.0.1;port=3306;dbname=flyfly;charset=utf8
+[ sql ] [ SQL ] set @@sql_mode='' [ RunTime:0.003000s ]
+---------------------------------------------------------------
+[ 2020-03-07T16:03:52+08:00 ] 127.0.0.1 GET www.flyfly.com/captcha
+[运行时间：0.084005s] [吞吐率：11.90req/s] [内存消耗：1,391.87kb] [文件加载：37]
+[ info ] [ LANG ] D:\phpstudy_pro\WWW\flyfly\thinkphp\lang\zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'method',
+  'method' => 
+  array (
+    0 => '\\think\\captcha\\CaptchaController',
+    1 => 'index',
+  ),
+  'var' => 
+  array (
+  ),
+)
+[ info ] [ HEADER ] array (
+  'cookie' => 'PHPSESSID=s6b5pbk6r1ktvgtl3usmh134jl',
+  'accept-language' => 'zh-CN,zh;q=0.9',
+  'accept-encoding' => 'gzip, deflate',
+  'referer' => 'http://www.flyfly.com/admin/login/index',
+  'accept' => 'image/webp,image/apng,image/*,*/*;q=0.8',
+  'user-agent' => 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36',
+  'connection' => 'keep-alive',
+  'host' => 'www.flyfly.com',
+  'content-length' => '',
+  'content-type' => '',
+)
+[ info ] [ PARAM ] array (
+  'id' => NULL,
+)
+[ info ] [ RUN ] think\captcha\CaptchaController->index[ D:\phpstudy_pro\WWW\flyfly\vendor\topthink\think-captcha\src\CaptchaController.php ]
+[ info ] [ SESSION ] INIT array (
+  'id' => '',
+  'var_session_id' => '',
+  'prefix' => 'think',
+  'type' => '',
+  'auto_start' => true,
+)
+[ info ] [ LOG ] INIT File
+---------------------------------------------------------------
+[ 2020-03-07T16:04:04+08:00 ] 127.0.0.1 POST www.flyfly.com/admin/login/login
+[运行时间：0.280016s] [吞吐率：3.57req/s] [内存消耗：2,759.02kb] [文件加载：56]
+[ info ] [ LANG ] D:\phpstudy_pro\WWW\flyfly\thinkphp\lang\zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'admin',
+    1 => 'login',
+    2 => 'login',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'cookie' => 'PHPSESSID=s6b5pbk6r1ktvgtl3usmh134jl',
+  'accept-language' => 'zh-CN,zh;q=0.9',
+  'accept-encoding' => 'gzip, deflate',
+  'referer' => 'http://www.flyfly.com/admin/login/index',
+  'origin' => 'http://www.flyfly.com',
+  'content-type' => 'application/x-www-form-urlencoded; charset=UTF-8',
+  'user-agent' => 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36',
+  'x-requested-with' => 'XMLHttpRequest',
+  'accept' => 'application/json, text/javascript, */*; q=0.01',
+  'content-length' => '43',
+  'connection' => 'keep-alive',
+  'host' => 'www.flyfly.com',
+)
+[ info ] [ PARAM ] array (
+  'username' => 'admin',
+  'password' => '123456',
+  'verify' => 'ckaek',
+)
+[ info ] [ DB ] INIT mysql
+[ info ] [ RUN ] app\admin\controller\Login->login[ D:\phpstudy_pro\WWW\flyfly\app\admin\controller\Login.php ]
+[ info ] [ SESSION ] INIT array (
+  'id' => '',
+  'var_session_id' => '',
+  'prefix' => 'think',
+  'type' => '',
+  'auto_start' => true,
+)
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.002000s ] mysql:host=127.0.0.1;port=3306;dbname=flyfly;charset=utf8
+[ sql ] [ SQL ] set @@sql_mode='' [ RunTime:0.001000s ]
+[ sql ] [ SQL ] SHOW COLUMNS FROM `f_admin` [ RunTime:0.043002s ]
+[ sql ] [ SQL ] SELECT * FROM `f_admin` WHERE  `name` = 'admin' LIMIT 1 [ RunTime:0.002000s ]
+[ sql ] [ SQL ] UPDATE `f_admin`  SET `last_login_time`='1583568244',`last_login_ip`='127.0.0.1'  WHERE  `id` = 1 [ RunTime:0.067004s ]
+[ sql ] [ SQL ] UPDATE `f_admin`  SET `count_login`=`count_login`+1  WHERE  `id` = 1 [ RunTime:0.041002s ]
+---------------------------------------------------------------
+[ 2020-03-07T16:04:07+08:00 ] 127.0.0.1 GET www.flyfly.com/admin/index/index
+[运行时间：0.097006s] [吞吐率：10.31req/s] [内存消耗：1,952.56kb] [文件加载：49]
+[ info ] [ LANG ] D:\phpstudy_pro\WWW\flyfly\thinkphp\lang\zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'admin',
+    1 => 'index',
+    2 => 'index',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'cookie' => 'PHPSESSID=s6b5pbk6r1ktvgtl3usmh134jl; remember_info=think%3A%7B%22username%22%3A%22admin%22%2C%22password%22%3A%22MTIzNDU2%22%2C%22verify%22%3A%22ckaek%22%7D',
+  'accept-language' => 'zh-CN,zh;q=0.9',
+  'accept-encoding' => 'gzip, deflate',
+  'referer' => 'http://www.flyfly.com/admin/login/index',
+  'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+  'user-agent' => 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36',
+  'upgrade-insecure-requests' => '1',
+  'connection' => 'keep-alive',
+  'host' => 'www.flyfly.com',
+  'content-length' => '',
+  'content-type' => '',
+)
+[ info ] [ PARAM ] array (
+)
+[ info ] [ SESSION ] INIT array (
+  'id' => '',
+  'var_session_id' => '',
+  'prefix' => 'think',
+  'type' => '',
+  'auto_start' => true,
+)
+[ info ] [ LOG ] INIT File
+[ error ] [0]致命错误: Class 'memcache' not found[D:\phpstudy_pro\WWW\flyfly\app\admin\controller\Base.php:49]
+---------------------------------------------------------------
+[ 2020-03-07T16:04:13+08:00 ] 127.0.0.1 GET www.flyfly.com/admin/login/index
+[运行时间：0.041003s] [吞吐率：24.39req/s] [内存消耗：2,136.19kb] [文件加载：52]
+[ info ] [ LANG ] D:\phpstudy_pro\WWW\flyfly\thinkphp\lang\zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'admin',
+    1 => 'login',
+    2 => 'index',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'cookie' => 'PHPSESSID=s6b5pbk6r1ktvgtl3usmh134jl; remember_info=think%3A%7B%22username%22%3A%22admin%22%2C%22password%22%3A%22MTIzNDU2%22%2C%22verify%22%3A%22ckaek%22%7D',
+  'accept-language' => 'zh-CN,zh;q=0.9',
+  'accept-encoding' => 'gzip, deflate',
+  'referer' => 'http://www.flyfly.com/admin',
+  'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+  'user-agent' => 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36',
+  'upgrade-insecure-requests' => '1',
+  'connection' => 'keep-alive',
+  'host' => 'www.flyfly.com',
+  'content-length' => '',
+  'content-type' => '',
+)
+[ info ] [ PARAM ] array (
+)
+[ info ] [ DB ] INIT mysql
+[ info ] [ RUN ] app\admin\controller\Login->index[ D:\phpstudy_pro\WWW\flyfly\app\admin\controller\Login.php ]
+[ info ] [ SESSION ] INIT array (
+  'id' => '',
+  'var_session_id' => '',
+  'prefix' => 'think',
+  'type' => '',
+  'auto_start' => true,
+)
+[ info ] [ VIEW ] ../app/admin/view/public\dispatch_jump.html [ array (
+  0 => 'code',
+  1 => 'msg',
+  2 => 'data',
+  3 => 'url',
+  4 => 'wait',
+) ]
+[ info ] [ LOG ] INIT File
+[ sql ] [ DB ] CONNECT:[ UseTime:0.001000s ] mysql:host=127.0.0.1;port=3306;dbname=flyfly;charset=utf8
+[ sql ] [ SQL ] set @@sql_mode='' [ RunTime:0.000000s ]
+---------------------------------------------------------------
+[ 2020-03-07T16:04:16+08:00 ] 127.0.0.1 GET www.flyfly.com/admin/index/index
+[运行时间：0.042002s] [吞吐率：23.81req/s] [内存消耗：1,952.56kb] [文件加载：49]
+[ info ] [ LANG ] D:\phpstudy_pro\WWW\flyfly\thinkphp\lang\zh-cn.php
+[ info ] [ ROUTE ] array (
+  'type' => 'module',
+  'module' => 
+  array (
+    0 => 'admin',
+    1 => 'index',
+    2 => 'index',
+  ),
+)
+[ info ] [ HEADER ] array (
+  'cookie' => 'PHPSESSID=s6b5pbk6r1ktvgtl3usmh134jl; remember_info=think%3A%7B%22username%22%3A%22admin%22%2C%22password%22%3A%22MTIzNDU2%22%2C%22verify%22%3A%22ckaek%22%7D',
+  'accept-language' => 'zh-CN,zh;q=0.9',
+  'accept-encoding' => 'gzip, deflate',
+  'referer' => 'http://www.flyfly.com/admin/login/index',
+  'accept' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+  'user-agent' => 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36',
+  'upgrade-insecure-requests' => '1',
+  'connection' => 'keep-alive',
+  'host' => 'www.flyfly.com',
+  'content-length' => '',
+  'content-type' => '',
+)
+[ info ] [ PARAM ] array (
+)
+[ info ] [ SESSION ] INIT array (
+  'id' => '',
+  'var_session_id' => '',
+  'prefix' => 'think',
+  'type' => '',
+  'auto_start' => true,
+)
+[ info ] [ LOG ] INIT File
+[ error ] [0]致命错误: Class 'memcache' not found[D:\phpstudy_pro\WWW\flyfly\app\admin\controller\Base.php:49]

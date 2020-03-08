@@ -181,20 +181,33 @@
             getCheckData: function(){ //获取选中数据
                 var checkStatus = table.checkStatus('idTest')
                 ,data = checkStatus.data;
-                data=JSON.stringify(data);
+                // layer.alert(JSON.stringify(data));
+                // data=JSON.stringify(data);
                 // console.log(data)
                 if(data.length==0){
                     layer.msg('请选择要删除的数据！');
                     return false;
                 }else{
                     layer.confirm('确认要删除吗？',{icon: 3, title:'提示'},function(index){
+                        arrobj=[];
+                        var str="";
+                        var jsonStr="";
+                        for (var i = 0; i < data.length; i++) {
+                          str="\""+data[i]['id']+"\":"+"\""+data[i]['id']+"\",";
+                          jsonStr+=str;
+                        };
+
+                        substr=jsonStr.slice(0,-1);
                         
+                        substr="{"+substr+"}";
+                        jsonObj=eval('(' + substr + ')');
+                        console.log(jsonObj)
                         // console.log(data)
                         $.ajax({
-                            url: "{:url('admin/Recycle/member_delete_all')}",
+                            url: "{:url('admin/Recycle/delete_all')}",
                             type: 'POST',
                             dataType: 'json',
-                            data: {id:data},
+                            data: jsonObj,
                             success: function(res) {
                                 //called when successful
                                 console.log(res)
@@ -248,9 +261,7 @@
                             }
                             ,where: {
                                 keywords: demoReload.val(),
-                                modules:modules.val(),
-                                start:start.val(),
-                                end:end.val()
+                                modules:modules.val()
                             }
                         });
                     },
@@ -290,6 +301,65 @@
         $('#sreach,.delete_all,.demoTable .layui-btn,.empty_recycle').on('click', function(){
             var type = $(this).data('type');
             active[type] ? active[type].call(this) : '';
+        });
+
+        //更改性别
+        form.on('switch(editSex)', function(obj){
+            if(obj.elem.checked){
+                sex=1;
+            }else{
+                sex=0;
+            }
+            post={
+                id:this.value,
+                field:this.name,
+                name:sex
+            }
+            $.ajax({
+                url: "{:url('admin/Member/member_edit')}",
+                type: 'POST',
+                dataType: 'json',
+                data: post,
+                success: function(res) {
+                    //called when successful
+                    layer.msg(res.msg,{icon:1,time:1000});
+                },
+                error: function(res) {
+                    //called when there is an error
+                    layer.msg('网络异常，请稍后再试！');
+                }
+            });
+            
+            // layer.tips(this.value + ' ' + this.name + '：'+ obj.elem.checked, obj.othis);
+        });
+
+        //监听状态操作
+        form.on('checkbox(deitStatus)', function(obj){
+            // layer.tips(this.value + ' ' + this.name + '：'+ obj.elem.checked, obj.othis);
+            if(obj.elem.checked){
+                status=1;
+            }else{
+                status=0;
+            }
+            post={
+                id:this.value,
+                field:this.name,
+                name:status
+            }
+            $.ajax({
+                url: "{:url('admin/Member/member_edit')}",
+                type: 'POST',
+                dataType: 'json',
+                data: post,
+                success: function(res) {
+                    //called when successful
+                    layer.msg(res.msg,{icon:1,time:1000});
+                },
+                error: function(res) {
+                    //called when there is an error
+                    layer.msg('网络异常，请稍后再试！');
+                }
+            });
         });
 
         //监听提交

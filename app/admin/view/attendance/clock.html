@@ -70,15 +70,6 @@
 
         $(this).toggleClass('layui-btn-warm');
 
-        if($(this).html()=='上班打卡'){
-
-            $(this).html('下班打卡');
-
-        }else{
-
-            $(this).html('上班打卡');
-        }
-
         $.ajax({
             url: "{:url('admin/Attendance/clock')}",
             type: 'POST',

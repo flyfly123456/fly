@@ -21,15 +21,6 @@
   </head>
   
   <body class="layui-anim layui-anim-up">
-    <div class="x-nav">
-        <span class="layui-breadcrumb">
-            <a href="">首页</a>
-            <a href="">用户管理</a>
-            <a><cite>编辑会员</cite></a>
-        </span>
-        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
-            <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
-    </div>
     <div class="x-body">
         <form class="layui-form">
             <div class="layui-form-item">
@@ -41,19 +32,13 @@
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label"><span class="x-red">*</span>性别</label>
-                <div class="layui-input-block">
+                <div class="layui-input-inline">
                     <if condition="$members.sex eq 0">
                         <input type="radio" name="sex" value="0" class="layui-input" title="男" checked>
                         <input type="radio" name="sex" value="1" class="layui-input" title="女">
-                        <input type="radio" name="sex" value="2" class="layui-input" title="保密">
-                    <elseif condition="$members.sex eq 1"/>
-                        <input type="radio" name="sex" value="0" class="layui-input" title="男">
-                        <input type="radio" name="sex" value="1" class="layui-input" title="女" checked>
-                        <input type="radio" name="sex" value="2" class="layui-input" title="保密">
                     <else />
                         <input type="radio" name="sex" value="0" class="layui-input" title="男">
-                        <input type="radio" name="sex" value="1" class="layui-input" title="女">
-                        <input type="radio" name="sex" value="2" class="layui-input" title="保密" checked>
+                        <input type="radio" name="sex" value="1" class="layui-input" title="女" checked>
                     </if>
                 </div>
             </div>

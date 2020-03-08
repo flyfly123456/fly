@@ -19,11 +19,11 @@
 <body class="login-bg">
     
     <div class="login layui-anim layui-anim-up">
-        <div class="message" style="background:none;color:#000;margin:0 auto;font-size:20px;">FlyFly v1.0-找回密码</div>
+        <div class="message" style="background:none;color:#000;margin:0 auto;font-size:20px;">FlyFly v1.0-忘记密码</div>
         <div id="darkbannerwrap" style="background:none"></div>
         
         <form method="post" class="layui-form" >
-            <input name="email" autocomplete='off' placeholder="输入邮箱地址"  type="email" lay-verify="required" class="layui-input" value="">
+            <input name="email" placeholder="输入邮箱获取验证码"  type="email" lay-verify="required" class="layui-input" value="">
             <hr class="hr15">
             <input name="img_verify" lay-verify="required" placeholder="图片验证码"  type="text" class="layui-input verify" style="width:45%;float:left;">
             <div class="verify-img"><img src="{:captcha_src()}" alt="captcha" onclick="this.src=this.src" /></div>

@@ -15,7 +15,7 @@ class Admin extends Validate
             'department_id|部门' =>  'require|checkEmpty',
             'status|状态' =>  'require|checkEmpty',
             'create_time|系统' =>  'require|checkEmpty',
-            // 'sex|性别' =>  'require|checkEmpty',
+            'sex|性别' =>  'require|checkEmpty',
             'is_super|角色' =>  'require',
         ];
         

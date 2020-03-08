@@ -8,13 +8,6 @@ use \think\Captcha;
 use \think\Cookie;
 use \think\Loader;
 use \think\Config;
-use app\admin\model\Article as At;
-use app\admin\model\Article_cate;
-
-use app\admin\logic\ArticleLogic;
-
-use app\admin\behavior\Behavior;
-use app\admin\behavior\Files;
 
 class Article extends Base
 {
@@ -29,6 +22,56 @@ class Article extends Base
         parent::admin_priv($action);
     }
 
+    
+    public function index()
+    {
+        $where=[];
+        $post = $this->request->param();
+        //添加时间搜索
+        if(isset($post['start']) and !empty($post['start']) and empty($post['end'])){
+            $post['start']=strtotime($post['start']);
+            $where['create_time'] = ['gt', $post['start']];
+
+        }
+        if(isset($post['end']) and !empty($post['end']) and empty($post['start'])){
+            $post['end']=strtotime($post['end']);
+            $where['create_time'] = ['lt', $post['end']];
+
+        }
+        if(isset($post['start']) and !empty($post['start']) and isset($post['end']) and !empty($post['end'])){
+            $post['start']=strtotime($post['start']);
+            $post['end']=strtotime($post['end']);
+            $where['create_time'] = ['between', [$post['start'],$post['end']]];
+
+        }
+        if (isset($post['modules']) and !empty($post['modules']) and !empty($post['keywords'])) {
+            if($post['keywords']=="未审核"){
+                $post['keywords']="0";
+            }
+            if($post['keywords']=="已审核"){
+                $post['keywords']="1";
+            }
+            $where[$post['modules']] = ['like', '%' . $post['keywords'] . '%'];
+        }
+
+        $count=Db::name('article')->where($where)->group('id')->count();
+
+        $deft=Db::name('article')->order('id desc')->paginate(5)->each(function($item, $key){$item['create_time'] = date('Y-m-d H:i:s',$item['create_time']);return $item;});
+                
+        $search=Db::name('article')->where($where)->order('id desc')->paginate(5,false,['query'=>$this->request->param()])->each(function($item, $key){$item['create_time'] = date('Y-m-d H:i:s',$item['create_time']);return $item;});
+        //判断是否有搜索
+        $rows = empty($where) ? $deft: $search;
+        
+        $page = $rows->render();
+        $rows=$rows->toArray();
+        if(!empty($rows)){
+            $this->assign('page', $page);
+            $this->assign('count',$count);
+            $this->assign('rows',$rows['data']);
+            
+        }
+        return $this->fetch('index');
+    }
 
     //显示文章列表
     public function article_list()
@@ -39,44 +82,80 @@ class Article extends Base
     //获取文章信息
     public function article_list_info()
     {
+        $page=input("get.page")?input("get.page"):1;
+        $page=intval($page);
+        $limit=input("get.limit")?input("get.limit"):1;
+        $limit=intval($limit);
+        $limit=input('limit');
+
+        $where=[];
+        $where['is_available']=1;
         //判断搜索
         $post = $this->request->param();
 
-        $info=ArticleLogic::select($post,'article');
-        
-        if(isset($info['list'])){
-            foreach ($info['list'] as $key => $value) {
-                
-                if($value['status']=='0'){
-                    $info['list'][$key]['status']="未送审";
-                }elseif($value['status']=='1'){
-                    $info['list'][$key]['status']="已送审";
-                }elseif($value['status']=='2'){
-                    $info['list'][$key]['status']="已审核";
-                }elseif($value['status']=='3'){
-                    $info['list'][$key]['status']="已驳回";
-                }elseif($value['status']=='4'){
-                    $info['list'][$key]['status']="已取回";
-                }
-                $info['list'][$key]['create_time']=date('Y-m-d H:i:s',$value['create_time']);
-                $info['list'][$key]['content']=trim(strip_tags($value['content']));
+        if(isset($post['keywords']) && isset($post['modules'])){
 
-                //查询分类
-                $cate=Db::name('article_cate')->where('id='.$value['cate_id'])->find();
-                $info['list'][$key]['cate']=$cate['name'];
+            if(empty($post['keywords']) && empty($post['modules'])){
+                unset($post['keywords']);
+                unset($post['modules']);
+                $data['status']=0;
+                $data['msg']="暂无数据...";
+                return json($data);
+            }
+            
+            if($post['modules']=="status"){
+                if($post['keywords']=="已驳回"){
+                    $post['keywords']=3;
+                }elseif($post['keywords']=="已审核"){
+                    $post['keywords']=2;
+                }elseif($post['keywords']=="已取回"){
+                    $post['keywords']=1;
+                }elseif($post['keywords']=="未送审"){
+                    $post['keywords']=0;
+                }else{
+                    $data['status']=0;
+                    $data['msg']="暂无数据！";
+                    return json($data);
+                }
+            
             }
 
-        }else{
-
-            return json($info);
+            $where[$post['modules']] = ['like', '%' . $post['keywords'] . '%'];
+            
         }
-        
+
+        $count=Db::name('article')->where($where)->count();
+
+        $list=Db::name('article')->page($page,$limit)->where($where)->select();
+
+        if(empty($list)){
+            $data['status']=0;
+            $data['msg']="暂无数据...";
+            return json($data);
+        }
+
+        foreach ($list as $key => $value) {
+            # code...
+            if($value['status']=='0'){
+                $list[$key]['status']="未送审";
+            }elseif($value['status']=='1'){
+                $list[$key]['status']="已送审";
+            }elseif($value['status']=='2'){
+                $list[$key]['status']="已审核";
+            }elseif($value['status']=='3'){
+                $list[$key]['status']="已驳回";
+            }elseif($value['status']=='4'){
+                $list[$key]['status']="已取回";
+            }
+            $list[$key]['create_time']=date('Y-m-d H:i:s',$value['create_time']);
+            $list[$key]['content']=trim(strip_tags($value['content']));
+        }
         
         $arr=array();
         $arr['code']=0;
         $arr['msg']="";
-        $arr['count']=$info['count'];
-        $arr['data']=$info['list'];
+        $arr['count']=$count;
+        $arr['data']=$list;
         
         return json_decode(json_encode($arr));
     }
@@ -88,30 +167,27 @@ class Article extends Base
             $data=Request::instance()->post();
             
             if(!empty($data)){
-
-                $arr['title']=$data['title'];
-                $arr['desc']=$data['desc'];
-                $arr['status']='0';
-                $arr['create_time']=time();
-                $arr['content']=trim($data['content']);
-                $arr['owner']=Session::get('login.name');
-                $arr['cate_id']=$data['cate_id'];
-
-                $result = $this->validate($arr,'Article');
+                $data['status']='0';
+                $data['create_time']=time();
+                $data['content']=trim(strip_tags($data['content']));
+                $data['owner']=Session::get('login.name');
+                $result = $this->validate($data,'Article');
                 if(true !== $result){
                     // 验证失败 输出错误信息
                     $data['msg']="参数错误";
                     $data['status']='0';
                     return json($data);
                 }
-
-                Files::thumb_image($data['img_url'],'article'.DS.date('Ymd'),$width=330,$height=200);
-
-                $arr['img']='article'.DS.date('Ymd').DS.$data['img_url'];
-                
-                $rows=At::create($arr,true);//true排除掉表中不存在的字段
-                
-                return Behavior::return_info($rows);
+                $rows=Db::name('article')->insert($data);
+                if($rows){
+                    $data['msg']="添加成功！";
+                    $data['status']='1';
+                    return json($data);
+                }else{
+                   $data['msg']="数据插入失败！";
+                   $data['status']='0';
+                   return json($data); 
+                }
                 
             }else{
                 $data['msg']="数据不能为空！";
@@ -119,12 +195,7 @@ class Article extends Base
                 return json($data);
             }
         }else{
-
-            $article_cate=Article_cate::all(['is_available'=>1]);
-
-            $this->assign('article_cate',$article_cate);
-            
-            return view('article_add');
+           return view('article_add');
         }
     	
     }
@@ -138,7 +209,6 @@ class Article extends Base
             if(!empty($data)){
 
                 $rest=Db::name('article')->where('id',$data['id'])->find();
-                
                 if($rest['owner']!=Session::get('login.name') && Session::get('acl_list')!='all'){
                     $data['status']='0';
                     $data['msg']="暂无权限操作其他人拥有的文章...";
@@ -161,7 +231,7 @@ class Article extends Base
                         $insert['sponsor']=Session::get('login.name');
                         $insert['approve']=$data['approve'];
                         $insert['type']="article";
-                        $insert['create_time']=time();
+                        $insert['time']=time();
                         $insert['status']='0';
                         $rest=Db::name('todo_list')->insert($insert);
 
@@ -203,41 +273,24 @@ class Article extends Base
                         }
                     }
                 }else{
-
-                    //常规修改操作
-
                     $arr['title']=$data['title'];
                     $arr['desc']=$data['desc'];
-                    $arr['content']=trim($data['content']);
-                    $arr['cate_id']=$data['cate_id'];
-                    $arr['img']=$data['img_url'];
-
-                    if($rest['img']!=$data['img_url']){
-
-                        Files::thumb_image($data['img_url'],dirname($rest['img']),$width=330,$height=200);
-
-                        $arr['img']=dirname($rest['img']).DS.$data['img_url'];
-                    }
-                    
+                    $arr['content']=trim(strip_tags($data['content']));
                     if($rest['status']!='0'){
                         $data['status']='0';
                         $data['msg']="文章已送审，不能进行修改...";
                         return json($data);
                     }
-
                     $rows=Db::name('article')->where('id',$rest['id'])->update($arr);
 
-                    if($rows!==false){
-
-                        Files::delete_img($rest['img']);
-
+                    if($rows){
                         $data['msg']="修改成功！";
                         $data['status']='1';
                         return json($data);
                     }else{
                        $data['msg']="数据修改失败！";
                        $data['status']='0';
-                       return json($data);
+                       return json($data); 
                     }
                 }
             }else{
@@ -252,11 +305,6 @@ class Article extends Base
             if($rows){
                 $this->assign('rows',$rows);
             }
-
-            $article_cate=Article_cate::all(['is_available'=>1]);
-
-            $this->assign('article_cate',$article_cate);
-
             return $this->fetch('article_edit');
         }
         
@@ -271,8 +319,16 @@ class Article extends Base
             if(!empty($data)){
                 $rest=Db::name('article')->where('id',$data['id'])->find();
                 if($rest['status']=='0'){
-                    
-                    return Behavior::delete($rest['id'],'article');
+                    $rows=Db::name('article')->where('id',$data['id'])->delete();
+                    if($rows){
+                        $data['msg']="删除成功！";
+                        $data['status']='1';
+                        return json($data); 
+                    }else{
+                        $data['msg']="删除失败！";
+                        $data['status']='0';
+                        return json($data);
+                    }
 
                 }else{
                    $data['msg']="已审核文章不能删除！";
@@ -336,16 +392,5 @@ class Article extends Base
         }
     }
 
-    public function delete_all()
-    {
-        if(Request::instance()->isAjax()){
-            $data=Request::instance()->post();
-            
-            if(!empty($data)){
-
-                return Behavior::delete_all($data,'article');
-            }
-        }
-    }
-
+    
 }

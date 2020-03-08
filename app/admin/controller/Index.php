@@ -9,18 +9,11 @@ use \think\Cookie;
 use app\admin\model\SystemInfo;
 use app\admin\model\Author;
 use app\admin\model\SystemLog;
+use app\admin\model\Phpmailer;
 use app\admin\controller\System;
 use app\admin\controller\Admin;
 use \think\Config;
 use \think\Cache;
-
-use PhpOffice\PhpWord\PhpWord;
-use PhpOffice\PhpWord\Autoloader;
-use PhpOffice\PhpWord\Settings;
-use PhpOffice\PhpWord\IOFactory;
-
-use PHPMailer\PHPMailer\PHPMailer;
-use TCPDF;
 
 class Index extends Base
 {
@@ -34,7 +27,6 @@ class Index extends Base
         $controller=$request->controller();
         $action=$module_name."/".$controller."/".$action;
         parent::admin_priv($action);
-
     }
 
     //后台主页显示
@@ -50,31 +42,8 @@ class Index extends Base
         //     print_r(strtotime('2018-06-09'));
         // echo "</pre>";
         // exit;
-
-        // $file_path=ROOT_PATH . 'public' . DS . 'static' . DS . 'admin' . DS . 'templet' . DS . 'questions.docx';
-        // $save_path=ROOT_PATH . 'public' . DS . 'static' . DS . 'admin' . DS . 'templet' . DS . 'questions.txt';
-
-        // $str=file_get_contents($file_path);
-
-        // $save_str=file_put_contents($save_path, $str);
-        // echo "<pre>";
-        //     print_r($save_str);
-        // echo "</pre>";
-        // exit;
-        // Include the main TCPDF library (search for installation path).
-        // vendor('TCPDF.tcpdf');
-
-        // create new PDF document
-        $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
-
-        $PhpWord=new PhpWord();
-        $PHPMailer=new PHPMailer();
-        $PhpWord->setDefaultFontName('仿宋'); // 全局字体
-        $PhpWord->setDefaultFontSize(16);     // 全局字号为3号
-
         $memcache=new \Memcache();
         $memcache->connect('127.0.0.1',11211) or die('Could not connect');
-        // $memcache->flush();
         $admin_id=Session::get('login.id');
         $admin_ids=Session::get('login.id').",";
         if(Request::instance()->isAjax()){
@@ -128,7 +97,7 @@ class Index extends Base
         $system_sort=parent::get_system_sort($admin_info['role_group_id']);
         
         //获取网站基本信息
-        $web_info=Db::name('web_info')->where('type','0')->limit(0,1)->find();
+        $web_info=Db::name('web_info')->limit(0,1)->find();
         
         $this->assign('system_sort',$system_sort);
         $this->assign('admin_info',$admin_info);

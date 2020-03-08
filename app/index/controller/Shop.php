@@ -404,12 +404,6 @@ class Shop extends Base
 
             if(!empty($data)){
 
-                if(!parent::$userinfo){
-                    $info['status']=-1;
-                    $info['msg']="暂未登入，请先登入...";
-                    return json($info);
-                }
-
                 $ids = json_decode($_POST['id'],true);
 
                 foreach ($ids as $key => $value) {

@@ -45,7 +45,6 @@
                             <option value="">选择搜索条件</option>
                             <option value="name">名称</option>
                             <option value="sponsor">发起人</option>
-                            <option value="approve">审批人</option>
                             <option value="back_reason">原因</option>
                             <option value="status">状态</option>
                         </select>
@@ -69,7 +68,7 @@
                     <th lay-data="{field:'sponsor', width:110}">发起人</th>
                     <th lay-data="{field:'approve', width:180}">审批人</th>
                     <th lay-data="{field:'back_reason', width:280}">原因</th>
-                    <th lay-data="{field:'create_time', width:180}">发起时间</th>
+                    <th lay-data="{field:'time', width:180}">发起时间</th>
                     <th lay-data="{fixed: 'right',field:'status'}">状态</th>
                     <th lay-data="{fixed: 'right', width:180, align:'center', toolbar: '#barDemo'}">操作</th>
                 </tr>
@@ -80,7 +79,7 @@
     <!-- 头部导出筛选 -->
     <script type="text/html" id="demoTable">
            
-        <button class="layui-btn layui-btn-danger layui-btn-sm delete_all" data-type="batchdelete"><i class="layui-icon layui-icon-delete"></i>批量删除</button>
+        <button class="layui-btn layui-btn-danger layui-btn-sm delete_all" data-type="getCheckData"><i class="layui-icon layui-icon-delete"></i>批量删除</button>
         <button class="layui-btn layui-btn-primary layui-btn-sm" onclick="f_todone_export()"><i class="layui-icon layui-icon-export"></i>导出</button>
     </script>
 
@@ -169,23 +168,36 @@
         });
       
         var $ = layui.$, active = {
-            batchdelete: function(){ //批量删除
+            getCheckData: function(){ //批量删除
                 var checkStatus = table.checkStatus('idTest')
                 ,data = checkStatus.data;
-                data=JSON.stringify(data);
+                // layer.alert(JSON.stringify(data));
+                // data=JSON.stringify(data);
                 // console.log(data)
                 if(data.length==0){
                     layer.msg('请选择要删除的数据！');
                     return false;
                 }else{
                     layer.confirm('确认要删除吗？',{icon: 3, title:'提示'},function(index){
+                        arrobj=[];
+                        var str="";
+                        var jsonStr="";
+                        for (var i = 0; i < data.length; i++) {
+                          str="\""+data[i]['id']+"\":"+"\""+data[i]['id']+"\",";
+                          jsonStr+=str;
+                        };
+
+                        substr=jsonStr.slice(0,-1);
                         
+                        substr="{"+substr+"}";
+                        jsonObj=eval('(' + substr + ')');
+                        console.log(jsonObj)
                         // console.log(data)
                         $.ajax({
-                            url: "{:url('admin/Todolist/delete_all')}",
+                            url: "{:url('admin/Todolist/todone_list_delete_all')}",
                             type: 'POST',
                             dataType: 'json',
-                            data: {id:data},
+                            data: jsonObj,
                             success: function(res) {
                                 //called when successful
                                 console.log(res)
@@ -227,12 +239,6 @@
                     start:start.val(),
                     end:end.val()
                 }
-
-                if(start.val()=="" && end.val()=="" && demoReload.val()=="" && modules.val()==""){
-                    layer.msg('请选择或输入关键字进行搜索',{icon:2});
-                    return false;
-                }
-                
                 console.log(post)
                 $.ajax({
                     url: "{:url('admin/Todolist/todone_list_info')}",
@@ -249,9 +255,7 @@
                             }
                             ,where: {
                                 keywords: demoReload.val(),
-                                modules:modules.val(),
-                                start:start.val(),
-                                end:end.val()
+                                modules:modules.val()
                             }
                         });
                     },

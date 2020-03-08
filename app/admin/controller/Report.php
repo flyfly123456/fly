@@ -201,6 +201,7 @@ class Report extends Base
         Db::startTrans();
         try{
             
+            // $truncate=Db::query('truncate table f_attendance_report');//不能rollback
             $delete_all=Db::name('attendance_report')->where('id','>=','0')->delete();
 
             foreach ($report as $key => $value) {

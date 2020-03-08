@@ -7,20 +7,6 @@ use \think\Request;
 use \think\Session;
 use \think\Config;
 use \think\Loader;
-
-use PhpOffice\PhpWord\PhpWord;
-
-use app\admin\model\Examination;
-use app\admin\model\Questions;
-use app\admin\model\QuestionsAnswer;
-use app\admin\model\QuestionsOptions;
-
-use app\admin\logic\QuestionsLogic;
-use app\admin\logic\ExaminationLogic;
-
-use app\admin\behavior\Behavior;
-use app\admin\behavior\Files;
-
 class Evaluation extends Base
 {
     public function _initialize()//_initialize与__construct有区别
@@ -34,579 +20,339 @@ class Evaluation extends Base
         parent::admin_priv($action);
     }
     
-    // 试卷列表
-    public function examination_list()
+    public function index()
     {
-     return $this->fetch();   
-    }
-
-    public function examination_list_info()
-    {
-        //判断搜索
+        $where=[];
         $post = $this->request->param();
+        //添加时间搜索
+        if(isset($post['start']) and !empty($post['start']) and empty($post['end'])){
+            $post['start']=strtotime($post['start']);
+            $where['create_time'] = ['gt', $post['start']];
 
-        $info=ExaminationLogic::select($post,'examination');
+        }
+        if(isset($post['end']) and !empty($post['end']) and empty($post['start'])){
+            $post['end']=strtotime($post['end']);
+            $where['create_time'] = ['lt', $post['end']];
 
-        if(isset($info['list'])){
-            foreach ($info['list'] as $key => $value) {
-                
-                if($value['status']=="1"){
-                    $info['list'][$key]['status']="正常";
-                }else{
-                    $info['list'][$key]['status']="禁用";
-                }
+        }
+        if(isset($post['start']) and !empty($post['start']) and isset($post['end']) and !empty($post['end'])){
+            $post['start']=strtotime($post['start']);
+            $post['end']=strtotime($post['end']);
+            $where['create_time'] = ['between', [$post['start'],$post['end']]];
 
-
-                $info['list'][$key]['create_time']=date('Y-m-d H:i:s',$value['create_time']);
-
-            }
-
-        }else{
-
-            return json($info);
         }
 
-        $arr=array();
-        $arr['code']=0;
-        $arr['msg']="";
-        $arr['count']=$info['count'];
-        $arr['data']=$info['list'];
+        //下拉选择搜索
+        if (isset($post['modules']) and !empty($post['modules']) and !empty($post['keywords'])) {
+           
+            if($post['keywords']=="已审核"){
+                $post['keywords']="1";
+            }
+            if($post['keywords']=="未审核"){
+                $post['keywords']="0";
+            }
+
+            $where[$post['modules']] = ['like', '%' . $post['keywords'] . '%'];
+        }
         
-        return json_decode(json_encode($arr));
+        $count=Db::name('evaluation')->where($where)->count();
+        //分页显示,每页5条数据
+        //联合查询members_type
+        $deft=Db::name('evaluation')->order('id desc')->paginate(5)->each(function($item, $key){
+                    $item['create_time'] = date('Y-m-d H:i:s',$item['create_time']);
+                    return $item;});
+        
+        $search=Db::name('evaluation')->where($where)->order('id desc')->paginate(5,false,['query'=>$this->request->param()])->each(function($item, $key){
+                    $item['create_time'] = date('Y-m-d H:i:s',$item['create_time']);
+                    return $item;});
+        //判断是否有搜索
+        $rows = empty($where) ? $deft: $search;
+        
+        $page = $rows->render();
+        $rows=$rows->toArray();
+        if(!empty($rows)){
+            $this->assign('page', $page);
+            $this->assign('count',$count);
+            $this->assign('rows',$rows['data']);
+            
+        }
+        
+        return $this->fetch('index');
+        
     }
 
-    // 添加试卷
-    public function examination_add()
+
+    public function evaluation_add()
     {
         if (Request::instance()->isAjax()){
 
             $data=Request::instance()->post();
-            if(!empty($data)){
-               
-               $arr['title']=$data['title'];
-               $arr['desc']=$data['desc'];
-               $arr['duration']=$data['duration'];
-               $arr['total_score']=$data['total_score'];
-               $arr['start_time']=strtotime($data['start_time']);
-               $arr['end_time']=strtotime($data['end_time']);
-               $arr['create_time']=time();
-               
-               $rows=Examination::create($arr,true);
+            if(count($data)<=5){
+                $data['status']='0';
+                $data['msg']='请选择要添加的题型！';
+                return json($data);
+            }
 
-               return Behavior::return_info($rows);
+            $array=array();
+            $array['title']=$data['title'];
+            $array['desc']=$data['desc'];
+            $array['create_time']=time();
+            $array['duration']=$data['duration'];
+            
+            if($data['total_score']==""){
+                $data['total_score']=100;
+            }else{
+                $array['total_score']=$data['total_score'];
+            }
+            if(!is_numeric($data['total_score'])){
+                $data['status']='0';
+                $data['msg']='总分值必须为数字类型！';
+                return json($data);
+            }
+
+            $sum_score=0;
+            if(isset($data['unit_answer_score'])){
+                $sum_score+=array_sum($data['unit_answer_score']);
+            }
+            if(isset($data['multi_answer_score'])){
+                $sum_score+=array_sum($data['multi_answer_score']);
+            }
+            if(isset($data['recognized_answer_score'])){
+                $sum_score+=array_sum($data['recognized_answer_score']);
+            }
+            if(isset($data['fill_answer_score'])){
+                $sum_score+=array_sum($data['fill_answer_score']);
+            }
+            if(isset($data['short_answer_score'])){
+                $sum_score+=array_sum($data['short_answer_score']);
+            }
+            
+            if($sum_score!=$data['total_score']){
+                $data['status']='0';
+                $data['msg']='请确保所有题型分值总和等于总分值！';
+                return json($data);
+            }
+
+            $array['status']="0";
+            //返回最后插入的主键值
+            $getRowsId=Db::name('evaluation')->insertGetId($array);
+
+            if($getRowsId){
+                
+                if(isset($data['unit_model'])){
+                    $conut_unit=count($data['unit_model']);
+                    $arr=array();
+                    foreach ($data['unit_model'] as $key => $value) {
+                        # code...
+
+                        if($value=="single"){
+
+                            $impStr="";
+                            $insarr['content']=strip_tags($data['unit'][$key]);
+                            $insarr['score']=$data['unit_answer_score'][$key];
+                            $insarr['answer']=strip_tags($data['unit_answer_resolution'][$key]);
+                            $temp['option']=[];
+                            foreach ($data["unit_answer".$key] as $k => $v) {
+                                # code...
+                                array_push($temp['option'], $v);
+
+                            }
+                            $insarr['option']=strip_tags(implode("_@", $temp['option']));
+
+                            $insarr['evaluation_id']=$getRowsId;
+
+                            $insarr['type']=$value;
+                            array_push($arr, $insarr);
+                            
+                        }
+                        
+                    }
+                    $rows=Db::name('evaluation_info')->insertAll($arr);
+                    if($rows!=$conut_unit){
+                        $data['status']='0';
+                        $data['msg']='试题添加失败！';
+                        return json($data);
+                    }
+                    
+                }
+
+                if(isset($data['multi_model'])){
+                    $conut_multi=count($data['multi_model']);
+                    $arr=array();
+                    foreach ($data['multi_model'] as $key => $value) {
+                        # code...
+                        if($value=="multi"){
+
+                            $impStr="";
+                            $insarr['content']=strip_tags($data['multi'][$key]);
+                            $insarr['score']=$data['multi_answer_score'][$key];
+                            $temp['answer']=[];
+                            foreach ($data["multi_answer_resolution".$key] as $kk => $vv) {
+                                # code...
+                                array_push($temp['answer'], $vv);
+
+                            }
+                            $temp['option']=[];
+                            foreach ($data["multi_answer".$key] as $k => $v) {
+                                # code...
+                                array_push($temp['option'], $v);
+
+                            }
+                            $insarr['option']=strip_tags(implode("_@", $temp['option']));
+                            $insarr['answer']=strip_tags(implode("_@", $temp['answer']));
+
+                            $insarr['evaluation_id']=$getRowsId;
+
+                            $insarr['type']=$value;
+                            array_push($arr, $insarr);
+                            
+                        }
+
+                        
+                    }
+                    $rows=Db::name('evaluation_info')->insertAll($arr);
+                    if($rows!=$conut_multi){
+                        $data['status']='0';
+                        $data['msg']='试题添加失败！';
+                        return json($data);
+                    }
+                }
+
+
+                if(isset($data['recognized_model'])){
+                    $conut_recognized=count($data['recognized_model']);
+                    $arr=array();
+                    foreach ($data['recognized_model'] as $key => $value) {
+                        # code...
+                        if($value=="recognized"){
+
+                            $insarr['content']=strip_tags($data['recognized'][$key]);
+                            $insarr['answer']=strip_tags($data['recognized_answer'.$key]);
+                            $insarr['score']=$data['recognized_answer_score'][$key];
+                            $insarr['option']="";
+
+                            $insarr['evaluation_id']=$getRowsId;
+
+                            $insarr['type']=$value;
+                            array_push($arr, $insarr);
+                            
+                        }
+
+                        
+                    }
+                    $rows=Db::name('evaluation_info')->insertAll($arr);
+                    if($rows!=$conut_recognized){
+                        $data['status']='0';
+                        $data['msg']='试题添加失败！';
+                        return json($data);
+                    }
+                }
+                
+                if(isset($data['fill_model'])){
+                    $conut_fill=count($data['fill_model']);
+                    $arr=array();
+                    foreach ($data['fill_model'] as $key => $value) {
+                        # code...
+                        if($value=="fill"){
+
+                            $insarr['content']=strip_tags($data['fill'][$key]);
+                            $insarr['answer']=strip_tags($data['fill_answer'.$key]);
+                            $insarr['score']=$data['fill_answer_score'][$key];
+                            $insarr['option']="";
+
+                            $insarr['evaluation_id']=$getRowsId;
+
+                            $insarr['type']=$value;
+                            array_push($arr, $insarr);
+                            
+                        }
+
+                        
+                    }
+                    $rows=Db::name('evaluation_info')->insertAll($arr);
+                    if($rows!=$conut_fill){
+                        $data['status']='0';
+                        $data['msg']='试题添加失败！';
+                        return json($data);
+                    }
+                }
+
+                if(isset($data['short_model'])){
+                    $conut_short=count($data['short_model']);
+                    $arr=array();
+                    foreach ($data['short_model'] as $key => $value) {
+                        # code...
+                        if($value=="short"){
+
+                            $insarr['content']=strip_tags($data['short'][$key]);
+                            $insarr['answer']=strip_tags($data['short_answer'.$key]);
+                            $insarr['score']=$data['short_answer_score'][$key];
+                            $insarr['option']="";
+
+                            $insarr['evaluation_id']=$getRowsId;
+
+                            $insarr['type']=$value;
+                            array_push($arr, $insarr);
+                            
+                        }
+
+                        
+                    }
+                    $rows=Db::name('evaluation_info')->insertAll($arr);
+                    if($rows!=$conut_short){
+                        $data['status']='0';
+                        $data['msg']='试题添加失败！';
+                        return json($data);
+                    }
+                }
+                
+                $data['status']='1';
+                $data['msg']='试题添加成功！';
+                return json($data);
+                
+            }else{
+                $data['status']='0';
+                $data['msg']='试题添加失败！';
+                return json($data);
             }
         }
         
-        return $this->fetch('examination_add');
+        return $this->fetch('evaluation_add');
      
     }
 
-    // 编辑试卷
-    public function examination_edit()
+
+    public function evaluation_edit()
     {
         
-        $id=input('id');
+        
+        return $this->fetch('evaluation_edit'); 
+        
+        
+    }
 
-        $rows=Examination::get($id);
-
-        $rows['start_time']=date('Y-m-d H:i:s',$rows['start_time']);
-        $rows['end_time']=date('Y-m-d H:i:s',$rows['end_time']);
-
+    public function evaluation_toggle(){
         if (Request::instance()->isAjax()){
 
             $data=Request::instance()->post();
-            if(!empty($data)){
-                
-                $arr['id']=$data['id'];
-                $arr['title']=$data['title'];
-                $arr['desc']=$data['desc'];
-                $arr['duration']=$data['duration'];
-                $arr['total_score']=$data['total_score'];
-                $arr['start_time']=strtotime($data['start_time']);
-                $arr['end_time']=strtotime($data['end_time']);
-                
-                $rows=Examination::update($arr);
-
-                return Behavior::return_info($rows);
+            if($data['status']=='审核'){
+                $array['status']=0;
+            }else{
+                $array['status']=1;
             }
-        }
-
-        
-        $this->assign('id',$id);
-        $this->assign('rows',$rows);
-
-        return $this->fetch('examination_edit'); 
-        
-    }
-
-    
-    // 试题列表
-    public function questions_list()
-    {
-        return $this->fetch();
-    }
-
-    public function questions_list_info()
-    {
-        //判断搜索
-        $post = $this->request->param();
-
-        $info=QuestionsLogic::select($post,'questions');
-
-        if(isset($info['list'])){
-            foreach ($info['list'] as $key => $value) {
-                
-                if($value['status']=="1"){
-                    $info['list'][$key]['status']="正常";
-                }else{
-                    $info['list'][$key]['status']="禁用";
-                }
-
-                if($value['type']=="0"){
-                    $info['list'][$key]['type']="单选题";
-                }elseif($value['type']=="1"){
-                    $info['list'][$key]['type']="多选题";
-                }elseif($value['type']=="2"){
-                    $info['list'][$key]['type']="判断题";
-                }elseif($value['type']=="3"){
-                    $info['list'][$key]['type']="填空题";
-                }elseif($value['type']=="4"){
-                    $info['list'][$key]['type']="简答题";
-                }
-
-
-                $info['list'][$key]['create_time']=date('Y-m-d H:i:s',$value['create_time']);
-
-            }
-
-        }else{
-
-            return json($info);
-        }
-
-        $arr=array();
-        $arr['code']=0;
-        $arr['msg']="";
-        $arr['count']=$info['count'];
-        $arr['data']=$info['list'];
-        
-        return json_decode(json_encode($arr));
-    }
-
-
-    public function questions_add()
-    {
-        if (Request::instance()->isAjax()){
-
-            $data=Request::instance()->post();
-            if(!empty($data)){
-               
-                $arr['problems']=Behavior::cutstr_html($data['name']);
-                $arr['type']=$data['type'];
-                $arr['score']=$data['score'];
-                $arr['examination_id']=$data['examination_id'];
-                $arr['create_time']=time();
-
-                //不向一个表中插入
-                // if(is_array($data['answer'])){
-                //     $str_answer=implode("@", $data['answer']);
-                //     $arr['answer']=$str_answer;
-                // }else{
-                //     $arr['answer']=$data['answer'];
-                // }
-
-                //开启事务
-                Db::startTrans();
-                try{
-
-                    $rows=Questions::create($arr,true);
-
-                    $answer=array();
-                    $options=array();
-
-                    if($data['type']=="0"){//单选题
-
-                        $answer['answer']=$data['answer'];
-
-                        $answer['questions_id']=$rows->id;
-
-                        $rest=QuestionsAnswer::create($answer);
-
-                        foreach ($data['options'] as $key => $value) {
-                           $options[$key]['options']=$value;
-
-                           $options[$key]['questions_id']=$rows->id;
-                        }
-
-                        $QuestionsOptions=model('QuestionsOptions');
-                        
-                        $result=$QuestionsOptions->saveAll($options);
-                        
-                    }
-
-                    if($data['type']=="1"){//多选题
-
-                        foreach ($data['answer'] as $key => $value) {
-                            $answer[$key]['answer']=$value;
-                            $answer[$key]['questions_id']=$rows->id;
-                        }
-                        
-                        $QuestionsAnswer=model('QuestionsAnswer');
-                        
-                        $rest=$QuestionsAnswer->saveAll($answer);
-
-
-                        foreach ($data['options'] as $key => $value) {
-                           $options[$key]['options']=$value;
-
-                           $options[$key]['questions_id']=$rows->id;
-                        }
-
-                        $QuestionsOptions=model('QuestionsOptions');
-                        
-                        $result=$QuestionsOptions->saveAll($options);
-                        
-                   }
-
-                    if($data['type']=="2" || $data['type']=="3" || $data['type']=="4"){//判断题、填空题、简答题
-
-                        $answer['answer']=Behavior::cutstr_html($data['answer']);
-
-                        $answer['questions_id']=$rows->id;
-
-                        $rest=QuestionsAnswer::create($answer);
-
-                        $result=true;
-                       
-                    }
-
-
-                    if(!$rows || !$rest || !$result){
-                        //  抛出异常
-                        throw new \Exception("数据写入失败...");
-                    }else{
-                        // 提交事务
-                        Db::commit();
-                        return Behavior::return_info(true);
-                    }
-                   
-                }catch(\Exception $e){
-                    // 回滚事务
-                    Db::rollback();
-                   
-                    return Behavior::return_info(false);
-                   
-                }
-               
-            }
-        }
-
-        $examination=Examination::all(['is_available'=>1,'status'=>1]);
-
-        $this->assign('examination',$examination);
-        
-        return $this->fetch('questions_add');
-    }
-
-
-    public function questions_edit()
-    {
-
-        if (Request::instance()->isAjax()){
-
-            $data=Request::instance()->post();
-            if(!empty($data)){
-
-                $arr['id']=$data['id'];
-                $arr['problems']=Behavior::cutstr_html($data['name']);
-                $arr['score']=$data['score'];
-                $arr['examination_id']=$data['examination_id'];               
-
-                // //开启事务
-                Db::startTrans();
-                try{
-
-                    $rows=Questions::update($arr);
-
-                    $find=QuestionsAnswer::get(['questions_id'=>$arr['id']]);
-
-                    $answer=array();
-                    $options=array();
-
-                    if($data['type']!=="1"){
-                        $answer['answer']=Behavior::cutstr_html($data['answer']);
-
-                        $answer['questions_id']=$arr['id'];
-
-                        $answer['id']=$find->id;
-
-                        $rest=QuestionsAnswer::update($answer);
-                    }
-
-                    if($data['type']=="0" || $data['type']=="1"){
-                        //先删除原来的题目选项，在重新新增现在的题目选项
-                        $delete=QuestionsOptions::destroy(['questions_id'=>$arr['id']]);
-
-                        if($delete===false){
-                            //  抛出异常
-                            throw new \Exception("数据初始化失败...");
-                        }
-                    }
-
-                    if($data['type']=="0"){//单选题
-
-                        foreach ($data['options'] as $key => $value) {
-                            $options[$key]['options']=$value;
-
-                            $options[$key]['questions_id']=$arr['id'];
-                        }
-
-                        $QuestionsOptions=model('QuestionsOptions');
-                         
-                        $result=$QuestionsOptions->saveAll($options);
-                         
-                    }
-
-                    if($data['type']=="1"){//多选题
-
-                        //先删除原来所有答案，在新增当前所有答案
-
-                        $delete_answer=QuestionsAnswer::destroy(['questions_id'=>$arr['id']]);
-
-                        if($delete_answer===false){
-                            //  抛出异常
-                            throw new \Exception("数据初始化失败...");
-                        }
-
-                        foreach ($data['answer'] as $key => $value) {
-                            $answer[$key]['answer']=$value;
-                            $answer[$key]['questions_id']=$arr['id'];
-                        }
-                         
-                        $QuestionsAnswer=model('QuestionsAnswer');
-                         
-                        $rest=$QuestionsAnswer->saveAll($answer);
-
-                        foreach ($data['options'] as $key => $value) {
-                            $options[$key]['options']=$value;
-
-                            $options[$key]['questions_id']=$arr['id'];
-                        }
-
-                        $QuestionsOptions=model('QuestionsOptions');
-                         
-                        $result=$QuestionsOptions->saveAll($options);
-                         
-                    }
-
-                    if($data['type']=="2" || $data['type']=="3" || $data['type']=="4"){//判断题、填空题、简答题
-
-                        $result=true;
-
-                    }
-
-                    if($rows===false || $find===false || $rest===false || $result===false){
-                        //  抛出异常
-                        throw new \Exception("数据写入失败...");
-                    }else{
-                        // 提交事务
-                        Db::commit();
-                        return Behavior::return_info(true);
-                    }
-                   
-                }catch(\Exception $e){
-                    // 回滚事务
-                    Db::rollback();
-                   
-                    return Behavior::return_info(false);
-                   
-                }
-            }
-        }
-
-        $examination=Examination::all(['is_available'=>1,'status'=>1]);
-
-        $id=input('id');
-
-        $questions=Questions::get($id);//查询当前题目信息
-
-        //查询当前题目答案
-        $questions_answer=QuestionsAnswer::all(['questions_id'=>$id]);
-
-        //查询当前题目答案选项
-        $options=QuestionsOptions::all(['questions_id'=>$id]);
-
-        //统计当前题目选项个数
-        $count_options=count($options);
-
-        $count_options_arr=Behavior::get_char_arr($count_options);
-        
-        if($questions['type']=="0" || $questions['type']=="1"){
-            foreach ($options as $key => $value) {
-                $options[$key]['answer']='0';
-                
-                foreach ($questions_answer as $k => $v) {
-
-                    if($value['options']==$v['answer']){
-                        $options[$key]['answer']='1';
-                    }
-                }
-
-                foreach ($count_options_arr as $kk => $vv) {
-                    
-                    $options[$kk]['char']=$vv;
-
-                }
-            }
-            
-        }
-
-        if($questions['type']==0){
-
-            $questions['style']="单选题";
-
-        }elseif($questions['type']==1){
-
-            $questions['style']="多选题";
-
-        }elseif($questions['type']==2){
-
-            $questions['style']="判断题";
-
-        }elseif($questions['type']==3){
-
-            $questions['style']="填空题";
-
-        }elseif($questions['type']==4){
-
-            $questions['style']="简答题";
-
-        }
-
-        $this->assign('examination',$examination);
-        $this->assign('id',$id);
-        $this->assign('questions',$questions);
-
-        $this->assign('single_options',$options);
-        $this->assign('multipart_options',$options);
-        $this->assign('recognized_options',$options);
-
-        $this->assign('questions_answer',$questions_answer);
-
-        return $this->fetch();
-    }
-
-
-    //导入试题
-    public function questions_import()
-    {
-        $single=array();
-        $multipart=array();
-        $recognized=array();
-        $fill=array();
-        $short=array();
-
-        $length=0;
-        
-        $word=new PhpWord();
-
-        $word = \PhpOffice\PhpWord\IOFactory::load(ROOT_PATH . 'public' . DS . 'static'.DS.'admin' . DS .'templet'.DS.'questions.docx');
-
-        $wordWriter = \PhpOffice\PhpWord\IOFactory::createWriter($word, "HTML");
-        
-        $wordWriter->save(ROOT_PATH . 'public' . DS . 'uploads'.DS.'temp' . DS .'questions.html');
-        
-        $files=file_get_contents(ROOT_PATH . 'public' . DS . 'uploads'.DS.'temp' . DS .'questions.html');
-        
-        $files=strip_tags($files);
-
-        $pos=strpos($files, "#@#");
-
-        if($pos>0){
-
-            $length=strlen("#@#");
-        }
-
-        $files=substr($files, $pos+$length);
-
-        $files_size=strlen($files);
-
-        
-        // echo $files_size;
-        echo $files;
-
-        // echo $pos;
-
-        if (Request::instance()->isAjax()){
-
-            $data=Request::instance()->post();
-            if(!empty($data)){
-                $arr['examination_id']=$data['examination_id'];
-
-                $word=$data['word'];
-
-                //处理上传的Word文件内容
-
-                
-            }
-        }
-
-
-        $examination=Examination::all(['is_available'=>1,'status'=>1]);
-
-        $this->assign('examination',$examination);
-
-        return $this->fetch();
-    }
-
-
-    public function uploads_file()
-    {
-        return Files::uploads_file();
-    }
-
-    public static function download_question_templet()
-    {
-
-        header("Content-type:text/html;charset=utf-8"); 
-        $file_path=ROOT_PATH . 'public' . DS . 'static' . DS . 'admin' . DS . 'templet' . DS . 'questions.docx';
-        //用以解决中文不能显示出来的问题 
-        // $file_name=iconv("utf-8","gb2312",$file_name);
-        //首先要判断给定的文件存在与否 
-        if(!file_exists($file_path)){
-            echo "没有该文件..."; 
-            return ;
-        }
-        $fp=fopen($file_path,"r");
-        $file_size=filesize($file_path);
-        
-        //下载文件需要用到的头
-        Header("Content-type: application/octet-stream");
-        Header("Accept-Ranges: bytes");
-        Header("Accept-Length:".$file_size);
-        Header("Content-Disposition: attachment; filename=questions.docx");
-        $buffer=1024;
-        $file_count=0;
-        //向浏览器返回数据
-        while(!feof($fp) && $file_count<$file_size){
-            $file_con=fread($fp,$buffer);
-            $file_count+=$buffer;
-            echo $file_con;
-        }
-        fclose($fp);
-    }
-
-
-    public function change_status()
-    {
-        if (Request::instance()->isAjax()){
-            $data=Request::instance()->post();
-            if(!empty($data)){
-
-            }
+            $array['id']=$data['id'];
+            $rest=Db::name('evaluation')->update($array);
+            if($rest){
+               $data['status']='1';
+               $data['msg']='操作成功！';
+               return json($data); 
+           }else{
+                $data['status']='0';
+                $data['msg']='操作失败！';
+                return json($data); 
+           }
         }
     }
-
 
     //判断开始测评
     public function start_exams(){
@@ -647,6 +393,72 @@ class Evaluation extends Base
                 return json($data);
             }
         }
+    }
+
+    public function evaluation_delete()
+    {
+        if (Request::instance()->isAjax()){
+
+            $data=Request::instance()->post();
+            if($data!=""){
+                if(intval($data['id'])>0){
+                    $rest=Db::name('evaluation')->where('id',$data['id'])->delete();
+                    if($rest){
+
+                        $data['status']='1';
+                        $data['msg']='数据删除成功！';
+                        return json($data);
+                    }else{
+                        $data['status']='0';
+                        $data['msg']='数据删除失败！';
+                        return json($data);
+                    }
+                }
+            }
+        }
+    }
+
+    //批量删除
+    public function delete_all(){
+        if (Request::instance()->isAjax()){
+
+            $data=Request::instance()->post();
+            if($data!=""||!empty($data)){
+                $count=0;
+                foreach ($data as $key => $value) {
+                    # code...
+                    Db::startTrans();
+                    try{
+                        $rest=Db::name('evaluation')->where('id',$value)->delete();
+                        if($rest){
+                            $count++;
+                        }
+                        // 提交事务
+                        Db::commit();    
+                    } catch (\Exception $e) {
+                        // 回滚事务
+                        Db::rollback();
+                    }
+                    
+                }
+                $number=count($data);
+                if($count===$number){
+                    $data['status']="1";
+                    $data['msg']="成功删除".$count."条数据！";
+                    return json($data);
+                }else{
+                    $data['status']="0";
+                    $data['msg']="删除失败，请稍后再试！";
+                    return json($data);
+                }
+                
+            }else{
+                $data['status']="0";
+                $data['msg']="数据获取异常，请稍后再试！";
+                return json($data);
+            }
+
+        } 
     }
 
 

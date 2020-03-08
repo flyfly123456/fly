@@ -155,7 +155,7 @@ return [
         '__LAYUI__'    => '/static/lib/layui',
         '__LAYER__'    => '/static/lib/layer',
         '__AMAZE__'    => '/static/lib/amaze/assets',
-        '__UEDITOR__'  => '/static/lib/ueditor',
+        '__UEDITOR__'  => '/static/admin/ueditor',
         '__AIMG__'     => '/static/admin/images',
         '__AAUDIO__'     => '/static/admin/audio',
         '__UPLOADS__'  => '/uploads',
@@ -163,7 +163,6 @@ return [
         '__IMAGES__'   => '/images',
         '__MANAGEMENT__'   => '/static/management',
         '__BXSLIDER__'   => '/static/lib/bxslider',
-        '__VUE__'   => '/static/lib/vue',
         
     ],
     // 默认跳转页面对应的模板文件
@@ -297,29 +296,5 @@ return [
         'var_page'  => 'page',
         'list_rows' => 15,
     ],
-
-    // 自动写入时间戳字段
-    // 'auto_timestamp' => true,
-
-    //邮件配置
-    'THINK_EMAIL' => array(
-
-    'SMTP_HOST' => 'smtp.qq.com', //SMTP服务器
-
-    'SMTP_PORT' => '465', //SMTP服务器端口
-
-    'SMTP_USER' => '1719847255@qq.com', //SMTP服务器用户名
-
-    'SMTP_PASS' => 'gpfnatajjnmcdcac', //SMTP服务器密码
-
-    'FROM_EMAIL' => '1719847255@qq.com', //发件人EMAIL
-
-    'FROM_NAME' => 'flyfly~~~', //发件人名称
-
-    'REPLY_EMAIL' => '1719847255@qq.com', //回复EMAIL（留空则为发件人EMAIL）
-
-    'REPLY_NAME' => 'flyfly~~~', //回复名称（留空则为发件人名称）
-
-    ),
 
 ];

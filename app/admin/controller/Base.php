@@ -7,8 +7,7 @@ use \think\Request;
 use \think\Db;
 use app\admin\model\Author;
 use app\admin\model\AdminLog;
-// use app\admin\controller\Admin;
-use app\admin\behavior\Behavior;
+use app\admin\controller\Admin;
 
 class Base extends Controller
 {
@@ -22,11 +21,6 @@ class Base extends Controller
         
         //设置mysql5.7的sql模式为空
         Db::query("set @@sql_mode=''");
-
-        $request = Request::instance();
-        $domain=$request->domain();
-        
-        $this->assign('domain',$domain);
 
     }
 
@@ -154,7 +148,6 @@ class Base extends Controller
                 
                 //开启权限验证
                 $this->admin_acl();
-
             }
         
         }
@@ -277,8 +270,8 @@ class Base extends Controller
 
     protected function get_system_sort($role_group_id){
         //获取系统类别
-        // $admin_system_sort=new Admin();
-        $system_sort=Behavior::get_system_sort($role_group_id);
+        $admin_system_sort=new Admin();
+        $system_sort=$admin_system_sort->get_system_sort($role_group_id);
         $system_author=array();
         
         foreach ($system_sort as $key => $value) {

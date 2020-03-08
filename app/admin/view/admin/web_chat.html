@@ -23,9 +23,6 @@
         .layim-send-set .layui-edge{
             top: 2px!important;
         }
-        body{
-            overflow-y:hidden; 
-        }
     </style>
 </head>
   
@@ -38,16 +35,6 @@
         </div>
     </header>
     <script type="text/javascript" src="__AJS__/constellation.js"></script>
-
-    <div class="x-nav">
-        <span class="layui-breadcrumb">
-            <a href="">首页</a>
-            <a href="">基础管理</a>
-            <a><cite>在线聊天</cite></a>
-        </span>
-        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
-            <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
-    </div>
 
     <!-- <fieldset class="layui-elem-field layui-field-title" style="margin-top: 50px;">
       <legend>面板外的操作示例</legend>
@@ -469,18 +456,13 @@
             ws = new WebSocket("ws://localhost:2346");
             ws.onopen = function() {
                 layer.alert("欢迎使用在线聊天...",{title:'系统提示',closeBtn:0,icon:6},function(){
-                    ws.send("{$Request.session.login.name}");
-                    // layer.alert("给服务端发送一个字符串：tom"); 
+                    ws.send('tom');
+                    layer.alert("给服务端发送一个字符串：tom"); 
                 });
                 
             };
             ws.onmessage = function(e) {
-                layer.alert("收到服务端的 消息：" + e.data);
-            };
-
-            ws.onclose = function(e) {
-                // 关闭 websocket
-                layer.alert("连接已关闭" + e.data);
+                layer.alert("收到服务端的消息：" + e.data);
             };
         })
     </script>

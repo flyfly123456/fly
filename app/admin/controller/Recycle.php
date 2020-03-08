@@ -6,11 +6,6 @@ use \think\Request;
 use \think\Session;
 use \think\Config;
 use \think\Loader;
-
-use app\admin\logic\RecycleLogic;
-
-use app\admin\behavior\Behavior;
-
 // 回收站控制器
 class Recycle extends Base
 {
@@ -37,45 +32,149 @@ class Recycle extends Base
 
     public function member_info()
     {
+        $page=input("get.page")?input("get.page"):1;
+        $page=intval($page);
+        $limit=input("get.limit")?input("get.limit"):1;
+        $limit=intval($limit);
+        $limit=input('limit');
+
+        $where=[];
+        $where['is_available']=0;
         //判断搜索
         $post = $this->request->param();
 
-        $info=RecycleLogic::select($post,'members');
+        if(isset($post['start']) && isset($post['end'])){
 
-        if(isset($info['list'])){
-            foreach ($info['list'] as $key => $value) {
-
-                $rest=Db::name('members_type')->where(['id'=>$value['type']])->find();
-
-                $info['list'][$key]['type']=$rest['type'];
-
-                $info['list'][$key]['create_time']=date('Y-m-d H:i:s',$value['create_time']);
-                if($value['sex']==0){
-                    $info['list'][$key]['sex']='男性';
-                }elseif($value['sex']==1){
-                    $info['list'][$key]['sex']='女性';
-                }else{
-                    $info['list'][$key]['sex']='保密';
-                }
-
-                if($value['status']=="0"){
-                    $info['list'][$key]['status']="未启用";
-                }else{
-                    $info['list'][$key]['status']="已启用";
-                }
-
+            if(empty($post['start']) && empty($post['end'])){
+                unset($post['start']);
+                unset($post['end']);
+                $data['status']=0;
+                $data['msg']="暂无数据！";
+                return json($data);
             }
-        }else{
-            return json($info);
+
+            $post['modules']="create_time";
+            $post['start']=strtotime($post['start']);
+            $post['end']=strtotime($post['end']);
+            // if(isset($post['start']) and !empty($post['start']) and empty($post['end'])){
+            //     $post['start']=strtotime($post['start']);
+            //     $where['create_time'] = ['gt', $post['start']];
+
+            // }
+            // if(isset($post['end']) and !empty($post['end']) and empty($post['start'])){
+            //     $post['end']=strtotime($post['end']);
+            //     $where['create_time'] = ['lt', $post['end']];
+
+            // }
+            // if(isset($post['start']) and !empty($post['start']) and isset($post['end']) and !empty($post['end'])){
+            //     $post['start']=strtotime($post['start']);
+            //     $post['end']=strtotime($post['end']);
+            //     $where['create_time'] = ['between', [$post['start'],$post['end']]];
+
+            // }
+            $where['create_time'] = ['between', [$post['start'],$post['end']]];
+
+            $where[$post['modules']] = $where['create_time'];
+
+            $where['status']=0;
+            $where['msg']="暂无数据！";
+            return json($where);
+
+        }
+
+        
+
+        if(isset($post['keywords']) && isset($post['modules'])){
+
+            if(empty($post['keywords']) && empty($post['modules'])){
+                unset($post['keywords']);
+                unset($post['modules']);
+                $data['status']=0;
+                $data['msg']="暂无数据！";
+                return json($data);
+            }
+            
+            if($post['modules']=="sex"){
+                if($post['keywords']=="男"){
+                    $post['keywords']=0;
+                }elseif($post['keywords']=="女"){
+                    $post['keywords']=1;
+                }else{
+                    $data['status']=0;
+                    $data['msg']="暂无数据！";
+                    return json($data);
+                }
+            
+            }
+
+            if($post['modules']=="status"){
+                if($post['keywords']=="已启用"){
+                    $post['keywords']=1;
+                }elseif($post['keywords']=="未启用"){
+                    $post['keywords']=0;
+                }else{
+                   $data['status']=0;
+                   $data['msg']="暂无数据！";
+                   return json($data); 
+                }
+                
+            }
+
+            if($post['modules']=="type"){
+                $rest=Db::name('members_type')->where('type',strtoupper($post['keywords']))->find();
+                if($rest){
+                    $post['keywords']=$rest['id'];
+
+                }else{
+                    $data['status']=0;
+                    $data['msg']="暂无数据！";
+                    return json($data);
+                }
+                
+            }
+
+
+            $where[$post['modules']] = ['like', '%' . $post['keywords'] . '%'];
+            
+        }
+
+        $count=Db::name('members')->where($where)->count();
+
+        $list=Db::name('members')->alias('m')->field(['m.id','m.username','m.sex','m.create_time','m.type','m.status','m.email','m.address','m.telephone'])->page($page,$limit)->where($where)->select();
+
+        if(empty($list)){
+            $data['status']=0;
+            $data['msg']="暂无数据！";
+            return json($data);
         }
         
-        
+        foreach ($list as $key => $value) {
+            # code...
+
+            $rest=Db::name('members_type')->where(['id'=>$value['type']])->find();
+
+            $list[$key]['type']=$rest['type'];
+
+            $list[$key]['create_time']=date('Y-m-d H:i:s',$value['create_time']);
+            if($value['sex']==0){
+                $list[$key]['sex']='男';
+            }else{
+                $list[$key]['sex']='女';
+            }
+
+            if($value['status']=="0"){
+                $list[$key]['status']="未启用";
+            }else{
+                $list[$key]['status']="已启用";
+            }
+
+        }
 
         $arr=array();
         $arr['code']=0;
         $arr['msg']="";
-        $arr['count']=$info['count'];
-        $arr['data']=$info['list'];
+        $arr['count']=$count;
+        $arr['data']=$list;
         
         return json_decode(json_encode($arr));
         
@@ -111,8 +210,16 @@ class Recycle extends Base
 
             $data=Request::instance()->post();
             if(!empty($data)){
-
-                return Behavior::recover('members',$data['id']);
+                $rest=Db::name('members')->where('id',$data['id'])->setField('is_available',1);
+                if($rest){
+                    $data['status']='1';
+                    $data['msg']='数据恢复成功！';
+                    return json($data);
+                }else{
+                    $data['status']='0';
+                    $data['msg']='数据恢复失败！';
+                    return json($data);
+                }
             }
 
         }
@@ -173,14 +280,40 @@ class Recycle extends Base
 
 
     //批量删除
-    public function member_delete_all(){
+    public function delete_all(){
         if (Request::instance()->isAjax()){
 
             $data=Request::instance()->post();
             
             if($data!=""||!empty($data)){
                 
-                return Behavior::delete_all($data,'members',true);
+                $count=0;
+                foreach ($data as $key => $value) {
+                    # code...
+                    Db::startTrans();
+                    try{
+                        $rest=Db::name('members')->where('id',$value)->delete();
+                        if($rest){
+                            $count++;
+                        }
+                        // 提交事务
+                        Db::commit();    
+                    } catch (\Exception $e) {
+                        // 回滚事务
+                        Db::rollback();
+                    }
+                    
+                }
+                $number=count($data);
+                if($count===$number&& $number!=0){
+                    $data['status']="1";
+                    $data['msg']="成功删除".$count."条数据！";
+                    return json($data);
+                }else{
+                    $data['status']="0";
+                    $data['msg']="删除失败，请稍后再试！";
+                    return json($data);
+                }
                 
             }else{
                 $data['status']="0";

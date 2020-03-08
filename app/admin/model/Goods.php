@@ -3,7 +3,6 @@ namespace app\admin\model;
 
 use \think\Model;
 use \think\Image;
-use app\admin\behavior\Behavior;
 
 class Goods extends Model
 {
@@ -18,7 +17,7 @@ class Goods extends Model
         if($file){
             if(!is_dir($path)){
                 
-                mkdir($path);
+                mkdir(is_dir($path));
 
                 if(!is_writable($path)){
                     chmod($path,0777);
@@ -39,28 +38,20 @@ class Goods extends Model
         }
     }
 
-    /**
-    * @parms $img:原始图片名称
-    * $savename:保存的名称
-    * 
-    */
-
-    public static function thumb_image($img,$id,$savename,$width=800,$height=800)
+    public static function thumb_image($img,$savename,$width=800,$height=800)
     {
-        $path=ROOT_PATH . 'public' . DS . 'uploads'.DS.'shop'.DS.date('Ymd').DS.$id;
-
-        $tempimg=ROOT_PATH . 'public' . DS . 'uploads'.DS.'temp'.DS.$img;
+        $path=ROOT_PATH . 'public' . DS . 'uploads'.DS.'shop';
 
         if(!is_dir($path)){
             
-            Behavior::directory($path);
+            mkdir(is_dir($path));
 
             if(!is_writable($path)){
                 chmod($path,0777);
             }
         }
 
-        if($image = Image::open($tempimg)){
+        if($image = Image::open(ROOT_PATH . 'public' . DS . 'uploads'.DS.$img)){
             
             if($image->thumb($width, $height)->save($path.DS.$savename)){
                 return true;
@@ -72,7 +63,5 @@ class Goods extends Model
         }
         
     }
-
-    
 
 }

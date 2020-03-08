@@ -36,7 +36,7 @@
 					<div class="am-slider am-slider-default scoll" data-am-flexslider id="demo-slider-0">
 						<ul class="am-slides">
 							<volist name="ad" id="ad" key="k">
-								<li class="banner{$k}"><a href="{$ad.url}"><img src="__UPLOADS__/ad/{$ad.img}" /></a></li>
+								<li class="banner{$k}"><a href="{$ad.url}"><img src="__UPLOADS__/{$ad.img}" /></a></li>
 							</volist>
 						</ul>
 					</div>
@@ -53,7 +53,7 @@
 									<volist name="cate" id="cate">
 										<li>
 											<div class="category-info">
-												<h3 class="category-name b-category-name"><i><img src="__UPLOADS__/cate/{$cate.img}"></i><a class="ml-22" title="{$cate.title}">{$cate.title}</a></h3>
+												<h3 class="category-name b-category-name"><i><img src="__UPLOADS__/{$cate.img}"></i><a class="ml-22" title="{$cate.title}">{$cate.title}</a></h3>
 												<em>&gt;</em>
 											</div>
 											<div class="menu-item menu-in top">
@@ -149,11 +149,28 @@
 						<span class="marqueen-title"><i class="am-icon-volume-up am-icon-fw"></i>商城头条<em class="am-icon-angle-double-right"></em></span>
 						<div class="demo">
 							<ul>
-								<foreach name="article" item="article">
-									<li class="title-first"><a target="_blank" href="{:url('index/article/index')}/id/{$article.aid}">
-										<span> [{$article.name}] </span>{$article.adesc}</a>
-									</li>
-								</foreach>
+								<li class="title-first"><a target="_blank" href="#">
+									<img src="__IIMG__/TJ2.jpg"></img>
+									<span>[特惠]</span>洋河年末大促，低至两件五折							
+								</a></li>
+								<li class="title-first"><a target="_blank" href="#">
+									<span>[公告]</span>商城与广州市签署战略合作协议
+									<img src="__IIMG__/TJ.jpg"></img>
+									<p>XXXXXXXXXXXXXXXXXX</p>
+								</a></li>
+
+								<li><a target="_blank" href="#"><span>[特惠]</span>女生节商城爆品1分秒	</a></li>
+								<li><a target="_blank" href="#"><span>[公告]</span>华北、华中部分地区配送延迟</a></li>
+								<li><a target="_blank" href="#"><span>[特惠]</span>家电狂欢千亿礼券 买1送1！</a></li>
+								<li><a target="_blank" href="#"><span>[特惠]</span>洋河年末大促，低至两件五折</a></li>
+								<li><a target="_blank" href="#"><span>[公告]</span>华北、华中部分地区配送延迟</a></li>
+								<li><a target="_blank" href="#"><span>[公告]</span>华北、华中部分地区配送延迟</a></li>
+								<li><a target="_blank" href="#"><span>[公告]</span>华北、华中部分地区配送延迟</a></li>
+								<li><a target="_blank" href="#"><span>[公告]</span>华北、华中部分地区配送延迟</a></li>
+								<li><a target="_blank" href="#"><span>[公告]</span>华北、华中部分地区配送延迟</a></li>
+								<li><a target="_blank" href="#"><span>[公告]</span>华北、华中部分地区配送延迟</a></li>
+								<li><a target="_blank" href="#"><span>[公告]</span>华北、华中部分地区配送延迟</a></li>
+								<li><a target="_blank" href="#"><span>[公告]</span>华北、华中部分地区配送延迟</a></li>
 							</ul>
 						</div>
 					</div>
@@ -170,7 +187,7 @@
 							<else />
 								<li class="index">
 							</if>
-							<a href="{$buy.url}"><img src="__UPLOADS__/ad/{$buy.img}" /></a></li>
+							<a href="{$buy.url}"><img src="__UPLOADS__/{$buy.img}" /></a></li>
 						</volist>
 					</div>
 					
@@ -296,7 +313,7 @@
 												</div>
 
 											</div>
-											<a href="{:url('index/shop/introduction',array('id'=>$hot.id))}" target="_blank"><img src="__UPLOADS__/shop/{$hot.cover}" /></a>						
+											<a href="{:url('index/shop/introduction',array('id'=>$hot.id))}" target="_blank"><img src="__UPLOADS__/{$hot.cover}" /></a>						
 										</div>
 									</if>
 								</foreach>
@@ -315,7 +332,7 @@
 													</div>
 
 												</div>
-												<a href="{:url('index/shop/introduction',array('id'=>$children.id))}" target="_blank"><img src="__UPLOADS__/shop/{$children.cover}" /></a>
+												<a href="{:url('index/shop/introduction',array('id'=>$children.id))}" target="_blank"><img src="__UPLOADS__/{$children.cover}" /></a>
 											</div>
 										</li>
 									</if>

@@ -7,15 +7,8 @@ use \think\Session;
 use \think\Captcha;
 use \think\Cookie;
 use \think\Image;
-
-use app\admin\logic\AdminLogic;
-use app\admin\logic\ResourceLogic;
-use app\admin\logic\LogLogic;
-use app\admin\logic\RoleGroupLogic;
-use app\admin\logic\ExaminationLogic;
-
-use app\admin\behavior\Behavior;
-use app\admin\behavior\Files;
+use app\admin\model\Author;
+use app\admin\model\Uploads;
 
 class Admin extends Base
 {
@@ -33,68 +26,190 @@ class Admin extends Base
     }
 
     //管理员列表显示
-    public function admin_list()
+    public function admin_lists()
     {
-        return $this->fetch('admin_list');
+        return $this->fetch('admin_lists');
+    }
+
+    //查看单一管理员信息
+    public function admin_view()
+    {
+        $id=input('id');
+        $rows=Db::name('admin')->where('id',$id)->find();
+
+        $sel_group_ids=Db::name('role_group')->select();
+        //获取所有部门
+        $department=Db::name('department')->where('is_available',1)->select();
+        $this->assign('rows',$rows);
+        $this->assign('sel_group_ids',$sel_group_ids);
+        $this->assign('department',$department);
+        return $this->fetch('admin_view');
     }
 
     //查看管理员信息
-    public function admin_list_info()
+    public function admin_list()
     {
+        $page=input("get.page")?input("get.page"):1;
+        $page=intval($page);
+        $limit=input("get.limit")?input("get.limit"):1;
+        $limit=intval($limit);
+        $limit=input('limit');
+
+        $where=[];
+        $where['is_available']=1;
         //判断搜索
         $post = $this->request->param();
 
-        $info=AdminLogic::select($post,'admin');
+        if(isset($post['start']) && isset($post['end'])){
+
+            if(empty($post['start']) && empty($post['end'])){
+                unset($post['start']);
+                unset($post['end']);
+                $data['status']=0;
+                $data['msg']="暂无数据...";
+                return json($data);
+            }
+
+            $post['modules']="create_time";
+            $post['start']=strtotime($post['start']);
+            $post['end']=strtotime($post['end']);
+            // if(isset($post['start']) and !empty($post['start']) and empty($post['end'])){
+            //     $post['start']=strtotime($post['start']);
+            //     $where['create_time'] = ['gt', $post['start']];
+
+            // }
+            // if(isset($post['end']) and !empty($post['end']) and empty($post['start'])){
+            //     $post['end']=strtotime($post['end']);
+            //     $where['create_time'] = ['lt', $post['end']];
+
+            // }
+            // if(isset($post['start']) and !empty($post['start']) and isset($post['end']) and !empty($post['end'])){
+            //     $post['start']=strtotime($post['start']);
+            //     $post['end']=strtotime($post['end']);
+            //     $where['create_time'] = ['between', [$post['start'],$post['end']]];
+
+            // }
+            $where['create_time'] = ['between', [$post['start'],$post['end']]];
+
+            $where[$post['modules']] = $where['create_time'];
+
+            $where['status']=0;
+            $where['msg']="暂无数据...";
+            return json($where);
+
+        }
+
         
-        if(isset($info['list'])){
 
-            foreach ($info['list'] as $key => $value) { 
+        if(isset($post['keywords']) && isset($post['modules'])){
 
-                //查询所在部门
-                $department=Db::name('department')->where(['id'=>$value['department_id']])->find();
-                $info['list'][$key]['department_id']=$department['name'];
-
-                //获取所在角色
-                $rest=Db::name('role_group')->where(['id'=>$value['role_group_id']])->find();
-                $info['list'][$key]['role']=$rest['role_name'];
-
-                $info['list'][$key]['create_time']=date('Y-m-d H:i:s',$value['create_time']);
-                if(!empty($value['last_login_time'])){
-                    $info['list'][$key]['last_login_time']=date('Y-m-d H:i:s',$value['last_login_time']);
+            if(empty($post['keywords']) && empty($post['modules'])){
+                unset($post['keywords']);
+                unset($post['modules']);
+                $data['status']=0;
+                $data['msg']="暂无数据...";
+                return json($data);
+            }
+            
+            if($post['modules']=="sex"){
+                if($post['keywords']=="男"){
+                    $post['keywords']=0;
+                }elseif($post['keywords']=="女"){
+                    $post['keywords']=1;
                 }else{
-                   $info['list'][$key]['last_login_time']="暂未登入..."; 
+                    $data['status']=0;
+                    $data['msg']="暂无数据！";
+                    return json($data);
                 }
+            
+            }
 
-                if(empty($value['last_login_ip'])){
-                    $info['list'][$key]['last_login_ip']="未知..."; 
+            if($post['modules']=="status"){
+                if($post['keywords']=="已启用"){
+                    $post['keywords']=1;
+                }elseif($post['keywords']=="未启用"){
+                    $post['keywords']=0;
+                }else{
+                   $data['status']=0;
+                   $data['msg']="暂无数据...";
+                   return json($data); 
                 }
                 
-                if($value['sex']==0){
-                    $info['list'][$key]['sex']='女';
-                }else{
-                    $info['list'][$key]['sex']='男';
-                }
-
-                if($value['status']=="0"){
-                    $info['list'][$key]['status']="未启用";
-                }else{
-                    $info['list'][$key]['status']="已启用";
-                }
-
-                if($value['multi_device']==0){
-                    $info['list'][$key]['multi_device']='关闭';
-                }else{
-                    $info['list'][$key]['multi_device']='开启';
-                }
-
             }
+
+            if($post['modules']=="department_id"){
+                $rows=Db::name('department')->where('name',$post['keywords'])->find();
+                if($rows){
+                    $post['keywords']=$rows['id'];
+                }else{
+                    $data['status']=0;
+                    $data['msg']="暂无数据...";
+                    return json($data); 
+                }
+            
+            }
+
+            $where[$post['modules']] = ['like', '%' . $post['keywords'] . '%'];
+            
+        }
+
+        $count=Db::name('admin')->where($where)->count();
+
+        $list=Db::name('admin')->page($page,$limit)->where($where)->select();
+
+        if(empty($list)){
+            $data['status']=0;
+            $data['msg']="暂无数据...";
+            return json($data);
+        }
+        
+        foreach ($list as $key => $value) {
+            # code...
+
+            //查询所在部门
+            $department=Db::name('department')->where(['id'=>$value['department_id']])->find();
+            $list[$key]['department_id']=$department['name'];
+
+            //获取所在角色
+            $rest=Db::name('role_group')->where(['id'=>$value['role_group_id']])->find();
+            $list[$key]['role']=$rest['role_name'];
+
+            $list[$key]['create_time']=date('Y-m-d H:i:s',$value['create_time']);
+            if(!empty($value['last_login_time'])){
+                $list[$key]['last_login_time']=date('Y-m-d H:i:s',$value['last_login_time']);
+            }else{
+               $list[$key]['last_login_time']="暂未登入..."; 
+            }
+
+            if(empty($value['last_login_ip'])){
+                $list[$key]['last_login_ip']="未知..."; 
+            }
+            
+            if($value['sex']==0){
+                $list[$key]['sex']='女';
+            }else{
+                $list[$key]['sex']='男';
+            }
+
+            if($value['status']=="0"){
+                $list[$key]['status']="未启用";
+            }else{
+                $list[$key]['status']="已启用";
+            }
+
+            if($value['multi_device']==0){
+                $list[$key]['multi_device']='关闭';
+            }else{
+                $list[$key]['multi_device']='开启';
+            }
+
         }
 
         $arr=array();
         $arr['code']=0;
         $arr['msg']="";
-        $arr['count']=$info['count'];
-        $arr['data']=$info['list'];
+        $arr['count']=$count;
+        $arr['data']=$list;
         
         return json_decode(json_encode($arr));
     }
@@ -107,33 +222,49 @@ class Admin extends Base
     }
 
     //权限资源信息显示
-    public function role_resource_list_info()
+    public function role_resource_info()
     {
+        $page=input("get.page")?input("get.page"):1;
+        $page=intval($page);
+        $limit=input("get.limit")?input("get.limit"):1;
+        $limit=intval($limit);
+        $limit=input('limit');
+
+        $where=[];
+        $where['is_available']=1;
         //判断搜索
         $post = $this->request->param();
 
-        $info=ResourceLogic::select($post,'role_author');
-        
-        if(isset($info['list'])){
+        if(isset($post['keywords']) && isset($post['modules'])){
 
-            foreach ($info['list'] as $key => $value) { 
-                if($value['is_available']=="0"){
-
-                    $info['list'][$key]['is_available']="未启用";
-                }else{
-                    $info['list'][$key]['is_available']="已启用";
-                }
+            if(empty($post['keywords']) && empty($post['modules'])){
+                unset($post['keywords']);
+                unset($post['modules']);
+                $data['status']=0;
+                $data['msg']="暂无数据...";
+                return json($data);
             }
+            
 
-        }else{
-            return $info;
+            $where[$post['modules']] = ['like', '%' . $post['keywords'] . '%'];
+            
+        }
+
+        $count=Db::name('role_author')->where($where)->count();
+
+        $list=Db::name('role_author')->page($page,$limit)->where($where)->select();
+
+        if(empty($list)){
+            $data['status']=0;
+            $data['msg']="暂无数据...";
+            return json($data);
         }
         
         $arr=array();
         $arr['code']=0;
         $arr['msg']="";
-        $arr['count']=$info['count'];
-        $arr['data']=$info['list'];
+        $arr['count']=$count;
+        $arr['data']=$list;
         
         return json_decode(json_encode($arr));
 
@@ -142,11 +273,12 @@ class Admin extends Base
     //添加权限资源
     public function role_resource_add()
     {
+        $Author = new Author();
         $post = $this->request->param();
 
         if(isset($post['name'])){
             $post['name']=$post['name'].".php";
-            $action=Behavior::get_action('admin', $post['name']);
+            $action=$Author->getAction('admin', $post['name']);
             
             $action['info']=$action;
             return json($action);
@@ -175,16 +307,16 @@ class Admin extends Base
             }
         }
         
-        $controller=Behavior::get_controller('admin');
+        $controller=$Author->getController('admin');
         foreach ($controller as $key => $value) {
-            
+            # code...
             $controller[$key]=basename($value,".php");
 
         }
         
         $group=Session::get('acl');
         //获取系统类别
-        $system_sort=Behavior::get_system_sort();
+        $system_sort=$this->get_system_sort();
 
         $this->assign('system_sort',$system_sort);
         $this->assign('group',$group);
@@ -214,7 +346,17 @@ class Admin extends Base
 
             $rows=Db::name('role_author')->where('id',$post['id'])->update($arr);
 
-            return Behavior::return_info($rows);
+            if($rows){
+                $data['status']="1";
+                $data['msg']="权限资源修改成功";
+                $data['info']=$arr;
+                return json($data);
+            }else{
+                $data['status']="0";
+                $data['msg']="权限资源修改失败";
+                $data['info']=$arr;
+                return json($data);
+            }
         }
         
         $rows=Db::name('role_author')->where('id',$id)->find();
@@ -223,7 +365,7 @@ class Admin extends Base
             $arr=explode("@", $rows['role_code']);
             
             foreach ($arr as $key => $value) {
-                
+                # code...
                 // $arr[$key]=substr($value, 17);//不隐藏入口文件使用
                 $arr[$key]=substr($value, 7);
             }
@@ -238,8 +380,8 @@ class Admin extends Base
         }
         $rows['controller']=array_unique($rows['controller']);
         
-        
-        $controller=Behavior::get_controller('admin');
+        $Author = new Author();
+        $controller=$Author->getController('admin');
         foreach ($controller as $key => $value) {
             # code...
             $controller[$key]=basename($value,".php");
@@ -247,7 +389,7 @@ class Admin extends Base
         }
         $group=Session::get('acl');
         //获取系统类别
-        $system_sort=Behavior::get_system_sort();
+        $system_sort=$this->get_system_sort();
         
         $this->assign('system_sort',$system_sort);
         $this->assign('group',$group);
@@ -275,8 +417,16 @@ class Admin extends Base
                     }
 
                     if(strpos($acl,$rows['role_code']) === false){
-
-                        return Behavior::delete($data['id'],'role_author');
+                        $rest=Db::name('role_author')->where('id',$data['id'])->update(['is_available'=>0]);
+                        if($rest){
+                            $data['status']='1';
+                            $data['msg']='数据删除成功！';
+                            return json($data);
+                        }else{
+                            $data['status']='0';
+                            $data['msg']='数据删除失败！';
+                            return json($data);
+                        }
                         
                     }else{
                         $data['status']="0";
@@ -300,14 +450,14 @@ class Admin extends Base
                 foreach ($data as $key => $value) {
 
                     $rows=Db::name('role_author')->where('id',$value)->find();
-                    
+                    # code...
                     Db::startTrans();
                     try{
 
                         $role_group=Db::name('role_group')->select();
                         $acl="";
                         foreach ($role_group as $k => $v) {
-                            
+                            # code...
                             $acl.=$v['acl'];
                         }
 
@@ -410,8 +560,15 @@ class Admin extends Base
                 }
                 unset($arr['repassword']);
                 $rows=Db::name('admin')->insert($arr);
-                
-                return Behavior::return_info($rows);
+                if($rows){
+                    $data['status']="1";
+                    $data['msg']="管理员添加成功";
+                    return json($data);
+                }else{
+                    $data['status']="0";
+                    $data['msg']="管理员添加失败";
+                    return json($data);
+                }
                 
                 
             }
@@ -446,9 +603,15 @@ class Admin extends Base
                         }
                     }
                     $rest=Db::name('admin')->where('id',$data['id'])->setField($data['field'],$data['name']);
-
-                    return Behavior::return_info($rest);
-
+                    if($rest){
+                        $data['status']='1';
+                        $data['msg']='数据修改成功！';
+                        return json($data);
+                    }else{
+                        $data['status']='0';
+                        $data['msg']='数据修改失败！';
+                        return json($data);
+                    }
                 }else{
                     if($data['pass']!=$data['repass']){
                         $data['status']="0";
@@ -463,11 +626,16 @@ class Admin extends Base
                     $arr['status']=$data['status'];
                     $arr['email']=$data['email'];
                     $arr['multi_device']=$data['multi_device'];
-                    $arr['sex']=$data['sex'];
-
                     $rows=Db::name('admin')->where('id',$data['id'])->update($arr);
-                    
-                    return Behavior::return_info($rows);
+                    if($rows){
+                        $data['status']="1";
+                        $data['msg']="管理员修改成功";
+                        return json($data);
+                    }else{
+                        $data['status']="0";
+                        $data['msg']="管理员修改失败";
+                        return json($data);
+                    }
                 }
             }else{
                 $data['status']="0";
@@ -512,7 +680,15 @@ class Admin extends Base
                         return json($data);
                     }else{
                         $rest=Db::name('admin')->where('id',$data['id'])->update(['is_available'=>0]);
-                        return Behavior::return_info($rest);   
+                        if($rest){
+                            $data['status']='1';
+                            $data['msg']='数据删除成功！';
+                            return json($data);
+                        }else{
+                            $data['status']='0';
+                            $data['msg']='数据删除失败！';
+                            return json($data);
+                        }    
                     }
                 }
             }
@@ -668,40 +844,80 @@ class Admin extends Base
     }
 
     //角色模板显示
-    public function role_group_list()
+    public function admin_role()
     {
-    	return view('role_group_list');
+    	return view('admin_role');
     }
 
     //角色信息查询
-    public function role_group_list_info()
+    public function admin_role_list()
     {
+        $page=input("get.page")?input("get.page"):1;
+        $page=intval($page);
+        $limit=input("get.limit")?input("get.limit"):1;
+        $limit=intval($limit);
+        $limit=input('limit');
+
+        $where=[];
+        $where['is_available']=1;
         //判断搜索
         $post = $this->request->param();
 
-        $info=RoleGroupLogic::select($post,'role_group');
-        
-        if(isset($info['list'])){
-            foreach ($info['list'] as $key => $value) {
-                $count_admin=Db::name('admin')->where(['role_group_id'=>$value['id'],'is_available'=>1])->count();
-                
-                $info['list'][$key]['count_admin']=$count_admin;
+        if(isset($post['keywords']) && isset($post['modules'])){
 
-                if($value['status']=="0"){
-                    $info['list'][$key]['status']="未启用";
-                }else{
-                    $info['list'][$key]['status']="已启用";
-                }
+            if(empty($post['keywords']) && empty($post['modules'])){
+                unset($post['keywords']);
+                unset($post['modules']);
+                $data['status']=0;
+                $data['msg']="暂无数据...";
+                return json($data);
             }
-        }else{
-            return json($info);
+
+            if($post['modules']=="status"){
+                if($post['keywords']=="已启用"){
+                    $post['keywords']=1;
+                }elseif($post['keywords']=="未启用"){
+                    $post['keywords']=0;
+                }else{
+                   $data['status']=0;
+                   $data['msg']="暂无数据...";
+                   return json($data); 
+                }
+                
+            }
+
+            $where[$post['modules']] = ['like', '%' . $post['keywords'] . '%'];
+            
+        }
+
+        $count=Db::name('role_group')->where($where)->count();
+
+        $list=Db::name('role_group')->page($page,$limit)->where($where)->select();
+
+        if(empty($list)){
+            $data['status']=0;
+            $data['msg']="暂无数据...";
+            return json($data);
+        }
+        
+        foreach ($list as $key => $value) {
+            # code...
+            $count_admin=Db::name('admin')->where(['role_group_id'=>$value['id'],'is_available'=>1])->count();
+            $list[$key]['count_admin']=$count_admin;
+
+            if($value['status']=="0"){
+                $list[$key]['status']="未启用";
+            }else{
+                $list[$key]['status']="已启用";
+            }
+
         }
 
         $arr=array();
         $arr['code']=0;
         $arr['msg']="";
-        $arr['count']=$info['count'];
-        $arr['data']=$info['list'];
+        $arr['count']=$count;
+        $arr['data']=$list;
         
         return json_decode(json_encode($arr));
     }
@@ -717,7 +933,15 @@ class Admin extends Base
                 if(isset($data['field'])){
 
                     $rest=Db::name('role_group')->where('id',$data['id'])->setField($data['field'],$data['name']);
-                    return Behavior::return_info($rest);
+                    if($rest){
+                        $data['status']='1';
+                        $data['msg']='数据修改成功！';
+                        return json($data);
+                    }else{
+                        $data['status']='0';
+                        $data['msg']='数据修改失败！';
+                        return json($data);
+                    }
                 }else{
                     $id=$data['id'];
                     $desc=$data['desc'];
@@ -743,7 +967,15 @@ class Admin extends Base
                     $arr['system_sort_id']=$sortStr;
                     $rows=Db::name('role_group')->where('id',$id)->update($arr);
 
-                    return Behavior::return_info($rows);
+                    if($rows){
+                        $data['status']="1";
+                        $data['msg']="权限修改成功";
+                        return json($data);
+                    }else{
+                        $data['status']="0";
+                        $data['msg']="权限修改失败";
+                        return json($data); 
+                    }
                 }
                 
             }else{
@@ -757,7 +989,7 @@ class Admin extends Base
             $acl=$this->get_acl($id);
             
             //获取系统类别
-            $system_sort=Behavior::get_system_sort($id);
+            $system_sort=$this->get_system_sort($id);
 
             $this->assign('acl',$acl);
             $this->assign('system_sort',$system_sort);
@@ -773,7 +1005,7 @@ class Admin extends Base
         $id=input('id');
         $acl=$this->get_acl($id);
         //获取系统类别
-        $system_sort=Behavior::get_system_sort($id);
+        $system_sort=$this->get_system_sort($id);
 
         $this->assign('acl',$acl);
         $this->assign('system_sort',$system_sort);
@@ -875,8 +1107,15 @@ class Admin extends Base
                 $arr['desc']=$data['desc'];
                 $arr['status']="1";
                 $rows=Db::name('role_group')->insert($arr);
-                
-                return Behavior::return_info($rows);
+                if($rows){
+                    $data['status']="1";
+                    $data['msg']="添加成功";
+                    return json($data);
+                }else{
+                    $data['status']="0";
+                    $data['msg']="添加失败";
+                    return json($data);
+                }
             }
 
         }else{
@@ -884,11 +1123,48 @@ class Admin extends Base
             //获取所有权限列表
             $acl=$this->get_acl($id="",$add=true);
             //获取系统类别
-            $system_sort=Behavior::get_system_sort();
+            $system_sort=$this->get_system_sort();
 
             $this->assign('acl',$acl);
             $this->assign('system_sort',$system_sort);
             return $this->fetch('role_add');
+        }
+    }
+
+    /*
+    *获取系统类别
+    *@params $id:角色id
+    */
+    public function get_system_sort($id=""){
+        $sort=Db::name('system_sort')->where('is_available',1)->select();
+        if($id==""){
+
+            if(!empty($sort)){
+                return $sort;
+            }else{
+                return '数据获取失败！';
+            }
+        }else{
+
+            $rows=Db::name('role_group')->where(['id'=>$id,'is_available'=>1])->find();
+            $system_sort_id=explode("@", $rows['system_sort_id']);
+            
+            foreach ($sort as $key => $value) {
+                # code...
+                foreach ($system_sort_id as $k => $v) {
+                    # code...
+                    if($value['id']==$v){
+                        $sort[$key]['select']=1;
+                    }
+                }
+            }
+            foreach ($sort as $key => $value) {
+                # code...
+                if(!isset($value['select'])){
+                    $sort[$key]['select']=0;
+                }
+            }
+            return $sort;
         }
     }
 
@@ -906,8 +1182,17 @@ class Admin extends Base
                         $data['msg']='请先解除该角色拥有的管理员，否则将无法删除！';
                         return json($data);
                     }else{
-                        $rest=Db::name('role_group')->where('id',$data['id'])->update(['is_available'=>0]);
-                        return Behavior::return_info($rest);    
+                       $rest=Db::name('role_group')->where('id',$data['id'])->update(['is_available'=>0]);
+                       if($rest){
+
+                           $data['status']='1';
+                           $data['msg']='数据删除成功！';
+                           return json($data);
+                       }else{
+                           $data['status']='0';
+                           $data['msg']='数据删除失败！';
+                           return json($data);
+                       } 
                     }
                 }
             }
@@ -1070,18 +1355,14 @@ class Admin extends Base
 
     //基础管理基本信息修改
     public function base_info(){
-
-        $admin_info=Session::get('login');
-
         if(Request::instance()->isAjax()){
             $data=Request::instance()->post();
             if(!empty($data)){
                 if(!empty($data['name'])){
                     $rest=Db::name('admin')->where('id','<>',$data['id'])->select();
-                    $rows=Db::name('admin')->where('id='.$data['id'])->find();
                     //检测用户名是否存在
                     foreach ($rest as $key => $value) {
-                        
+                        # code...
                         if($value['name']==$data['name']){
                             $data['status']="0";
                             $data['msg']="修改失败，用户名已经存在！";
@@ -1093,21 +1374,7 @@ class Admin extends Base
                             $arr['telephone']=$data['phone'];
                             $arr['email']=$data['email'];
                             $arr['remark']=$data['remark'];
-
-                            if(basename($data['img_url'])!=$rows['img_url']){
-
-                                $arr['img_url']=$data['img_url'];
-
-                                Files::thumb_image($data['img_url'],'header'.DS.$data['id'],$width=400,$height=300);
-
-                                $heade_img=ROOT_PATH . 'public' . DS . 'uploads'.DS.'header'.DS.$data['id'].DS.$admin_info['img_url'];
-                                
-                                if(file_exists($heade_img)){
-                                    unlink(ROOT_PATH . 'public' . DS . 'uploads'.DS.'header'.DS.$data['id'].DS.$admin_info['img_url']);
-                                }
-
-                            }
-
+                            $arr['img_url']=$data['img_url'];
                             
                             if(isset($data['multi_device'])){
                                 $arr['multi_device']=$data['multi_device']=1;
@@ -1115,7 +1382,15 @@ class Admin extends Base
                                 $arr['multi_device']=0;
                             }
                             $rows=Db::name('admin')->where('id',$data['id'])->update($arr);
-                            return Behavior::return_info($rows);
+                            if($rows!==false){
+                                $data['status']="1";
+                                $data['msg']="修改成功,请重新登入！";
+                                return json($data);
+                            }else{
+                                $data['status']="0";
+                                $data['msg']="当前未做任何修改！";
+                                return json($data);
+                            }
                         }
                     }
                     
@@ -1129,53 +1404,89 @@ class Admin extends Base
         }
     }
 
-    // 试卷列表
-    public function evaluation_list()
-    {
-        $login=Session::get('login');
-
-        $this->assign('login_id',$login['id']);
+    //管理员上传头像
+    public function up_photos(){
         
-        return $this->fetch();   
+        if(Request::instance()->isAjax()){
+            $file=Request::instance()->file('file');
+            $uploads=Uploads::uploads_img($file);
+            return $uploads;
+        }
     }
 
-    public function evaluation_list_info()
+    //管理员的测评列表
+    public function evaluation()
     {
-        //判断搜索
+        $where=[];
         $post = $this->request->param();
+        $login=Session::get('login');
+        //添加时间搜索
+        if(isset($post['start']) and !empty($post['start']) and empty($post['end'])){
+            $post['start']=strtotime($post['start']);
+            $where['create_time'] = ['gt', $post['start']];
 
-        $info=ExaminationLogic::select($post,'examination');
+        }
+        if(isset($post['end']) and !empty($post['end']) and empty($post['start'])){
+            $post['end']=strtotime($post['end']);
+            $where['create_time'] = ['lt', $post['end']];
 
-        if(isset($info['list'])){
-            foreach ($info['list'] as $key => $value) {
-                
-                $info['list'][$key]['type']=$value['status'];
-                $info['list'][$key]['id']=base64_encode($value['id']);
-                
-                if($value['status']=="1"){
-                    $info['list'][$key]['status']="正常";
-                    
-                }else{
-                    $info['list'][$key]['status']="禁用";
-                }
+        }
+        if(isset($post['start']) and !empty($post['start']) and isset($post['end']) and !empty($post['end'])){
+            $post['start']=strtotime($post['start']);
+            $post['end']=strtotime($post['end']);
+            $where['create_time'] = ['between', [$post['start'],$post['end']]];
 
-
-                $info['list'][$key]['create_time']=date('Y-m-d H:i:s',$value['create_time']);
-
-            }
-
-        }else{
-
-            return json($info);
         }
 
-        $arr=array();
-        $arr['code']=0;
-        $arr['msg']="";
-        $arr['count']=$info['count'];
-        $arr['data']=$info['list'];
+        //下拉选择搜索
+        if (isset($post['modules']) and !empty($post['modules']) and !empty($post['keywords'])) {
+           
+            if($post['keywords']=="已审核"){
+                $post['keywords']="1";
+            }
+            if($post['keywords']=="未审核"){
+                $post['keywords']="0";
+            }
+
+            $where[$post['modules']] = ['like', '%' . $post['keywords'] . '%'];
+        }
         
-        return json_decode(json_encode($arr));
+        $count=Db::name('evaluation')->where($where)->count();
+        //分页显示,每页5条数据
+        //联合查询
+        $deft=Db::name('evaluation')->alias('e')->order('e.id desc')->paginate(5)->each(function($item, $key){
+                    $item['create_time'] = date('Y-m-d H:i:s',$item['create_time']);
+                    return $item;});
+
+        $search=Db::name('evaluation')->alias('e')->where($where)->order('e.id desc')->paginate(5,false,['query'=>$this->request->param()])->each(function($item, $key){
+                    $item['create_time'] = date('Y-m-d H:i:s',$item['create_time']);
+                    return $item;});
+        //判断是否有搜索
+        $rows = empty($where) ? $deft: $search;
+        
+        $page = $rows->render();
+        $rows=$rows->toArray();
+
+        $arr=array();
+        foreach ($rows['data'] as $key => $value) {
+            # code...
+            $value['id']=base64_encode($value['id']);
+            if(in_array($login['id'], explode("@", $value['pass_id']))){
+              $value['mark_id']=$login['id'];
+            }else{
+                $value['mark_id']="";
+            }
+            array_push($arr, $value);
+        }
+
+        if(!empty($rows)){
+            $this->assign('page', $page);
+            $this->assign('count',$count);
+            $this->assign('rows',$arr);
+            $this->assign('login_id',$login['id']);
+            
+        }
+        return $this->fetch('evaluation');
     }
 
     //参加考试
@@ -1187,315 +1498,267 @@ class Admin extends Base
         $memcache=new \Memcache();
         $memcache->connect('127.0.0.1',11211) or die('Count not connect');
         $id=base64_decode(input('id'));
-        
         $login=Session::get('login');
         
         if(Request::instance()->isAjax()){
             $data=Request::instance()->post();
-
+            
+            $rest=Db::name('evaluation_info')->where('evaluation_id',$data['id'])->select();
+            //获取最大的主键值
+            $lastInsId=Db::name('evaluation_record')->max('id');
+            $lastInsId=$lastInsId+1;
             $arr=array();
             $instarr=array();
             $login=Session::get('login');
-            //定义答题分数
-            $result_score=0;
-            //定义多选题答案一维数组
-            $multi=array();
-            $result=array();
+            $count=count($rest);
 
-            $ins=array();
-
-            $ins['examination_id']=$data['id'];
-
-            $ins['admin_id']=$login['id'];
-
-            $evaluation_record=Db::name('evaluation_record')->insertGetId($ins);
-
-            $arr['record_id']=$evaluation_record;
-
-            //判断单选答案
-            if(isset($data['single_answer'])){
-
-                foreach ($data['single_answer'] as $key => $value) {
-
-                    $single_answer=Db::name('questions_answer')->where('questions_id',$key)->find();
-
-                    $arr['answer']=$value;
-
-                    if($value==$single_answer['answer']){
-
-                        $single_questions=Db::name('questions')->where('id',$key)->find();
-
-                        $arr['score']=$single_questions['score'];
-
+            foreach ($rest as $key => $value) {
+                # code...
+                if($value['type']=="single"){
+                    if(!isset($data['single_answer'. $value['id']])||$data['single_answer'. $value['id']]==null){
+                        $data['single_answer'. $value['id']]="";
+                    }
+                    $arr['answer']=$value['answer'];
+                    $arr['result']=$data['single_answer'. $value['id']];
+                    if($arr['answer']==$arr['result']){
+                        $arr['score']=$value['score'];
                     }else{
-
                         $arr['score']=0;
                     }
-
-                    $result_score+=$arr['score'];
-
-                    $arr['questions_id']=$key;
-
+                    $arr['evaluation_id']=$data['id'];
+                    $arr['evaluation_info_id']=$value['id'];
+                    $arr['admin_id']=$login['id'];
+                    $arr['type']=$value['type'];
+                    $arr['record_id']=$lastInsId;
                     array_push($instarr, $arr);
-
+                   
                 }
-            }
 
-            //判断多选题答案
-            //答不全得一半的分数
-            //答错不得分
-
-            if(isset($data['multi_answer'])){
-                
-                $multi_score=0;
-
-                foreach ($data['multi_answer'] as $key => $value) {
+                if($value['type']=="multi"){
+                    if(!isset($data['multi_answer'. $value['id']])||$data['multi_answer'. $value['id']]==null){
+                        $data['multi_answer'. $value['id']]="";
+                        $arr['result']="";
+                    }else{
+                        $arr['result']=implode('_@', $data['multi_answer'. $value['id']]);
+                    }
+                    $arr['answer']=$value['answer'];
+                    if($arr['answer']==$arr['result']){
+                        $arr['score']=$value['score'];
+                    }else{
+                        $arr['score']=0;
+                    }
+                    $arr['evaluation_id']=$data['id'];
+                    $arr['evaluation_info_id']=$value['id'];
+                    $arr['admin_id']=$login['id'];
+                    $arr['type']=$value['type'];
+                    $arr['record_id']=$lastInsId;
+                    array_push($instarr, $arr);
                     
-                    $multi_str="";
+                }
 
-                    $multi_questions=Db::name('questions')->where('id',$key)->find();
-
-                    $multi_answer=Db::name('questions_answer')->where('questions_id',$key)->select();
+                if($value['type']=="recognized"){
+                    if(!isset($data['recognized_answer'.$value['id']])||$data['recognized_answer'.$value['id']]==null){
+                        $data['recognized_answer'.$value['id']]="";
+                    }
+                    $arr['answer']=$value['answer'];
+                    $arr['result']=$data['recognized_answer'. $value['id']];
+                    if($arr['answer']==$arr['result']){
+                        $arr['score']=$value['score'];
+                    }else{
+                        $arr['score']=0;
+                    }
+                    $arr['evaluation_id']=$data['id'];
+                    $arr['evaluation_info_id']=$value['id'];
+                    $arr['admin_id']=$login['id'];
+                    $arr['type']=$value['type'];
+                    $arr['record_id']=$lastInsId;
+                    array_push($instarr, $arr);
                     
-                    //多选了答案
-                    if(count($data['multi_answer'][$key])>count($multi_answer)){
-                        //答错，不得分
-                        $arr['score']=0;
-
-                    }elseif(count($data['multi_answer'][$key])<=count($multi_answer)){
-
-                        //本题的正确答案选项
-
-                        foreach ($multi_answer as $km => $vm) {
-                            array_push($multi, $vm['answer']);
-                        }
-                        
-                        if(is_array($value)){
-
-                            foreach ($value as $k => $v) {
-                                
-                                $multi_str.="@".$v;
-                                
-                                array_push($result, $v);//本题提交的答案
-                            }
-
-                            $arr['answer']=$multi_str;
-
-                        }
-
-                        $diff1 = array_diff($result,$multi);
-
-                        $diff2 = array_diff($multi,$result);
-
-                        if(empty($diff1) && empty($diff2)){
-
-                            // 答案无误，得满分
-                            $arr['score']=$multi_questions['score'];
-                               
-                        }elseif(empty($diff1) && !empty($diff2)){
-
-                            //答案不全，得一半分
-
-                            $arr['score']=$multi_questions['score']*0.5;
-
-                        }else{
-                            
-                            //答案有误，不得分
-
-                            $arr['score']=0;
-                        }
-
-
-                    }
-
-                    $result_score+=$arr['score'];
-
-                    $arr['questions_id']=$key;
-
-                    array_push($instarr, $arr);
-
                 }
-
-                
-            }
-
-
-            //判断填空题
-            if(isset($data['fill_answer'])){
-
-                foreach ($data['fill_answer'] as $key => $value) {
-
-                    $fill_answer=Db::name('questions_answer')->where('questions_id',$key)->find();
-
-                    $arr['answer']=$value;
-
-                    if($value==$fill_answer['answer']){
-
-                        $fill_questions=Db::name('questions')->where('id',$key)->find();
-
-                        $arr['score']=$fill_questions['score'];
-
-                    }else{
-
-                        $arr['score']=0;
+                //填空题评分
+                if($value['type']=="fill"){
+                    if(!isset($data['fill_answer'. $value['id']])||$data['fill_answer'. $value['id']]==null){
+                        $data['fill_answer'. $value['id']]="";
                     }
-
-                    $result_score+=$arr['score'];
-
-                    $arr['questions_id']=$key;
-
-                    array_push($instarr, $arr);
-
-                }
-
-            }
-
-
-            // 判断题
-            if(isset($data['recognized_answer'])){
-
-                foreach ($data['recognized_answer'] as $key => $value) {
-
-                    $recognized_answer=Db::name('questions_answer')->where('questions_id',$key)->find();
-
-                    $arr['answer']=$value;
-
-                    if($value==$recognized_answer['answer']){
-
-                        $recognized_questions=Db::name('questions')->where('id',$key)->find();
-
-                        $arr['score']=$recognized_questions['score'];
-
-                    }else{
-
-                        $arr['score']=0;
-                    }
-
-                    $result_score+=$arr['score'];
-
-                    $arr['questions_id']=$key;
-
-                    array_push($instarr, $arr);
-
-                }
-
-            }
-
-            //判断简答题
-            //相似度90%以上的满分
-            //低于90%按相似度计算分值
-
-            if(isset($data['short_answer'])){
-
-                foreach ($data['short_answer'] as $key => $value) {
-
-                    $short_answer=Db::name('questions_answer')->where('questions_id',$key)->find();
-
-                    $recognized_questions=Db::name('questions')->where('id',$key)->find();
-
-                    similar_text($short_answer['answer'], $value, $percent);
-
-                    $arr['answer']=Behavior::cutstr_html($value);
+                    $arr['answer']=$value['answer'];
+                    $arr['result']=$data['fill_answer'. $value['id']];
+                    //计算相似度获取分数
+                    similar_text($arr['answer'], $arr['result'], $percent);
 
                     if($percent>90){
-
-                        $arr['score']=$recognized_questions['score'];
-
+                        $arr['score']=$value['score'];
                     }else{
-
-                        $arr['score']=round(($percent/100)*$recognized_questions['score'],1);
+                        $arr['score']=round(($percent/100)*$value['score'],1);
                     }
-
-                    $result_score+=$arr['score'];
-
-                    $arr['questions_id']=$key;
-
+                    
+                    $arr['evaluation_id']=$data['id'];
+                    $arr['evaluation_info_id']=$value['id'];
+                    $arr['admin_id']=$login['id'];
+                    $arr['type']=$value['type'];
+                    $arr['record_id']=$lastInsId;
                     array_push($instarr, $arr);
-
                 }
-            }
 
+                //简答题评分
+                if($value['type']=="short"){
+                    if(!isset($data['short_answer'. $value['id']])||$data['short_answer'. $value['id']]==null){
+                        $data['short_answer'. $value['id']]="";
+                    }
+                    $arr['answer']=$value['answer'];
+                    $arr['result']=$data['short_answer'. $value['id']];
+                    //计算相似度获取分数
+                    similar_text($arr['answer'], $arr['result'], $percent);
+
+                    if($percent>90){
+                        $arr['score']=$value['score'];
+                    }else{
+                        $arr['score']=round(($percent/100)*$value['score'],1);
+                    }
+                    
+                    $arr['evaluation_id']=$data['id'];
+                    $arr['evaluation_info_id']=$value['id'];
+                    $arr['admin_id']=$login['id'];
+                    $arr['type']=$value['type'];
+                    $arr['record_id']=$lastInsId;
+                    array_push($instarr, $arr);
+                }
+                
+            }
+ 
             $rows=Db::name('evaluation_answer')->insertAll($instarr);
 
-            //获取本次提交分数
-            $count_score=Db::name('evaluation_answer')->where('record_id',$evaluation_record)->sum('score');
-            
-            //判断是否通过考试
-            $examination=Db::name('examination')->where('id',$data['id'])->find();
+            if($rows==$count){
+                //获取分数
+                $total_score=Db::name('evaluation')->where('id',$data['id'])->find();
 
-            $pass=$count_score/$examination['total_score'];
+                $score_arr=array();
+                foreach ($instarr as $key => $value) {
+                    # code...
+                    array_push($score_arr, $value['score']);
+                }
+                $score=array_sum($score_arr);
+                $score=round($score,1);//四舍五入保留一位小数计算分数
+                
+                // $score=Db::name('evaluation_answer')->where(array('record_id'=>$lastInsId,'admin_id'=>$login['id']))->sum('score');
+                $pass=$total_score['total_score']*0.6;
+                $insert_record['evaluation_id']=$data['id'];
+                $insert_record['admin_id']=$login['id'];
+                $insert_record['score']=$score;
+                //判断是否通过测评
+                if($score>=$pass){
+                    $insert_record['pass']='1';
 
-            if($pass>=$examination['pass_score']){
-                $pass=1;//通过测评
-                $info['examination_id']=$data['id'];
-                $info['admin_id']=$login['id'];
+                    $in_pass_id=in_array($login['id'], explode("@", $total_score['pass_id']));
+                    if(!$in_pass_id){
+                        $pass_ids=$total_score['pass_id'].$login['id']."@";
+                        $pass_id['pass_id']=$pass_ids;
+                        //通过测评更新数据
+                        $update_evaluation=Db::name('evaluation')->where('id',$data['id'])->update($pass_id);
+                    }
 
-                $select_admin=Db::name('examination_pass')->where($info)->find();
+                }else{
 
-                if($select_admin==false){
-                    $pass_admin=Db::name('examination_pass')->insert($info);
+                    $insert_record['pass']='0';
+                }
+                
+                $record=Db::name('evaluation_record')->insert($insert_record);
+                
+                if($record){
+                    //清除Session，退出考试
+                    Session::delete('stopIntval'.$login['id']);
+
+                    $data['status']="1";
+                    $data['msg']="恭喜您,交卷成功...<br>您的成绩为：".$score."分！";
+                    return json($data);
+                }else{
+                    $data['status']="0";
+                    $data['msg']="网络异常，请重试！";
+                    return json($data);
                 }
                 
             }else{
-                $pass=0;
-            }
-
-            //重新赋值考试记录数据
-            $update_evaluation_record=Db::name('evaluation_record')->where('id',$evaluation_record)->update(['score'=>$count_score,'pass'=>$pass]);
-
-            if($pass){
-                $data['status']="1";
-                $data['msg']='恭喜你，通过测评，您的成绩为：'.$count_score.'分';
-                return json($data);
-            }else{
                 $data['status']="0";
-                $data['msg']='很遗憾，您没有通过测评，您的成绩为：'.$count_score.'分';
+                $data['msg']="网络异常，请重试！";
                 return json($data);
             }
                 
         }
 
         //正常显示答题页面
+        $rest=$memcache->get('rest'.$id);
 
-        $rest=Db::name('examination')->where('id',$id)->find();
+        if(!$rest){
 
+            $rest=Db::name('evaluation')->where('id',$id)->find();
+            $memcache->set('rest'.$id,$rest);
+        }
+        
         $rest['duration']=$rest['duration']*60;
         
-        $rows=Db::name('questions')->where('examination_id',$id)->order('id')->select();
+        $rows=$memcache->get('rows'.$id);
+        
+        if(!$rows){
 
-        foreach ($rows as $key => $value) {
-            $rows[$key]['options']=array();
-            $options=Db::name('questions_options')->where('questions_id',$value['id'])->select();
-            foreach ($options as $k => $v) {
-
-                $index=Behavior::get_char($k);
-                
-                $options[$k]['index']=$index;
-            }
-            
-            $rows[$key]['options']=$options;
-
-
+            $rows=Db::name('evaluation_info')->where('evaluation_id',$id)->order('id desc')->select();
+            $memcache->set('rows'.$id,$rows);
         }
 
         //分组查询题型
-        $count=Db::name('questions')->group('type')->order('id asc')->where('examination_id',$id)->select();
+        $count=$memcache->get('count'.$id);
+        if(!$count){
 
+            $count=Db::name('evaluation_info')->group('type')->order('id asc')->where('evaluation_id',$id)->select();
+            $memcache->set('count'.$id,$count);
+        }
         $info=$count;
+        
+        $single=$memcache->get('single'.$id);
+        if(!$single){
+            $single=Db::name('evaluation_info')->where(array('evaluation_id'=>$id,'type'=>'single'))->order('id desc')->select();
+            $memcache->set('single'.$id,$single);
+        }
+        $single=$this->get_options($single);
+        
+        $multi=$memcache->get('multi'.$id);
+        if(!$multi){
+            $multi=Db::name('evaluation_info')->where(array('evaluation_id'=>$id,'type'=>'multi'))->order('id desc')->select();
+            $memcache->set('multi'.$id,$multi);
+        }
+        $multi=$this->get_options($multi);
+
+        $recognized=$memcache->get('recognized'.$id);
+        if(!$recognized){
+            $recognized=Db::name('evaluation_info')->where(array('evaluation_id'=>$id,'type'=>'recognized'))->order('id desc')->select();
+            $memcache->set('recognized'.$id,$recognized);
+        }
+        $recognized=$this->get_options($recognized);
+        
+        $fill=$memcache->get('fill'.$id);
+        if(!$fill){
+            $fill=Db::name('evaluation_info')->where(array('evaluation_id'=>$id,'type'=>'fill'))->order('id desc')->select();
+            $memcache->set('fill'.$id,$fill);
+        }
+        $fill=$this->get_options($fill);
+
+        $short=$memcache->get('short'.$id);
+        if(!$short){
+            $short=Db::name('evaluation_info')->where(array('evaluation_id'=>$id,'type'=>'short'))->order('id desc')->select();
+            $memcache->set('short'.$id,$short);
+        }
+        $short=$this->get_options($short);
         
         $this->assign('type',$count);
         $this->assign('info',$info);
         $this->assign('login',$login);
         $this->assign('login_id',$login['id']);
-        $this->assign('single',$rows);
-        $this->assign('multi',$rows);
-        $this->assign('recognized',$rows);
-        $this->assign('fill',$rows);
-        $this->assign('short',$rows);
+        $this->assign('single',$single);
+        $this->assign('multi',$multi);
+        $this->assign('recognized',$recognized);
+        $this->assign('fill',$fill);
+        $this->assign('short',$short);
         $this->assign('rows',$rows);
         $this->assign('rest',$rest);
         $this->assign('id',$id);
-
         return $this->fetch('join_evaluation');
     }
 
@@ -1505,32 +1768,22 @@ class Admin extends Base
         $id=base64_decode(input('id'));
         
         $login=Session::get('login');
-
-        $count=Db::name('evaluation_record')->where(['examination_id'=>$id,'admin_id'=>$login['id']])->count();
-
-        $rows=Db::name('examination')->alias('e')->field('e.id eID,e.*,r.id rId,r.*')->join('evaluation_record r','r.examination_id=e.id','LEFT')->where(['examination_id'=>$id,'admin_id'=>$login['id']])->select();
-       
+        $count=Db::name('evaluation_answer')->where(['evaluation_id'=>$id,'admin_id'=>$login['id']])->group('record_id')->count();
+        $rows=Db::name('evaluation_answer')->alias('a')->field('a.id aID,a.*,e.id eId,e.*')->join('evaluation e','a.evaluation_id=e.id','LEFT')->where(['evaluation_id'=>$id,'admin_id'=>$login['id']])->group('record_id')->select();
         foreach ($rows as $key => $value) {
-            
+            # code...
             $rows[$key]['id']=base64_encode($value['id']);
-            $rows[$key]['eID']=base64_encode($value['eID']);
-            $rows[$key]['rId']=base64_encode($value['rId']);
-
+            $rows[$key]['record_id']=base64_encode($value['record_id']);
             $rows[$key]['admin_name']=$login['name'];
-
-            $rows[$key]['total_number']=Db::name('questions')->where(['examination_id'=>$id,'is_available'=>1])->count();
-
-            $score=Db::name('evaluation_record')->where('id',$value['rId'])->find();
-
-            $rows[$key]['fact_score']=$score['score'];
-
-            if($value['pass']==1){
+            $rows[$key]['total_number']=Db::name('evaluation_answer')->where(['evaluation_id'=>$id,'admin_id'=>$login['id']])->where('record_id',$value['record_id'])->count();
+            $rows[$key]['fact_score']=Db::name('evaluation_answer')->where(['evaluation_id'=>$id,'admin_id'=>$login['id']])->where('record_id',$value['record_id'])->sum('score');
+            if($rows[$key]['fact_score']/$rows[$key]['total_score']>=0.6){
                 $rows[$key]['pass']="已通过";
             }else{
                 $rows[$key]['pass']="未通过";
             }
         }
-
+        
         $this->assign('count',$count);
         $this->assign('rows',$rows);
         return $this->fetch('evaluation_record');
@@ -1542,64 +1795,97 @@ class Admin extends Base
     {
         $id=base64_decode(input('id'));
         $record_id=base64_decode(input('record_id'));
-
         $login=Session::get('login');
-
-        $rows=Db::name('questions')->where('examination_id',$id)->select();
-
-        $total_score=Db::name('evaluation_answer')->where(['record_id'=>$record_id])->sum('score');
-
+        $rows=Db::name('evaluation_answer')->alias('ea')->field('ea.id eaId,ea.evaluation_id eaEvaluation_Id,ea.answer eaAnswer,ea.type eaType,ea.score eaScore,ea.*,ei.id eiId,ei.evaluation_id eiEvaluation_Id,ei.answer eiAnswer,ei.type eiType,ei.score eiScore,ei.*')->join('evaluation_info ei','ea.evaluation_info_id=ei.id','LEFT')->where(['ea.evaluation_id'=>$id,'admin_id'=>$login['id'],'record_id'=>$record_id])->select();
+        $count=array();
         foreach ($rows as $key => $value) {
-
-            $result=Db::name('evaluation_answer')->where(['record_id'=>$record_id,'questions_id'=>$value['id']])->find();
-
-            if(empty($result) || $result['answer']==""){
-                $result['answer']="未答题";
-            }
-
-            if(empty($result) || empty($result['score'])){
-                $result['score']=0;
-            }
-
-            $rows[$key]['result']=$result['answer'];
-            $rows[$key]['real_score']=$result['score'];
-
-            if($value['type']=="0"){
+            # code...
+            array_push($count, $value['eaScore']);
+            $rows[$key]['id']=$key+1;
+            if($value['type']=="single"){
                 $rows[$key]['type']="单选题";
             }
 
-            if($value['type']=="1"){
-
+            if($value['type']=="multi"){
                 $rows[$key]['type']="多选题";
-                $rows[$key]['result']=str_replace("@", "", $rows[$key]['result']);
+                $rows[$key]['eaAnswer']=str_replace("_@", "、", $value['eaAnswer']);
+                $rows[$key]['result']=str_replace("_@", "、", $value['result']);
                 
             }
 
-            if($value['type']=="2"){
-
+            if($value['type']=="recognized"){
                 $rows[$key]['type']="判断题";
-
-                if($rows[$key]['result']=="1"){
-                    $rows[$key]['result']="正确";
-                }else{
+                if($value['eaAnswer']=="1"){
+                    $rows[$key]['eaAnswer']="错误";
                     $rows[$key]['result']="错误";
+                }else{
+                    $rows[$key]['eaAnswer']="正确";
+                    $rows[$key]['result']="正确";
                 }
             }
 
-            if($value['type']=="3"){
+            if($value['type']=="fill"){
                 $rows[$key]['type']="填空题";
             }
 
-            if($value['type']=="4"){
+            if($value['type']=="short"){
                 $rows[$key]['type']="简答题";
             }
         }
 
-        $this->assign('total_score',$total_score);
+        $this->assign('count',round(array_sum($count),1));
         $this->assign('rows',$rows);
-        $this->assign('id',input('id'));
-        
         return $this->fetch('evaluation_info');
+    }
+
+
+    public function get_options($arr)
+    {
+        foreach ($arr as $key => $value) {
+            # code...
+            if(is_array($value)){
+                $arr[$key]['content']=$this->cutstr_html($arr[$key]['content']);
+
+                $arr[$key]['answer']=$this->cutstr_html($arr[$key]['answer']);
+                
+                if(!empty($value['option'])){
+                    $value['option']=$this->cutstr_html($value['option']);
+                    
+                    $arr[$key]['option']=explode("_@", $value['option']);
+
+                    $i=65;
+                    foreach ($arr[$key]['option'] as $k => $v) {
+                        # code...
+                        $Char=strtoupper(chr($i)).'. ';//输出大写字母
+                        $arr[$key]['option'][$k]=$Char.$v."<br>";
+                        if($i<91){
+                            $i++;
+                        }
+                    }
+                    // for($i=65;$i<91;$i++){
+                    //     echo strtolower(chr($i)).' ';//输出小写字母
+                    //     echo strtoupper(chr($i)).' ';//输出大写字母
+                    // }
+                }
+            }
+            
+        }
+
+        return $arr;
+    }
+
+    //去除空格和html标签
+    public function cutstr_html($string)
+    {  
+
+        $string = strip_tags($string);  
+        $string = trim($string);  
+        // $string = preg_replace("/s/","",$string);  
+        // $string = str_replace("rn", '', $string);
+        // $string = str_replace("n", '', $string);
+
+        return trim($string);  
+
     }
 
     //管理员操作日志记录
@@ -1611,28 +1897,51 @@ class Admin extends Base
     //管理员日志信息查询
     public function admin_log_list()
     {
+        
+        $page=input("get.page")?input("get.page"):1;
+        $page=intval($page);
+        $limit=input("get.limit")?input("get.limit"):1;
+        $limit=intval($limit);
+        $limit=input('limit');
+
+        $where=[];
+        $where['is_available']=1;
         //判断搜索
         $post = $this->request->param();
 
-        $info=LogLogic::select($post,'admin_log');
-        
-        if(isset($info['list'])){
-            foreach ($info['list'] as $key => $value) {
+        if(isset($post['keywords']) && isset($post['modules'])){
 
-                $info['list'][$key]['create_time']=date('Y-m-d H:i:s',$value['create_time']);
+            if(empty($post['keywords']) && empty($post['modules'])){
+                unset($post['keywords']);
+                unset($post['modules']);
+                $data['status']=0;
+                $data['msg']="暂无数据...";
+                return json($data);
             }
+            
 
-        }else{
-
-            return $info;
+            $where[$post['modules']] = ['like', '%' . $post['keywords'] . '%'];
+            
         }
 
+        $count=Db::name('admin_log')->where($where)->count();
+
+        $list=Db::name('admin_log')->alias('l')->field('a.name,l.id,l.operation,l.time,g.role_name')->join('admin a','l.admin_id=a.id','LEFT')->join('role_group g','a.role_group_id=g.id','LEFT')->page($page,$limit)->where('l.is_available',1)->select();
+        foreach ($list as $key => $value) {
+            # code...
+            $list[$key]['time']=date('Y-m-d H:i:s',$value['time']);
+        }
+        if(empty($list)){
+            $data['status']=0;
+            $data['msg']="暂无数据...";
+            return json($data);
+        }
         
         $arr=array();
         $arr['code']=0;
         $arr['msg']="";
-        $arr['count']=$info['count'];
-        $arr['data']=$info['list'];
+        $arr['count']=$count;
+        $arr['data']=$list;
         
         return json_decode(json_encode($arr));
         
@@ -1652,9 +1961,9 @@ class Admin extends Base
         $id=Session::get('login.id');
 
         if(Session::get('login.img_url')!="" || Session::get('login.img_url')!=null){
-            $img_url="/uploads/header/".$id."/".Session::get('login.img_url');
+            $img_url="/uploads/".Session::get('login.img_url');
         }else{
-            $img_url="/uploads/header/face.jpg";
+            $img_url="/static/admin/images/face.jpg";
         }
 
         //好友列表
@@ -1665,13 +1974,13 @@ class Admin extends Base
         $list=array();
 
         foreach ($admin as $key => $value) {
-            
+            # code...
             $admin[$key]['username']=$value['name'];
 
             if($value['img_url']=='man.png' || $value['img_url']=='woman.png'){
-                $admin[$key]['avatar']="/uploads/header/".$value['img_url'];
+                $admin[$key]['avatar']="/images/".$value['img_url'];
             }else{
-                $admin[$key]['avatar']="/uploads/header/".$value['id']."/".$value['img_url'];
+                $admin[$key]['avatar']="/uploads/".$value['img_url'];
             }
             
             $admin[$key]['sign']="在自己实力不济的时候，不要去相信什么媒体和记者。他们不是善良的人，有时候候他们的采访对当事人而言就是陷阱";
@@ -1682,12 +1991,12 @@ class Admin extends Base
         }
 
         foreach ($department as $key => $value) {
-            
+            # code...
             $list[$key]['groupname']=$value['name'];
             $list[$key]['id']=$value['id'];
             $list[$key]['list']=array();
             foreach ($admin as $k => $v) {
-                
+                # code...
                 if($value['id']==$v['department_id']){
                     array_push($list[$key]['list'], $v);
                 }

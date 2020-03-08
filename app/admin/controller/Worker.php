@@ -3,15 +3,10 @@
 namespace app\admin\controller;
 
 use think\worker\Server;
-use Workerman\Lib\Timer;
-
-use app\admin\controller\Test;
 
 class Worker extends Server
 {
     protected $socket = 'websocket://localhost:2346';
-
-    protected $processes=1;
 
     /**
      * 收到信息
@@ -20,18 +15,7 @@ class Worker extends Server
      */
     public function onMessage($connection, $data)
     {
-        // $connection->send($data);
-        foreach($connection->worker->connections as $con)
-        {
-            $con->send($data.'已上线');
-        }
-
-        $timer_id = Timer::add(1, function()use($connection, $data,&$timer_id)
-        {
-            // $connection->send('timer_id='.$timer_id);
-            // $connection->send($data.'已上线');
-        });
-        
+        $connection->send($data);
     }
 
     /**
@@ -40,9 +24,6 @@ class Worker extends Server
      */
     public function onConnect($connection)
     {
-        // var_dump($connection->getRemoteIp());
-        // echo $connection->id;
-        // $connection->send($connection->id.'已上线');
 
     }
 
@@ -52,8 +33,7 @@ class Worker extends Server
      */
     public function onClose($connection)
     {
-        var_dump($connection->getRemoteIp());
-
+        
     }
 
     /**
@@ -73,8 +53,6 @@ class Worker extends Server
      */
     public function onWorkerStart($worker)
     {
-        $handle=new Test();
-        $handle->add_timer();
-    }
 
+    }
 }

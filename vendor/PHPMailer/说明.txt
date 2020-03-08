@@ -1,0 +1,104 @@
+第一步：准备PHPMailer
+将下载的PHPMailer放到ThinkPHP/library/Vendor下面
+第二:
+windows下在php.ini中去掉下面的分号
+extension=php_openssl.dll
+并将allow_url_fopen = Off改为
+allow_url_fopen = On
+第三：
+把以下内容放入common配置文件下:
+'THINK_EMAIL' => array(
+
+'SMTP_HOST' => 'smtp.163.com', //SMTP服务器
+
+'SMTP_PORT' => '465', //SMTP服务器端口
+
+'SMTP_USER' => 'huangfenhu10@163.com', //SMTP服务器用户名
+
+'SMTP_PASS' => '******', //SMTP服务器密码
+
+'FROM_EMAIL' => 'huangfenhu10@163.com', //发件人EMAIL
+
+'FROM_NAME' => '****', //发件人名称
+
+'REPLY_EMAIL' => 'huangfenhu10@163.com', //回复EMAIL（留空则为发件人EMAIL）
+
+'REPLY_NAME' => '*****', //回复名称（留空则为发件人名称）
+
+),
+第四：
+把以下内容放入common下面的common下的function.php下:
+function think_send_mail($to, $name, $subject = '', $body = '', $attachment = null){
+
+$config = C('THINK_EMAIL');
+
+Vendor('PHPMailer.PHPMailerAutoload'); //从PHPMailer目录导class.phpmailer.php类文件
+
+$mail = new PHPMailer(); //PHPMailer对象
+
+$mail->CharSet = 'UTF-8'; //设定邮件编码，默认ISO-8859-1，如果发中文此项必须设置，否则乱码
+
+$mail->IsSMTP(); // 设定使用SMTP服务
+
+$mail->SMTPDebug = 0; // 关闭SMTP调试功能
+
+// 1 = errors and messages
+
+// 2 = messages only
+
+$mail->SMTPAuth = true; // 启用 SMTP 验证功能
+
+$mail->SMTPSecure = 'ssl'; // 使用安全协议
+
+$mail->Host = $config['SMTP_HOST']; // SMTP 服务器
+
+$mail->Port = $config['SMTP_PORT']; // SMTP服务器的端口号
+
+$mail->Username = $config['SMTP_USER']; // SMTP服务器用户名
+
+$mail->Password = $config['SMTP_PASS']; // SMTP服务器密码
+
+$mail->SetFrom($config['FROM_EMAIL'], $config['FROM_NAME']);
+
+$replyEmail = $config['REPLY_EMAIL']?$config['REPLY_EMAIL']:$config['FROM_EMAIL'];
+
+$replyName = $config['REPLY_NAME']?$config['REPLY_NAME']:$config['FROM_NAME'];
+
+$mail->AddReplyTo($replyEmail, $replyName);
+
+$mail->Subject = $subject;
+
+$mail->AltBody = "为了查看该邮件，请切换到支持 HTML 的邮件客户端";
+
+$mail->MsgHTML($body);
+
+$mail->AddAddress($to, $name);
+
+if(is_array($attachment)){ // 添加附件
+
+foreach ($attachment as $file){
+
+is_file($file) && $mail->AddAttachment($file);
+
+}
+
+}
+
+return $mail->Send() ? true : $mail->ErrorInfo;
+
+}
+第五步调取函数：
+public function add(){
+if (think_send_mail($_POST['mail'], $_POST['title'], $subject = '一起来欢乐!',$_POST['content'], $attachment = null)) {
+$this->success('发送成功！');
+} else {
+$this->error('发送失败');
+}
+}
+第六步在模板里传值:
+<form action="/home/add/index" method="post" enctype="multipart/form-data">
+邮箱：<input type="text" id="mail" name="mail"/>
+标题：<input type="text" id="title" name="title"/>
+内容: <input type="text" id="content" name="content"/>
+<input class="button" type="submit" value="发送" style="margin: 0 auto;display: block;"/>
+</form>

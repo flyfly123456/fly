@@ -4,41 +4,28 @@ use \think\Controller;
 use \think\Db;
 use \think\Request;
 use \think\Image;
-use app\admin\model\Cate as Sort;
 
-use app\admin\behavior\Behavior;
-use app\admin\behavior\Files;
-
-class Cate extends Base
+class Cate extends Controller
 {
-    public function _initialize()//_initialize与__construct有区别
-    {
-        parent::_initialize();
-        $request= Request::instance();
-        $module_name=$request->module();
-        $action=$request->action();
-        $controller=$request->controller();
-        $action=$module_name."/".$controller."/".$action;
-        parent::admin_priv($action);
-    }
-
     public function cate_list()
     {
-    	$rows=Sort::all(['is_available'=>1]);
+    	$rows=Db::name('cate')->where('is_available=1')->select();
         
     	foreach ($rows as $key => $value) {
             
-            if($value['status']=='1'){
-                $rows[$key]['status']="已启用";
+            if($value['is_available']=='1'){
+                $rows[$key]['is_available']="正常";
             }else{
-                $rows[$key]['status']="已禁用";
+                $rows[$key]['is_available']="禁用";
             }
         }
 
     	$cate=json_encode($rows,JSON_UNESCAPED_UNICODE);
-
-        $count=count($rows);
-
+    	// echo "<pre>";
+    	//     print_r($cate);
+    	// echo "</pre>";
+    	// exit;
+        $count=Db::name('cate')->where('is_available=1')->count();
         $this->assign('cate',$cate);
         $this->assign('count',$count);
 
@@ -47,7 +34,20 @@ class Cate extends Base
 
     public function cate_add()
     {
-        $rows=Sort::select();
+    	$rows=Db::name('cate')->field("id,title,pid,path,concat(path,',',id) as bpath")->order('bpath')->where('is_available=1')->select();
+
+    	foreach ($rows as $key => $value) {
+    		
+    		$rows[$key]['count']=count(explode('-',$value['bpath']));
+
+    		$rows[$key]['title']=str_repeat('&nbsp;&nbsp;', substr_count($value['path'], '-')).'&nbsp;&nbsp;|--'.$value['title'];
+
+    	}
+
+    	// echo "<pre>";
+    	//     print_r($rows);
+    	// echo "</pre>";
+    	// exit;
 
     	$post = $this->request->param();
 
@@ -61,19 +61,14 @@ class Cate extends Base
                 $arr['is_available']=$post['status'];
 	    		$arr['desc']=$post['desc'];
                 if(isset($post['img_url'])){
-                    $arr['img']=date('Ymd').DS.$post['img_url'];
-
-                    Files::thumb_image($post['img_url'],'cate'.DS.date('Ymd'),$width=400,$height=300);
+                    $arr['img']=$post['img_url'];
                 }
 
                 if(isset($post['url'])){
                     $arr['url']=$post['url'];
                 }
 
-                $insertGetId=Sort::create($arr);
-
-	    		$pid=$insertGetId->id;
-
+	    		$pid=Db::name('cate')->insertGetId($arr);
 	    		if(!$pid){
 	    			//  抛出异常
 	    			throw new \Exception("插入失败...");
@@ -83,9 +78,7 @@ class Cate extends Base
 
 	    			$array['path']='0-'.$pid;
 	    		}else{
-
-                    $path=Sort::get(['id'=>$post['pid']]);
-
+	    			$path=Db::name('cate')->field('path')->where("id=$post[pid]")->find();
 	    			if(!$path){
 	    				//  抛出异常
 	    				throw new \Exception("查询失败...");
@@ -94,7 +87,7 @@ class Cate extends Base
 	    			$array['path']=$path['path'].'-'.$pid;
 	    		}
 
-	    		$result=Sort::where('id',$pid)->update($array);
+	    		$result=Db::name('cate')->where("id=$pid")->update($array);
 
 	    		if($pid && $result){
 	    			// 提交事务
@@ -117,14 +110,11 @@ class Cate extends Base
             }
     	}
 
-        $pid=input('pid');
-        $id=input('id');
-
+        $request = Request::instance();
+        $domain=$request->domain();
 
         $this->assign('cate',$rows);
-        
-        $this->assign('pid',$pid);
-    	$this->assign('id',$id);
+    	$this->assign('domain',$domain);
 
     	return $this->fetch('cate_add');
     }
@@ -134,89 +124,112 @@ class Cate extends Base
     {
         $id=input('id');
 
-        $rows=Sort::get(['id'=>$id]);
+        $rows=Db::name('cate')->where("id=$id")->find();
+        $cate=Db::name('cate')->field("id,title,pid,path,concat(path,',',id) as bpath")->order('bpath')->where('is_available=1')->select();
 
-        $cate=Sort::select();
+        foreach ($cate as $key => $value) {
+            
+            $cate[$key]['count']=count(explode('-',$value['bpath']));
+
+            $cate[$key]['title']=str_repeat('&nbsp;&nbsp;', substr_count($value['path'], '-')).'&nbsp;&nbsp;|--'.$value['title'];
+
+        }
 
         $post = $this->request->param();
 
         if(isset($post['id']) && isset($post['title']) && isset($post['status'])){
-            
-            $rest=Sort::get(['id'=>$post['id']]);
-            
+                
             $array['title']=$post['title'];
             $array['is_available']=$post['status'];
             $array['desc']=$post['desc'];
-            
-            if(isset($post['img_url']) && $post['img_url']!=$rest['img']){
-
-                $array['img']=dirname($rest['img']).DS.$post['img_url'];
-
-                Files::thumb_image($post['img_url'],'cate'.DS.dirname($rest['img']),$width=400,$height=300);
+            if(isset($post['img_url'])){
+                $array['img']=$post['img_url'];
             }
 
             if(isset($post['url'])){
                 $array['url']=$post['url'];
             }
 
-            $result=Sort::where("id",$post['id'])->update($array);
-            
-            return Behavior::return_info($result);
+            $result=Db::name('cate')->where("id=$post[id]")->update($array);
+            if($result){
+                $data['status']='1';
+                $data['msg']='修改成功！';
+                return json($data);
+            }else{
+                $data['status']='0';
+                $data['msg']='修改失败！';
+                return json($data);
+            }
         }
+
+        $request = Request::instance();
+        $domain=$request->domain();
         
         $this->assign('rows',$rows);
         $this->assign('cate',$cate);
         $this->assign('id',$id);
+        $this->assign('domain',$domain);
 
         return $this->fetch('cate_edit');
         
     }
 
-
-    public function cate_toggle()
+    public function show_img()
     {
-        if (Request::instance()->isAjax()){
-
-            $data=Request::instance()->post();
-            if(!empty($data)){
-
-                return Behavior::toggle_status('cate',$data['id']);
+        $post = $this->request->param();
+        if(isset($post['id'])){
+            $rows=Db::name('cate')->where("id=$post[id]")->find();
+            if($rows['pid']=='0'){
+                $data['status']='1';
+                return json($data);
+            }else{
+                $data['status']='0';
+                return json($data);
             }
-
         }
     }
 
-    
+    public function upload_img()
+    {
+        if(Request::instance()->isAjax()){
+            $file=Request::instance()->file('file');
+            // $file = request()->file('file');
+            // $info = $file->move(ROOT_PATH . 'public' . DS . 'uploads');
+            if($file){
+
+                $info = $file->validate(['size'=>1048576,'ext'=>'jpg,png,gif'])->move(ROOT_PATH . 'public' . DS . 'uploads');
+                if($info){
+
+                    $image = \think\Image::open(ROOT_PATH . 'public' . DS . 'uploads'.DS.$info->getSaveName());
+                    $image->thumb(400, 300)->save(ROOT_PATH . 'public' . DS . 'uploads'.DS.$info->getSaveName());
+
+                    return json_encode(['state' => 1, 'message' => $file->getError(),'img'=>$info->getSaveName()]);
+                
+                }else{
+                    // 上传失败获取错误信息
+                    //     return $file->getError();
+                    return json_encode(['state' => 0, 'message' => $file->getError()]);
+                }
+            }
+        }
+    }
+
+
     public function cate_delete()
     {
         $post = $this->request->param();
         if(isset($post['id'])){
-            
-            return Behavior::delete($post['id'],'cate');
-            
-        }
-    }
-
-
-    public function delete_all()
-    {
-        if (Request::instance()->isAjax()){
-
-            $data=Request::instance()->post();
-            
-            if($data!=""||!empty($data)){
-                
-                return Behavior::delete_all($data,'cate');
-                
+            $rows=Db::name('cate')->where("id=$post[id]")->update(['is_available'=>'0']);
+            if($rows){
+                $data['status']='1';
+                $data['msg']='删除成功';
+                return json($data);
             }else{
-                $data['status']="0";
-                $data['msg']="数据获取异常，请稍后再试！";
+                $data['status']='0';
+                $data['msg']='删除失败';
                 return json($data);
             }
-
-        } 
+        }
     }
-
-
 
 }
