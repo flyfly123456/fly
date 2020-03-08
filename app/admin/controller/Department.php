@@ -115,6 +115,7 @@ class Department extends Base
                     return json($data);
                 }else{
                     $arr['status']=$data['status'];
+                    $arr['desc']=$data['desc'];
                     $arr['is_available']=1;
                     $rows=Db::name('department')->insert($arr);
                     if($rows){
@@ -151,16 +152,20 @@ class Department extends Base
                         return json($data);
                     }
                     $rest=Db::name('department')->where('name',$data['name'])->select();
-                    if($rest){
-                        $data['status']="0";
-                        $data['msg']="部门名称已经存在！";
-                        return json($data);
+                    foreach ($rest as $key => $value) {
+                        if($value['id']!=$arr['id']){
+                            $data['status']="0";
+                            $data['msg']="部门名称已经存在！";
+                            return json($data);
+                        }
                     }
+                    
                     $arr['status']=$data['status'];
                 }else{
                     $arr['status']=$data['status'];
                 }
                 $arr['is_available']=1;
+                $arr['desc']=$data['desc'];
                 $rows=Db::name('department')->where('id',$arr['id'])->update($arr);
                 if($rows){
                     $data['status']="1";

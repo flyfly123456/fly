@@ -281,14 +281,44 @@
 									<a id="LikBuy" title="点此按钮到下一步确认购买信息" href="#">立即购买</a>
 								</div>
 							</li>
-							<li>
+							<li onClick="openModal()">
 								<div class="clearfix tb-btn tb-btn-basket theme-login">
 									<a id="LikBasket" title="加入购物车" href="javascript:;"><i></i>加入购物车</a>
 								</div>
 							</li>
 						</div>
-
 					</div>
+
+					<div class="am-modal am-modal-alert" tabindex="-1" id="sett_login">
+			            <div class="am-modal-dialog" style="padding:20px;">
+			            	<div class="am-modal-hd"></div>
+			                <div class="am-modal-bd">
+			                <!--模态框内容-->
+			                    <h3 style="font-size:16px;color:red;">商品已成功加入购物车...</h3>
+			                </div>
+			                <div class="am-modal-footer">
+			                	<!--关键是在这里为两个按钮加上data-am-modal-confirm与data-am-modal-cancel属性-->
+			                    <span class="am-modal-btn" data-am-modal-confirm>继续购物</span>
+			                    <span class="am-modal-btn" data-am-modal-cancel>订单结算</span>     
+			                </div>
+			            </div>
+			        </div>
+
+			        <script>
+
+			        function openModal(){
+			        	$('#sett_login').modal({
+			        		onConfirm: function() {
+			        			var username=document.getElementById("username").value;
+			        			var password=document.getElementById("password").value;
+			        			alert("用户点击了提交，输入了用户名："+username+"，密码："+password+"，接下去一般是ajax提交表单");
+			        		},
+			        		onCancel: function() {
+			        			window.location.href="{:url('index/shop/cart')}"
+			        		}
+			        	});
+			        }
+			        </script>
 
 					<div class="clear"></div>
 

@@ -203,7 +203,7 @@ layui.use(['form','layer'], function(){
                     action="";
                     $.each(res.info, function(index, val) {
                         //iterate through array or object
-                        action+="<li style='float:left;width:150px;'><input name='code_list' lay-skin='primary' lay-filter='code_list' type='checkbox' title='"+val+"' value='"+val+"'></li>";
+                        action+="<li style='float:left;width:220px;'><input name='code_list' lay-skin='primary' lay-filter='code_list' type='checkbox' title='"+val+"' value='"+val+"'></li>";
                     });
                     // console.log(action);
                     $('.action').empty().append(action);

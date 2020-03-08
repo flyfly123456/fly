@@ -43,12 +43,12 @@
                     <div class="layui-input-inline">
                         <select name="modules" lay-verify="" lay-search="">
                             <option value="">选择搜索条件</option>
-                            <option value="name">登入名</option>
-                            <option value="sex">性别</option>
-                            <option value="telephone">电话</option>
-                            <option value="email">邮箱</option>
-                            <option value="role">角色</option>
-                            <option value="department_id">部门</option>
+                            <option value="name">名称</option>
+                            <option value="cate">分类</option>
+                            <option value="brand">品牌</option>
+                            <option value="desc">描述</option>
+                            <option value="price">价格</option>
+                            <option value="number">库存</option>
                             <option value="status">状态</option>
                         </select>
                     </div>
@@ -68,14 +68,15 @@
                     <th lay-data="{type:'checkbox', fixed: 'left'}"></th>
                     <th lay-data="{field:'id',sort: true, fixed: true}">ID</th>
                     <th lay-data="{field:'name', width:180}">名称</th>
-                    <th lay-data="{field:'cate_id'}">分类</th>
-                    <th lay-data="{field:'brand_id'}">品牌</th>
+                    <th lay-data="{field:'cate', width:180}">分类</th>
+                    <th lay-data="{field:'brand',width:180}">品牌</th>
                     <th lay-data="{field:'desc', width:300}">描述</th>
                     <th lay-data="{field:'parameter', width:300}">参数</th>
                     <th lay-data="{field:'price', width:120}">价格</th>
                     <th lay-data="{field:'number', width:180}">库存</th>
-                    <th lay-data="{fixed: 'right', field:'is_available', width:110, templet: '#is_available'}">状态</th>
-                    <th lay-data="{fixed: 'right', width:210, align:'center', toolbar: '#barDemo'}">操作</th>
+                    <th lay-data="{field:'create_time', width:180}">添加时间</th>
+                    <th lay-data="{fixed: 'right', field:'shelf', width:110, templet: '#shelf'}">状态</th>
+                    <th lay-data="{fixed: 'right', width:140, align:'center', toolbar: '#barDemo'}">操作</th>
                 </tr>
             </thead>
         </table>
@@ -84,19 +85,18 @@
     <!-- 头部导出筛选 -->
     <script type="text/html" id="demoTable">
            
-        <button class="layui-btn layui-btn-danger layui-btn-sm delete_all" data-type="getCheckData"><i class="layui-icon layui-icon-delete"></i>批量删除</button>
+        <button class="layui-btn layui-btn-danger layui-btn-sm delete_all" data-type="batchdelete"><i class="layui-icon layui-icon-delete"></i>批量删除</button>
         <button class="layui-btn layui-btn-sm" onclick="x_admin_show('添加用户','shop_add')"><i class="layui-icon">&#xe608;</i>添加</button>
         <button class="layui-btn layui-btn-primary layui-btn-sm" onclick="f_admin_export()"><i class="layui-icon layui-icon-export"></i>导出</button>
     </script>
 
     <script type="text/html" id="barDemo">
-        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail" onclick="x_admin_show('查看','shop_view?id={{d.id}}')">查看</a>
         <a class="layui-btn layui-btn-xs" lay-event="edit" onclick="x_admin_show('商品编辑','shop_edit?id={{d.id}}')">编辑</a>
         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
     </script>
 
-    <script type="text/html" id="is_available">
-        <input type="checkbox" name="is_available" value="{{d.id}}" title="上架" lay-filter="deitStatus" {{ '上架' == d.is_available ? 'checked' : '' }}>
+    <script type="text/html" id="shelf">
+        <input type="checkbox" name="shelf" value="{{d.id}}" title="上架" lay-filter="deitStatus" {{ '1' == d.shelf ? 'checked' : '' }}>
     </script>
 
     <script>
@@ -206,36 +206,22 @@
         });
       
         var $ = layui.$, active = {
-            getCheckData: function(){ //批量删除
+            batchdelete: function(){ //批量删除
                 var checkStatus = table.checkStatus('idTest')
                 ,data = checkStatus.data;
-                // layer.alert(JSON.stringify(data));
-                // data=JSON.stringify(data);
+                data=JSON.stringify(data);
                 // console.log(data)
                 if(data.length==0){
                     layer.msg('请选择要删除的数据！');
                     return false;
                 }else{
                     layer.confirm('确认要删除吗？',{icon: 3, title:'提示'},function(index){
-                        arrobj=[];
-                        var str="";
-                        var jsonStr="";
-                        for (var i = 0; i < data.length; i++) {
-                          str="\""+data[i]['id']+"\":"+"\""+data[i]['id']+"\",";
-                          jsonStr+=str;
-                        };
-
-                        substr=jsonStr.slice(0,-1);
-                        
-                        substr="{"+substr+"}";
-                        jsonObj=eval('(' + substr + ')');
-                        console.log(jsonObj)
                         // console.log(data)
                         $.ajax({
-                            url: "{:url('admin/Admin/admin_delete_all')}",
+                            url: "{:url('admin/shop/delete_all')}",
                             type: 'POST',
                             dataType: 'json',
-                            data: jsonObj,
+                            data: {id:data},
                             success: function(res) {
                                 //called when successful
                                 console.log(res)
@@ -293,7 +279,9 @@
                             }
                             ,where: {
                                 keywords: demoReload.val(),
-                                modules:modules.val()
+                                modules:modules.val(),
+                                start:start.val(),
+                                end:end.val()
                             }
                         });
                     },
@@ -311,35 +299,6 @@
             active[type] ? active[type].call(this) : '';
         });
 
-        //更改性别
-        form.on('switch(editSex)', function(obj){
-            if(obj.elem.checked){
-                sex=0;
-            }else{
-                sex=1;
-            }
-            post={
-                id:this.value,
-                field:this.name,
-                name:sex
-            }
-            $.ajax({
-                url: "{:url('admin/Admin/admin_edit')}",
-                type: 'POST',
-                dataType: 'json',
-                data: post,
-                success: function(res) {
-                    //called when successful
-                    layer.msg(res.msg,{icon:1,time:1000});
-                },
-                error: function(res) {
-                    //called when there is an error
-                    layer.msg('网络异常，请稍后再试！');
-                }
-            });
-            
-            // layer.tips(this.value + ' ' + this.name + '：'+ obj.elem.checked, obj.othis);
-        });
 
         //监听状态操作
         form.on('checkbox(deitStatus)', function(obj){
@@ -354,8 +313,9 @@
                 field:this.name,
                 name:is_available
             }
+            console.log(post)
             $.ajax({
-                url: "{:url('admin/Shop/shop_edit')}",
+                url: "{:url('admin/shop/change_status')}",
                 type: 'POST',
                 dataType: 'json',
                 data: post,

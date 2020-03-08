@@ -42,26 +42,21 @@
                 </div>
             </div>
 
-            <div class="layui-form-item"> 
-                <label class="layui-form-label"><span class="x-red">*</span>图片</label> 
-                <div class="layui-input-inline"> 
-                    <input name="img_url" lay-verify="required" id="img_url" placeholder="图片地址" value="" autocomplete="off" class="layui-input" /> 
-                </div> 
-                <div class="layui-input-inline" style="width: auto;"> 
-                    <div class="layui-upload"> 
-                        <button type="button" class="layui-btn" id="up_img">上传图片</button>
-                        <button type="button" class="layui-btn" id="view_img">查看图片</button> 
-                    </div> 
-                </div> 
-                <div class="layui-form-mid layui-word-aux"> 
-                    <span class="x-red">*</span>选择图片后系统会自动上传
-                </div> 
-            </div> 
-            <div class="layui-form-item"> 
-                <div class="layui-upload-list" style="margin-left:66px"> 
-                    <img class="layui-upload-img" id="up_imgs" /> 
-                    <span id="up_text"></span> 
-                </div> 
+            <div class="layui-form-item img">
+                <label for="img_url" class="layui-form-label"><span class="x-red">*</span>图片</label>
+                <div class="layui-input-inline">
+                    <input name="img_url" id="img_url" placeholder="图片地址" value="" class="layui-input" />
+                  
+                </div>
+                <div class="layui-input-inline" style="width: auto;">
+                    <div class="layui-upload">
+                        <button type="button" class="layui-btn" id="img">上传图片</button>
+                        <button type="button" class="layui-btn" id="show_img">查看图片</button>
+                    </div>
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    <span class="x-red">*</span>选择图片后系统会自动上传...
+                </div>
             </div>
 
             <div class="layui-form-item"> 
@@ -152,32 +147,7 @@ layui.use(['form','layer','upload','colorpicker'], function(){
     });
 
     //普通图片上传
-    var uploadInst = upload.render({
-        elem: '#up_img'
-        ,url: "{:url('admin/Ad/ad_up_img')}"
-        ,before: function(obj){
-            //预读本地文件示例，不支持ie8
-            obj.preview(function(index, file, result){
-                $('#up_imgs').attr('src', result); //图片链接（base64）
-            });
-        }
-        ,done: function(res){
-            //如果上传失败
-            if(res.code > 0){
-                return layer.msg('上传失败');
-            }
-            $('#img_url').val(res.img);
-            //上传成功
-        }
-        ,error: function(){
-            //演示失败状态，并实现重传
-            var demoText = $('#coverText');
-            demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
-            demoText.find('.demo-reload').on('click', function(){
-                uploadInst.upload();
-            });
-        }
-    });
+    <include file="public/uploads" />
 
     //监听提交
     form.on('submit(add)', function(data){
@@ -222,8 +192,6 @@ layui.use(['form','layer','upload','colorpicker'], function(){
 
     return false;
 });
-
-
 
 
 });

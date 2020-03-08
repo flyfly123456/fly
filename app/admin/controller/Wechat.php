@@ -5,6 +5,7 @@ use \think\Request;
 use \think\Db;
 use \think\Session;
 use app\admin\model\Wechat as WechatModel;
+use app\admin\model\WechatFans;
 
 class Wechat extends Base
 {
@@ -116,7 +117,9 @@ class Wechat extends Base
     		$memcache=new \Memcache();
             $memcache->connect('127.0.0.1',11211) or die('Count not connect...');
             $wechat_config=$memcache->get('wechat_config');
+
             if($wechat_config==null){
+
                 $wechat_config=Db::name('wechat_config')->where('id',1)->limit(0,1)->find();
                 if(!$wechat_config){
                     $data['status']='0';
@@ -129,6 +132,7 @@ class Wechat extends Base
 
     		$WechatModel= new WechatModel($wechat_config['appid'],$wechat_config['appsecret']);
 
+
     		$get_users_list=$WechatModel->get_users_list();
     		
     		foreach ($get_users_list['user_info_list'] as $key => $value) {
@@ -136,9 +140,9 @@ class Wechat extends Base
     			foreach ($value as $k => $v) {
     				# code...
     				if(!is_array($v)){
-    					if($v===""){
-    						unset($get_users_list['user_info_list'][$key][$k]);
-    					}
+    					// if($v===""){
+    					// 	unset($get_users_list['user_info_list'][$key][$k]);
+    					// }
     				}else{
     					unset($get_users_list['user_info_list'][$key][$k]);
     				}
@@ -153,7 +157,8 @@ class Wechat extends Base
 
     		if(empty($rows)){
 
-    			$rest=Db::name('wechat_fans')->insertAll($get_users_list['user_info_list']);
+                $WechatFans=new WechatFans;
+                $rest=$WechatFans->saveAll($get_users_list['user_info_list']);
 
     			if($rest){
     				$data['status']='1';
@@ -173,7 +178,7 @@ class Wechat extends Base
 
                 Db::startTrans();
                 try{
-                    Db::query('truncate table wechat_fans');
+                    Db::name('wechat_fans')->where('id','>',0)->delete();
 
                     $rest=Db::name('wechat_fans')->insertAll($get_users_list['user_info_list']);
                     if(!$rest){

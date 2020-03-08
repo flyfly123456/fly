@@ -43,12 +43,9 @@
                     <div class="layui-input-inline">
                         <select name="modules" lay-verify="" lay-search="">
                             <option value="">选择搜索条件</option>
-                            <option value="name">登入名</option>
-                            <option value="sex">性别</option>
-                            <option value="telephone">电话</option>
-                            <option value="email">邮箱</option>
-                            <option value="role">角色</option>
-                            <option value="department_id">部门</option>
+                            <option value="name">名称</option>
+                            <option value="sponsor">发起人</option>
+                            <option value="approve">审批人</option>
                             <option value="status">状态</option>
                         </select>
                     </div>
@@ -70,7 +67,7 @@
                     <th lay-data="{field:'name', width:240}">名称</th>
                     <th lay-data="{field:'sponsor', width:180}">发起人</th>
                     <th lay-data="{field:'approve', width:180}">审批人</th>
-                    <th lay-data="{field:'time', width:180}">发起时间</th>
+                    <th lay-data="{field:'create_time', width:180}">发起时间</th>
                     <th lay-data="{fixed: 'right',field:'status', width:110}">状态</th>
                     <th lay-data="{fixed: 'right', width:240, align:'center', toolbar: '#barDemo'}">操作</th>
                 </tr>
@@ -81,7 +78,7 @@
     <!-- 头部导出筛选 -->
     <script type="text/html" id="demoTable">
            
-        <button class="layui-btn layui-btn-danger layui-btn-sm delete_all" data-type="getCheckData"><i class="layui-icon layui-icon-delete"></i>批量删除</button>
+        <button class="layui-btn layui-btn-danger layui-btn-sm delete_all" data-type="batchdelete"><i class="layui-icon layui-icon-delete"></i>批量删除</button>
         <button class="layui-btn layui-btn-sm again_approval" data-type="again_approval"><i class="layui-icon layui-icon-release"></i>重新送审</button>
         <button class="layui-btn layui-btn-primary layui-btn-sm" onclick="f_todo_export()"><i class="layui-icon layui-icon-export"></i>导出</button>
     </script>
@@ -231,36 +228,36 @@
         });
       
         var $ = layui.$, active = {
-            getCheckData: function(){ //批量删除
+            batchdelete: function(){ //批量删除
                 var checkStatus = table.checkStatus('idTest')
                 ,data = checkStatus.data;
-                // layer.alert(JSON.stringify(data));
-                // data=JSON.stringify(data);
+                data=JSON.stringify(data);
                 // console.log(data)
                 if(data.length==0){
                     layer.msg('请选择要删除的数据！');
                     return false;
                 }else{
                     layer.confirm('确认要删除吗？',{icon: 3, title:'提示'},function(index){
-                        arrobj=[];
-                        var str="";
-                        var jsonStr="";
-                        for (var i = 0; i < data.length; i++) {
-                          str="\""+data[i]['id']+"\":"+"\""+data[i]['id']+"\",";
-                          jsonStr+=str;
-                        };
+                        // arrobj=[];
+                        // var str="";
+                        // var jsonStr="";
+                        // for (var i = 0; i < data.length; i++) {
+                        //   str="\""+data[i]['id']+"\":"+"\""+data[i]['id']+"\",";
+                        //   jsonStr+=str;
+                        // };
 
-                        substr=jsonStr.slice(0,-1);
+                        // substr=jsonStr.slice(0,-1);
                         
-                        substr="{"+substr+"}";
-                        jsonObj=eval('(' + substr + ')');
-                        console.log(jsonObj)
+                        // substr="{"+substr+"}";
+                        // jsonObj=eval('(' + substr + ')');
+                        // console.log(jsonObj)
+
                         // console.log(data)
                         $.ajax({
-                            url: "{:url('admin/Todolist/todo_list_delete_all')}",
+                            url: "{:url('admin/Todolist/delete_all')}",
                             type: 'POST',
                             dataType: 'json',
-                            data: jsonObj,
+                            data: {id:data},
                             success: function(res) {
                                 //called when successful
                                 console.log(res)
@@ -339,7 +336,12 @@
                     start:start.val(),
                     end:end.val()
                 }
-                console.log(post)
+                
+                if(start.val()=="" && end.val()=="" && demoReload.val()=="" && modules.val()==""){
+                    layer.msg('请选择或输入关键字进行搜索',{icon:2});
+                    return false;
+                }
+                // console.log(post)
                 $.ajax({
                     url: "{:url('admin/Todolist/todo_list_info')}",
                     type: 'POST',
@@ -355,7 +357,9 @@
                             }
                             ,where: {
                                 keywords: demoReload.val(),
-                                modules:modules.val()
+                                modules:modules.val(),
+                                start:start.val(),
+                                end:end.val()
                             }
                         });
                     },
@@ -381,10 +385,10 @@
 
     });
 
-    //会员导出
+    //待办事项导出
     function f_todo_export(){
       layer.confirm('确认要导出吗？',function(){
-          window.location="{:url('admin/Todolist/todo_export')}";
+          window.location="{:url('admin/Todolist/export_list')}";
           layer.msg('导出成功', {icon: 1});
 
       })

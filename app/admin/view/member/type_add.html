@@ -21,6 +21,15 @@
   </head>
   
   <body class="layui-anim layui-anim-up">
+    <div class="x-nav">
+        <span class="layui-breadcrumb">
+            <a href="">首页</a>
+            <a href="">会员管理</a>
+            <a><cite>添加类型</cite></a>
+        </span>
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+            <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
+    </div>
     <div class="x-body">
       <blockquote class="layui-elem-quote">
               注意：会员类型名称不得少于2个字符！
@@ -33,13 +42,21 @@
                   <input type="text" id="L_type" name="type" required="" lay-verify="type" autocomplete="off" class="layui-input" value="{$rows.type?$rows.type:''}" placeholder="请输入会员类型名称">
                 </div>
             </div>
+
+            <div class="layui-form-item layui-form-text"> 
+                <label class="layui-form-label">描述</label> 
+                <div class="layui-input-block"> 
+                    <textarea name="desc" placeholder="请输入内容" class="layui-textarea">{$rows.desc?$rows.desc:''}</textarea> 
+                </div> 
+            </div>
+
             <div class="layui-form-item">
                 <label for="L_repass" class="layui-form-label">
                 </label>
-                <button  class="layui-btn" lay-filter="add" lay-submit="">
+                <button  class="layui-btn layui-btn-sm" lay-filter="add" lay-submit="">
                       {$rows.id?'立即修改':'立即添加'}
                 </button>
-                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                <button type="reset" class="layui-btn layui-btn-sm layui-btn-warm">重置</button>
             </div>
             <input type="hidden" name="id" value="{$rows.id?$rows.id:''}">
       </form>

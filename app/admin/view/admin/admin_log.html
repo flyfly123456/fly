@@ -23,8 +23,8 @@
     <div class="x-nav">
         <span class="layui-breadcrumb">
             <a href="">首页</a>
-            <a href="">演示</a>
-            <a><cite>导航元素</cite></a>
+            <a href="">权限管理</a>
+            <a><cite>管理员日志</cite></a>
         </span>
         <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
             <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
@@ -43,13 +43,9 @@
                     <div class="layui-input-inline">
                         <select name="modules" lay-verify="" lay-search="">
                             <option value="">选择搜索条件</option>
-                            <option value="username">用户名</option>
-                            <option value="sex">性别</option>
-                            <option value="telephone">电话</option>
-                            <option value="email">邮箱</option>
-                            <option value="address">地址</option>
-                            <option value="type">类型</option>
-                            <option value="status">状态</option>
+                            <option value="name">管理员</option>
+                            <option value="role_name">管理员权限</option>
+                            <option value="operation">操作内容</option>
                         </select>
                     </div>
                 </div>
@@ -70,7 +66,7 @@
                     <th lay-data="{field:'name'}">管理员名称</th>
                     <th lay-data="{field:'role_name'}">管理员权限</th>
                     <th lay-data="{field:'operation'}">操作内容</th>
-                    <th lay-data="{field:'time', sort: true}">操作时间</th>
+                    <th lay-data="{field:'create_time', sort: true}">操作时间</th>
                     <th lay-data="{fixed: 'right', width:100, align:'center', toolbar: '#barDemo'}">操作</th>
                 </tr>
             </thead>
@@ -229,7 +225,7 @@
                 }
                 console.log(post)
                 $.ajax({
-                    url: "{:url('admin/Member/admin_log_list')}",
+                    url: "{:url('admin/Admin/admin_log_list')}",
                     type: 'POST',
                     dataType: 'json',
                     data: post,
@@ -243,7 +239,9 @@
                             }
                             ,where: {
                                 keywords: demoReload.val(),
-                                modules:modules.val()
+                                modules:modules.val(),
+                                start:start.val(),
+                                end:end.val()
                             }
                         });
                     },

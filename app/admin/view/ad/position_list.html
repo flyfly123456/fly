@@ -70,7 +70,7 @@
                     <th lay-data="{field:'name', width:180}">名称</th>
                     <th lay-data="{field:'desc'}">描述</th>
                     <th lay-data="{fixed: 'right', field:'status', width:110, templet: '#status'}">状态</th>
-                    <th lay-data="{fixed: 'right', width:210, align:'center', toolbar: '#barDemo'}">操作</th>
+                    <th lay-data="{fixed: 'right', width:160, align:'center', toolbar: '#barDemo'}">操作</th>
                 </tr>
             </thead>
         </table>
@@ -85,8 +85,7 @@
     </script>
 
     <script type="text/html" id="barDemo">
-        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail" onclick="x_admin_show('查看','ad_view?id={{d.id}}')">查看</a>
-        <a class="layui-btn layui-btn-xs" lay-event="edit" onclick="x_admin_show('位置编辑','ad_edit?id={{d.id}}')">编辑</a>
+        <a class="layui-btn layui-btn-xs" lay-event="edit" onclick="x_admin_show('位置编辑','position_edit?id={{d.id}}')">编辑</a>
         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
     </script>
 
@@ -138,7 +137,7 @@
                     console.log(data.id)
                     //发异步删除数据
                     $.ajax({
-                        url: 'admin_delete',
+                        url: 'position_delete',
                         type: 'POST',
                         dataType: 'json',
                         data: {id:data.id},
@@ -162,34 +161,6 @@
                 });
             } else if(obj.event === 'edit'){
                 // layer.alert('编辑行：<br>'+ JSON.stringify(data.id))
-            } else if(obj.event === 'reset'){
-                // layer.alert('重置密码：<br>'+ JSON.stringify(data.id))
-                layer.confirm('确认重置密码？',{icon: 3, title:'提示'},function(index){
-                    post={
-                        id:data.id,
-                        field:'password',
-                        name:''
-                    }
-                    $.ajax({
-                        url: "{:url('admin/Admin/admin_edit')}",
-                        type: 'POST',
-                        dataType: 'json',
-                        data: post,
-                        success: function(res) {
-                            //called when successful
-                            if(res.status==1){
-                                layer.msg('密码重置成功！',{icon:1,time:1000});
-                            }else{
-                                layer.msg(res.msg,{icon:1,time:1000});
-                            }
-                            
-                        },
-                        error: function(res) {
-                            //called when there is an error
-                            layer.msg('网络异常，请稍后再试！');
-                        }
-                    });
-                });
             }
         });
 
@@ -204,33 +175,20 @@
             getCheckData: function(){ //批量删除
                 var checkStatus = table.checkStatus('idTest')
                 ,data = checkStatus.data;
-                // layer.alert(JSON.stringify(data));
-                // data=JSON.stringify(data);
+                data=JSON.stringify(data);
                 // console.log(data)
                 if(data.length==0){
                     layer.msg('请选择要删除的数据！');
                     return false;
                 }else{
                     layer.confirm('确认要删除吗？',{icon: 3, title:'提示'},function(index){
-                        arrobj=[];
-                        var str="";
-                        var jsonStr="";
-                        for (var i = 0; i < data.length; i++) {
-                          str="\""+data[i]['id']+"\":"+"\""+data[i]['id']+"\",";
-                          jsonStr+=str;
-                        };
-
-                        substr=jsonStr.slice(0,-1);
                         
-                        substr="{"+substr+"}";
-                        jsonObj=eval('(' + substr + ')');
-                        console.log(jsonObj)
                         // console.log(data)
                         $.ajax({
-                            url: "{:url('admin/Admin/admin_delete_all')}",
+                            url: "{:url('admin/Ad/admin_delete_all')}",
                             type: 'POST',
                             dataType: 'json',
-                            data: jsonObj,
+                            data: {id:data},
                             success: function(res) {
                                 //called when successful
                                 console.log(res)
@@ -288,7 +246,9 @@
                             }
                             ,where: {
                                 keywords: demoReload.val(),
-                                modules:modules.val()
+                                modules:modules.val(),
+                                start:start.val(),
+                                end:end.val()
                             }
                         });
                     },

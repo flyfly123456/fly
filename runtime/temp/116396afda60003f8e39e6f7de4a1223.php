@@ -1,4 +1,4 @@
-<?php if (!defined('THINK_PATH')) exit(); /*a:4:{s:34:"../app/admin/view/index\index.html";i:1548165269;s:56:"D:\phpStudy\WWW\flyfly\app\admin\view\public\header.html";i:1551014440;s:54:"D:\phpStudy\WWW\flyfly\app\admin\view\public\left.html";i:1547183755;s:56:"D:\phpStudy\WWW\flyfly\app\admin\view\public\footer.html";i:1546746502;}*/ ?>
+<?php if (!defined('THINK_PATH')) exit(); /*a:4:{s:34:"../app/admin/view/index\index.html";i:1548165269;s:56:"D:\phpStudy\WWW\flyfly\app\admin\view\public\header.html";i:1556330191;s:54:"D:\phpStudy\WWW\flyfly\app\admin\view\public\left.html";i:1553753165;s:56:"D:\phpStudy\WWW\flyfly\app\admin\view\public\footer.html";i:1546746502;}*/ ?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -91,9 +91,11 @@
                 </dl>
             </li>
             <li class="layui-nav-item"><a href="javascript:;">
-                <?php if($admin_info['img_url']): ?>
-                    <img class="layui-nav-img userAvatar" width="35" height="35" src="/uploads/<?php echo $admin_info['img_url']; ?>" />
-                <?php else: ?>
+                <?php if($admin_info['img_url']): if(($admin_info['img_url'] == 'woman.png') OR ($admin_info['img_url'] == 'man.png')): ?>
+                        <img class="layui-nav-img userAvatar" width="35" height="35" src="/uploads/header/<?php echo $admin_info['img_url']; ?>" />
+                    <?php else: ?>
+                        <img class="layui-nav-img userAvatar" width="35" height="35" src="/uploads/header/<?php echo $admin_info['id']; ?>/<?php echo $admin_info['img_url']; ?>" />
+                    <?php endif; else: ?>
                     <img class="layui-nav-img userAvatar" width="35" height="35" src="/static/admin/images/face.jpg" />
                 <?php endif; ?><?php echo $admin_name; ?></a>
                 <dl class="layui-nav-child"> <!-- 二级菜单 -->
@@ -112,10 +114,12 @@
     <!-- 锁屏start -->
     <div class="admin-header-lock" id="lock-box" style="display:none;">
         <div class="admin-header-lock-img">
-            <?php if($admin_info['img_url']): ?>
-                <img src="/uploads/<?php echo $admin_info['img_url']; ?>" />
-            <?php else: ?>
-                <img src="/static/admin/images/face.jpg" />
+            <?php if($admin_info['img_url']): if(($admin_info['img_url'] == 'woman.png') OR ($admin_info['img_url'] == 'man.png')): ?>
+                    <img src="/uploads/header/<?php echo $admin_info['img_url']; ?>" />
+                <?php else: ?>
+                    <img src="/uploads/header/<?php echo $admin_info['id']; ?>/<?php echo $admin_info['img_url']; ?>" />
+                <?php endif; else: ?>
+                <img src="/uploads/header/face.jpg" />
             <?php endif; ?>
         </div>
         <div class="admin-header-lock-name" id="lockUserName">欢迎使用<?php echo $web_info['web_name']; ?>系统</div>
@@ -565,6 +569,28 @@
     <!-- 平台菜单 -->
     <?php if(is_array($menu_sort) || $menu_sort instanceof \think\Collection || $menu_sort instanceof \think\Paginator): $index = 0; $__LIST__ = $menu_sort;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$menu_sort): $mod = ($index % 2 );++$index;if($menu_sort['sort_name_en'] == 'Admin' and $menu_sort['select'] == 1): ?>
             <ul class="nav hidden-nav" data-type="<?php echo $menu_sort['sort_name_en']; ?>">
+                <?php if(is_array($menu) || $menu instanceof \think\Collection || $menu instanceof \think\Paginator): $i = 0; $__LIST__ = $menu;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$left_menu): $mod = ($i % 2 );++$i;if($left_menu['isShow'] == 1 and $left_menu['sort'] == $menu_sort['sort_name_en']): ?>
+                        <li>
+                            <a href="javascript:;">
+                                <i class="layui-icon <?php echo $left_menu['icon']; ?>"></i>
+                                <cite><?php echo $left_menu['name']; ?></cite>
+                                <i class="iconfont nav_right">&#xe697;</i>
+                            </a>
+                            <ul class="sub-menu">
+                                <?php if($left_menu['hasSub'] == 1): if(is_array($left_menu['sub']) || $left_menu['sub'] instanceof \think\Collection || $left_menu['sub'] instanceof \think\Paginator): $i = 0; $__LIST__ = $left_menu['sub'];if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$sub): $mod = ($i % 2 );++$i;if($sub['isShow'] == 1): ?>
+                                            <li>
+                                                <a _href="<?php echo $sub['url']; ?>">
+                                                    <i class="iconfont">&#xe6a7;</i>
+                                                    <cite><?php echo $sub['name']; ?></cite>
+                                                </a>
+                                            </li >
+                                        <?php endif; endforeach; endif; else: echo "" ;endif; endif; ?>
+                            </ul>
+                        </li>
+                    <?php endif; endforeach; endif; else: echo "" ;endif; ?>
+            </ul>
+        <?php elseif($menu_sort['sort_name_en'] == 'Shop' and $menu_sort['select'] == 1): ?>
+            <ul class="nav hidden-nav" data-type="<?php echo $menu_sort['sort_name_en']; ?>" style="display:none;">
                 <?php if(is_array($menu) || $menu instanceof \think\Collection || $menu instanceof \think\Paginator): $i = 0; $__LIST__ = $menu;if( count($__LIST__)==0 ) : echo "" ;else: foreach($__LIST__ as $key=>$left_menu): $mod = ($i % 2 );++$i;if($left_menu['isShow'] == 1 and $left_menu['sort'] == $menu_sort['sort_name_en']): ?>
                         <li>
                             <a href="javascript:;">

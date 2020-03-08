@@ -20,7 +20,7 @@ return [
                 ],
                 [
                     'name'=>'在线测评',
-                    'url' =>url('/admin/Admin/evaluation'),
+                    'url' =>url('/admin/Admin/evaluation_list'),
                     'icon'=>'',
                     'isShow'=>1,
                     'hasSub'=>0,
@@ -97,202 +97,6 @@ return [
         ],
         [
             'sort'=>'Admin',
-            'name'=>'文章管理',
-            'icon'=>'layui-icon-read',
-            'isShow'=>1,
-            'state'=>1,
-            'hasSub'=>1,
-            'author'=>0,
-            'sub'=>[
-                [
-                    'name'=>'文章列表',
-                    'url' =>url('/admin/Article/article_list'),
-                    'icon'=>'',
-                    'isShow'=>1,
-                    'state'=>1,
-                    'hasSub'=>0,
-                    'author'=>0,
-                ],
-                [
-                    'name'=>'添加文章',
-                    'url' =>url('/admin/Article/article_add'),
-                    'icon'=>'',
-                    'isShow'=>1,
-                    'state'=>1,
-                    'hasSub'=>0,
-                    'author'=>0,
-                ]
-            ]
-        ],
-		[
-            'sort'=>'Admin',
-            'name'=>'用户管理',
-            'icon'=>'layui-icon-user',
-            'isShow'=>1,
-            'state'=>1,
-            'hasSub'=>1,
-            'author'=>0,
-            'sub'=>[
-                [
-                    'name'=>'会员列表',
-                    'url' =>url('/admin/Member/member_list'),
-                    'icon'=>'',
-                    'isShow'=>1,
-                    'state'=>1,
-                    'hasSub'=>0,
-                    'author'=>0,
-                ],
-                [
-                    'name'=>'会员类型',
-                    'url' =>url('/admin/Member/member_type'),
-                    'icon'=>'',
-                    'isShow'=>1,
-                    'state'=>1,
-                    'hasSub'=>0,
-                    'author'=>0,
-                ]
-			]
-    	],
-        [
-            'sort'=>'Admin',
-            'name'=>'分类管理',
-            'icon'=>'layui-icon-tree',
-            'isShow'=>1,
-            'state'=>1,
-            'hasSub'=>1,
-            'author'=>0,
-            'sub'=>[
-                [
-                    'name'=>'分类列表',
-                    'url' =>url('/admin/Cate/cate_list'),
-                    'icon'=>'',
-                    'isShow'=>1,
-                    'state'=>1,
-                    'hasSub'=>0,
-                    'author'=>0,
-                ]
-            ]
-        ],
-        [
-            'sort'=>'Admin',
-            'name'=>'品牌管理',
-            'icon'=>'layui-icon-star',
-            'isShow'=>1,
-            'state'=>1,
-            'hasSub'=>1,
-            'author'=>0,
-            'sub'=>[
-                [
-                    'name'=>'品牌列表',
-                    'url' =>url('/admin/Brand/brand_list'),
-                    'icon'=>'',
-                    'isShow'=>1,
-                    'state'=>1,
-                    'hasSub'=>0,
-                    'author'=>0,
-                ]
-            ]
-        ],
-        [
-            'sort'=>'Admin',
-            'name'=>'广告管理',
-            'icon'=>'layui-icon-carousel',
-            'isShow'=>1,
-            'state'=>1,
-            'hasSub'=>1,
-            'author'=>0,
-            'sub'=>[
-                [
-                    'name'=>'广告列表',
-                    'url' =>url('/admin/Ad/ad_list'),
-                    'icon'=>'',
-                    'isShow'=>1,
-                    'state'=>1,
-                    'hasSub'=>0,
-                    'author'=>0,
-                ],
-                [
-                    'name'=>'广告位置',
-                    'url' =>url('/admin/Ad/position_list'),
-                    'icon'=>'',
-                    'isShow'=>1,
-                    'state'=>1,
-                    'hasSub'=>0,
-                    'author'=>0,
-                ]
-            ]
-        ],
-        [
-            'sort'=>'Admin',
-            'name'=>'商品管理',
-            'icon'=>'layui-icon-cart',
-            'isShow'=>1,
-            'state'=>1,
-            'hasSub'=>1,
-            'author'=>0,
-            'sub'=>[
-                [
-                    'name'=>'商品列表',
-                    'url' =>url('/admin/Shop/shop_list'),
-                    'icon'=>'',
-                    'isShow'=>1,
-                    'state'=>1,
-                    'hasSub'=>0,
-                    'author'=>0,
-                ],
-                [
-                    'name'=>'商品模型',
-                    'url' =>url('/admin/Shop/model_list'),
-                    'icon'=>'',
-                    'isShow'=>1,
-                    'state'=>1,
-                    'hasSub'=>0,
-                    'author'=>0,
-                ]
-            ]
-        ],
-    	[
-            'sort'=>'Admin',
-    		'name'=>'订单管理',
-            'icon'=>'layui-icon-cart-simple',
-            'isShow'=>1,
-            'state'=>1,
-            'hasSub'=>1,
-            'author'=>0,
-            'sub'=>[
-                [
-                    'name'=>'订单列表',
-                    'url' =>url('/admin/Order/index'),
-                    'icon'=>'',
-                    'isShow'=>1,
-                    'state'=>1,
-                    'hasSub'=>0,
-                    'author'=>0,
-                ]
-			]
-    	],
-        [
-            'sort'=>'Admin',
-            'name'=>'评论管理',
-            'icon'=>'layui-icon-dialogue',
-            'isShow'=>1,
-            'state'=>1,
-            'hasSub'=>1,
-            'author'=>0,
-            'sub'=>[
-                [
-                    'name'=>'评论列表',
-                    'url' =>url('/admin/Comment/comment_list'),
-                    'icon'=>'',
-                    'isShow'=>1,
-                    'state'=>1,
-                    'hasSub'=>0,
-                    'author'=>0,
-                ]
-            ]
-        ],
-        [
-            'sort'=>'Admin',
             'name'=>'权限管理',
             'icon'=>'layui-icon-password',
             'isShow'=>1,
@@ -302,7 +106,7 @@ return [
             'sub'=>[
                 [
                     'name'=>'管理员列表',
-                    'url' =>url('/admin/Admin/admin_lists'),
+                    'url' =>url('/admin/Admin/admin_list'),
                     'icon'=>'',
                     'isShow'=>1,
                     'state'=>1,
@@ -311,7 +115,7 @@ return [
                 ],
                 [
                     'name'=>'角色管理',
-                    'url' =>url('/admin/Admin/admin_role'),
+                    'url' =>url('/admin/Admin/role_group_list'),
                     'icon'=>'',
                     'isShow'=>1,
                     'state'=>1,
@@ -349,7 +153,7 @@ return [
             'sub'=>[
                 [
                     'name'=>'基础设置',
-                    'url' =>url('/admin/System/web_info'),
+                    'url' =>url('/admin/System/base_info'),
                     'icon'=>'',
                     'isShow'=>1,
                     'state'=>1,
@@ -414,8 +218,8 @@ return [
             'author'=>0,
             'sub'=>[
                 [
-                    'name'=>'测评列表',
-                    'url' =>url('/admin/Evaluation/index'),
+                    'name'=>'试卷列表',
+                    'url' =>url('/admin/Evaluation/examination_list'),
                     'icon'=>'',
                     'isShow'=>1,
                     'state'=>1,
@@ -424,7 +228,25 @@ return [
                 ],
                 [
                     'name'=>'添加试卷',
-                    'url' =>url('/admin/Evaluation/evaluation_add'),
+                    'url' =>url('/admin/Evaluation/examination_add'),
+                    'icon'=>'',
+                    'isShow'=>1,
+                    'state'=>1,
+                    'hasSub'=>0,
+                    'author'=>0,
+                ],
+                [
+                    'name'=>'试题列表',
+                    'url' =>url('/admin/Evaluation/questions_list'),
+                    'icon'=>'',
+                    'isShow'=>1,
+                    'state'=>1,
+                    'hasSub'=>0,
+                    'author'=>0,
+                ],
+                [
+                    'name'=>'添加试题',
+                    'url' =>url('/admin/Evaluation/questions_add'),
                     'icon'=>'',
                     'isShow'=>1,
                     'state'=>1,
@@ -586,6 +408,202 @@ return [
                     'author'=>0,
                 ]
 
+            ]
+        ],
+        [
+            'sort'=>'Shop',
+            'name'=>'会员管理',
+            'icon'=>'layui-icon-user',
+            'isShow'=>1,
+            'state'=>1,
+            'hasSub'=>1,
+            'author'=>0,
+            'sub'=>[
+                [
+                    'name'=>'会员列表',
+                    'url' =>url('/admin/Member/member_list'),
+                    'icon'=>'',
+                    'isShow'=>1,
+                    'state'=>1,
+                    'hasSub'=>0,
+                    'author'=>0,
+                ],
+                [
+                    'name'=>'会员类型',
+                    'url' =>url('/admin/Member/member_type'),
+                    'icon'=>'',
+                    'isShow'=>1,
+                    'state'=>1,
+                    'hasSub'=>0,
+                    'author'=>0,
+                ]
+            ]
+        ],
+        [
+            'sort'=>'Shop',
+            'name'=>'文章管理',
+            'icon'=>'layui-icon-read',
+            'isShow'=>1,
+            'state'=>1,
+            'hasSub'=>1,
+            'author'=>0,
+            'sub'=>[
+                [
+                    'name'=>'文章列表',
+                    'url' =>url('/admin/Article/article_list'),
+                    'icon'=>'',
+                    'isShow'=>1,
+                    'state'=>1,
+                    'hasSub'=>0,
+                    'author'=>0,
+                ],
+                [
+                    'name'=>'添加文章',
+                    'url' =>url('/admin/Article/article_add'),
+                    'icon'=>'',
+                    'isShow'=>1,
+                    'state'=>1,
+                    'hasSub'=>0,
+                    'author'=>0,
+                ]
+            ]
+        ],
+        [
+            'sort'=>'Shop',
+            'name'=>'分类管理',
+            'icon'=>'layui-icon-tree',
+            'isShow'=>1,
+            'state'=>1,
+            'hasSub'=>1,
+            'author'=>0,
+            'sub'=>[
+                [
+                    'name'=>'分类列表',
+                    'url' =>url('/admin/Cate/cate_list'),
+                    'icon'=>'',
+                    'isShow'=>1,
+                    'state'=>1,
+                    'hasSub'=>0,
+                    'author'=>0,
+                ]
+            ]
+        ],
+        [
+            'sort'=>'Shop',
+            'name'=>'品牌管理',
+            'icon'=>'layui-icon-star',
+            'isShow'=>1,
+            'state'=>1,
+            'hasSub'=>1,
+            'author'=>0,
+            'sub'=>[
+                [
+                    'name'=>'品牌列表',
+                    'url' =>url('/admin/Brand/brand_list'),
+                    'icon'=>'',
+                    'isShow'=>1,
+                    'state'=>1,
+                    'hasSub'=>0,
+                    'author'=>0,
+                ]
+            ]
+        ],
+        [
+            'sort'=>'Shop',
+            'name'=>'广告管理',
+            'icon'=>'layui-icon-carousel',
+            'isShow'=>1,
+            'state'=>1,
+            'hasSub'=>1,
+            'author'=>0,
+            'sub'=>[
+                [
+                    'name'=>'广告列表',
+                    'url' =>url('/admin/Ad/ad_list'),
+                    'icon'=>'',
+                    'isShow'=>1,
+                    'state'=>1,
+                    'hasSub'=>0,
+                    'author'=>0,
+                ],
+                [
+                    'name'=>'广告位置',
+                    'url' =>url('/admin/Ad/position_list'),
+                    'icon'=>'',
+                    'isShow'=>1,
+                    'state'=>1,
+                    'hasSub'=>0,
+                    'author'=>0,
+                ]
+            ]
+        ],
+        [
+            'sort'=>'Shop',
+            'name'=>'商品管理',
+            'icon'=>'layui-icon-cart',
+            'isShow'=>1,
+            'state'=>1,
+            'hasSub'=>1,
+            'author'=>0,
+            'sub'=>[
+                [
+                    'name'=>'商品列表',
+                    'url' =>url('/admin/Shop/shop_list'),
+                    'icon'=>'',
+                    'isShow'=>1,
+                    'state'=>1,
+                    'hasSub'=>0,
+                    'author'=>0,
+                ],
+                [
+                    'name'=>'商品模型',
+                    'url' =>url('/admin/Shop/model_list'),
+                    'icon'=>'',
+                    'isShow'=>1,
+                    'state'=>1,
+                    'hasSub'=>0,
+                    'author'=>0,
+                ]
+            ]
+        ],
+        [
+            'sort'=>'Shop',
+            'name'=>'订单管理',
+            'icon'=>'layui-icon-cart-simple',
+            'isShow'=>1,
+            'state'=>1,
+            'hasSub'=>1,
+            'author'=>0,
+            'sub'=>[
+                [
+                    'name'=>'订单列表',
+                    'url' =>url('/admin/Order/index'),
+                    'icon'=>'',
+                    'isShow'=>1,
+                    'state'=>1,
+                    'hasSub'=>0,
+                    'author'=>0,
+                ]
+            ]
+        ],
+        [
+            'sort'=>'Shop',
+            'name'=>'评论管理',
+            'icon'=>'layui-icon-dialogue',
+            'isShow'=>1,
+            'state'=>1,
+            'hasSub'=>1,
+            'author'=>0,
+            'sub'=>[
+                [
+                    'name'=>'评论列表',
+                    'url' =>url('/admin/Comment/comment_list'),
+                    'icon'=>'',
+                    'isShow'=>1,
+                    'state'=>1,
+                    'hasSub'=>0,
+                    'author'=>0,
+                ]
             ]
         ],
         [

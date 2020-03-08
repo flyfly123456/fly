@@ -6,6 +6,12 @@ use \think\Request;
 use \think\Session;
 use \think\Config;
 use \think\Loader;
+
+use app\admin\logic\MemberLogic;
+
+use app\admin\behavior\Behavior;
+
+
 class Member extends Base
 {
     public function _initialize()//_initialize与__construct有区别
@@ -21,7 +27,7 @@ class Member extends Base
 
 
     //会员列表信息
-    public function member_info()
+    public function member_list_info()
     {
         $page=input("get.page")?input("get.page"):1;
         $page=intval($page);
@@ -34,138 +40,42 @@ class Member extends Base
         //判断搜索
         $post = $this->request->param();
 
-        if(isset($post['start']) && isset($post['end'])){
+        $info=MemberLogic::select($post,'article');
 
-            if(empty($post['start']) && empty($post['end'])){
-                unset($post['start']);
-                unset($post['end']);
-                $data['status']=0;
-                $data['msg']="暂无数据！";
-                return json($data);
-            }
+        if(isset($info['list'])){
+            foreach ($info['list'] as $key => $value) {
 
-            $post['modules']="create_time";
-            $post['start']=strtotime($post['start']);
-            $post['end']=strtotime($post['end']);
-            // if(isset($post['start']) and !empty($post['start']) and empty($post['end'])){
-            //     $post['start']=strtotime($post['start']);
-            //     $where['create_time'] = ['gt', $post['start']];
+                $rest=Db::name('members_type')->where(['id'=>$value['type']])->find();
 
-            // }
-            // if(isset($post['end']) and !empty($post['end']) and empty($post['start'])){
-            //     $post['end']=strtotime($post['end']);
-            //     $where['create_time'] = ['lt', $post['end']];
+                $info['list'][$key]['type']=$rest['type'];
 
-            // }
-            // if(isset($post['start']) and !empty($post['start']) and isset($post['end']) and !empty($post['end'])){
-            //     $post['start']=strtotime($post['start']);
-            //     $post['end']=strtotime($post['end']);
-            //     $where['create_time'] = ['between', [$post['start'],$post['end']]];
-
-            // }
-            $where['create_time'] = ['between', [$post['start'],$post['end']]];
-
-            $where[$post['modules']] = $where['create_time'];
-
-            $where['status']=0;
-            $where['msg']="暂无数据！";
-            return json($where);
-
-        }
-
-        
-
-        if(isset($post['keywords']) && isset($post['modules'])){
-
-            if(empty($post['keywords']) && empty($post['modules'])){
-                unset($post['keywords']);
-                unset($post['modules']);
-                $data['status']=0;
-                $data['msg']="暂无数据！";
-                return json($data);
-            }
-            
-            if($post['modules']=="sex"){
-                if($post['keywords']=="男"){
-                    $post['keywords']=0;
-                }elseif($post['keywords']=="女"){
-                    $post['keywords']=1;
+                $info['list'][$key]['create_time']=date('Y-m-d H:i:s',$value['create_time']);
+                if($value['sex']==0){
+                    $info['list'][$key]['sex']='男性';
+                }elseif($value['sex']==1){
+                    $info['list'][$key]['sex']='女性';
                 }else{
-                    $data['status']=0;
-                    $data['msg']="暂无数据！";
-                    return json($data);
+                    $info['list'][$key]['sex']='保密';
                 }
-            
-            }
 
-            if($post['modules']=="status"){
-                if($post['keywords']=="已启用"){
-                    $post['keywords']=1;
-                }elseif($post['keywords']=="未启用"){
-                    $post['keywords']=0;
+                if($value['status']=="0"){
+                    $info['list'][$key]['status']="未启用";
                 }else{
-                   $data['status']=0;
-                   $data['msg']="暂无数据！";
-                   return json($data); 
+                    $info['list'][$key]['status']="已启用";
                 }
-                
+
             }
-
-            if($post['modules']=="type"){
-                $rest=Db::name('members_type')->where('type',strtoupper($post['keywords']))->find();
-                if($rest){
-                    $post['keywords']=$rest['id'];
-
-                }else{
-                    $data['status']=0;
-                    $data['msg']="暂无数据！";
-                    return json($data);
-                }
-                
-            }
-
-
-            $where[$post['modules']] = ['like', '%' . $post['keywords'] . '%'];
-            
-        }
-
-        $count=Db::name('members')->where($where)->count();
-
-        $list=Db::name('members')->alias('m')->field(['m.id','m.username','m.sex','m.create_time','m.type','m.status','m.email','m.address','m.telephone'])->page($page,$limit)->where($where)->select();
-
-        if(empty($list)){
-            $data['status']=0;
-            $data['msg']="暂无数据！";
-            return json($data);
+        }else{
+            return json($info);
         }
         
-        foreach ($list as $key => $value) {
-            # code...
-
-            $rest=Db::name('members_type')->where(['id'=>$value['type']])->find();
-
-            $list[$key]['type']=$rest['type'];
-
-            $list[$key]['create_time']=date('Y-m-d H:i:s',$value['create_time']);
-            if($value['sex']==0){
-                $list[$key]['sex']='男';
-            }else{
-                $list[$key]['sex']='女';
-            }
-
-            if($value['status']=="0"){
-                $list[$key]['status']="未启用";
-            }else{
-                $list[$key]['status']="已启用";
-            }
-
-        }
+        
 
         $arr=array();
         $arr['code']=0;
         $arr['msg']="";
-        $arr['count']=$count;
-        $arr['data']=$list;
+        $arr['count']=$info['count'];
+        $arr['data']=$info['list'];
         
         return json_decode(json_encode($arr));
         
@@ -411,33 +321,7 @@ class Member extends Base
             
             if($data!=""||!empty($data)){
                 
-                $count=0;
-                foreach ($data as $key => $value) {
-                    # code...
-                    Db::startTrans();
-                    try{
-                        $rest=Db::name('members')->where('id',$value)->update(['is_available'=>0]);
-                        if($rest){
-                            $count++;
-                        }
-                        // 提交事务
-                        Db::commit();    
-                    } catch (\Exception $e) {
-                        // 回滚事务
-                        Db::rollback();
-                    }
-                    
-                }
-                $number=count($data);
-                if($count===$number&& $number!=0){
-                    $data['status']="1";
-                    $data['msg']="成功删除".$count."条数据！";
-                    return json($data);
-                }else{
-                    $data['status']="0";
-                    $data['msg']="删除失败，请稍后再试！";
-                    return json($data);
-                }
+                return Behavior::delete_all($data,'members');
                 
             }else{
                 $data['status']="0";

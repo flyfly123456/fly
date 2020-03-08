@@ -3,6 +3,7 @@
 namespace app\admin\model;
 
 use think\Model;
+use TCPDF;
 
 class Pdf extends Model {
 
@@ -10,10 +11,10 @@ class Pdf extends Model {
 		public function pdf($content,$type="I",$title="")
 	    {
 	        // Include the main TCPDF library (search for installation path).
-	        vendor('TCPDF.tcpdf');
+	        // vendor('TCPDF.tcpdf');
 
 	        // create new PDF document
-	        $pdf = new \TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+	        $pdf = new TCPDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
 	        // set document information
 	        $pdf->SetCreator(PDF_CREATOR);

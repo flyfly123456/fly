@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head lang="en">
+        <meta charset="UTF-8">
+        <title>新闻页面</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="Cache-Control" content="no-siteapp"/>
+
+        <link href="__AMAZE__/css/admin.css" rel="stylesheet" type="text/css">
+        <link href="__AMAZE__/css/amazeui.css" rel="stylesheet" type="text/css">
+        <link href="__ICSS__/personal.css" rel="stylesheet" type="text/css">
+    </head>
+<body>
+		<!--头 -->
+		<include file="public/header1" /><!-- 包含头部模版header1 -->
+        <include file="public/plug1" /><!-- 包含插件模版plug1 -->
+		<b class="line"></b>	
+    <!--文章 -->
+    <div class="am-g am-g-fixed blog-g-fixed bloglist">
+      <div class="am-u-md-9">
+        <article class="blog-main">
+          <h3 class="am-article-title blog-title">
+            <a href="#">{$article.title}</a>
+          </h3>
+          <h4 class="am-article-meta blog-meta">{$article.create_time}</h4>
+
+          <div class="am-g blog-content">
+            <div class="am-u-sm-12">
+              <p>{$article.desc}</p>
+              
+              {$article.content}
+              
+
+            </div>
+      
+          </div>
+
+        </article>
+
+
+        <hr class="am-article-divider blog-hr">
+        <ul class="am-pagination blog-pagination">
+          <li class="am-pagination-prev"><a href="">&laquo; 上一页</a></li>
+          <li class="am-pagination-next"><a href="">下一页 &raquo;</a></li>
+        </ul>
+      </div>
+
+      <div class="am-u-md-3 blog-sidebar">
+        <div class="am-panel-group">
+
+          <section class="am-panel am-panel-default">
+            <div class="am-panel-hd">热门话题</div>
+            <ul class="am-list blog-list">
+              <foreach name="article_list" item="article_list">
+                <li><a href="{:url('index/article/index')}/id/{$article_list.aid}"><p> [{$article_list.name}] {$article_list.adesc}</p></a></li>  
+              </foreach>   
+            </ul>
+          </section>
+
+        </div>
+      </div>
+
+    </div>
+
+    <include file="public/footer" /><!-- 包含底部模版footer -->
+
+    <!--[if lt IE 9]>
+    <script src="http://libs.baidu.com/jquery/1.11.1/jquery.min.js"></script>
+    <script src="http://cdn.staticfile.org/modernizr/2.8.3/modernizr.js"></script>
+    <script src="{{assets}}js/amazeui.ie8polyfill.min.js"></script>
+    <![endif]-->
+
+    <!--[if (gte IE 9)|!(IE)]><!-->
+    <script src="__AMAZE__/js/jquery.min.js"></script>
+    <!--<![endif]-->
+    <script src="__AMAZE__/js/amazeui.min.js"></script>
+
+    </body>
+</html>

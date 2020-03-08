@@ -43,12 +43,9 @@
                     <div class="layui-input-inline">
                         <select name="modules" lay-verify="" lay-search="">
                             <option value="">选择搜索条件</option>
-                            <option value="name">登入名</option>
-                            <option value="sex">性别</option>
-                            <option value="telephone">电话</option>
-                            <option value="email">邮箱</option>
-                            <option value="role">角色</option>
-                            <option value="department_id">部门</option>
+                            <option value="name">名称</option>
+                            <option value="url">链接</option>
+                            <option value="position">位置</option>
                             <option value="status">状态</option>
                         </select>
                     </div>
@@ -67,11 +64,13 @@
                 <tr>
                     <th lay-data="{type:'checkbox', fixed: 'left'}"></th>
                     <th lay-data="{field:'id',sort: true, fixed: true}">ID</th>
-                    <th lay-data="{field:'img', width:180,templet:'#img'}">图片</th>
-                    <th lay-data="{field:'url'}">链接</th>
-                    <th lay-data="{field:'pName'}">位置</th>
-                    <th lay-data="{fixed: 'right', field:'is_available', width:110, templet: '#is_available'}">状态</th>
-                    <th lay-data="{fixed: 'right', width:210, align:'center', toolbar: '#barDemo'}">操作</th>
+                    <th lay-data="{field:'aname', width:180}">名称</th>
+                    <th lay-data="{field:'img', width:140,templet:'#img'}">图片</th>
+                    <th lay-data="{field:'url', width:180}">链接</th>
+                    <th lay-data="{field:'pname', width:160}">位置</th>
+                    <th lay-data="{field:'create_time', width:160}">时间</th>
+                    <th lay-data="{fixed: 'right', field:'astatus', width:110, templet: '#astatus'}">状态</th>
+                    <th lay-data="{fixed: 'right', width:160, align:'center', toolbar: '#barDemo'}">操作</th>
                 </tr>
             </thead>
         </table>
@@ -86,18 +85,17 @@
     </script>
 
     <script type="text/html" id="barDemo">
-        <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail" onclick="x_admin_show('查看','ad_view?id={{d.id}}')">查看</a>
-        <a class="layui-btn layui-btn-xs" lay-event="edit" onclick="x_admin_show('广告编辑','ad_edit?id={{d.id}}')">编辑</a>
+        <a class="layui-btn layui-btn-xs" lay-event="edit" onclick="x_admin_show('广告编辑','ad_edit?id={{d.aid}}')">编辑</a>
         <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
     </script>
 
-    <script type="text/html" id="is_available">
-        <input type="checkbox" name="is_available" value="{{d.id}}" title="正常" lay-filter="deitStatus" {{ '正常' == d.is_available ? 'checked' : '' }}>
+    <script type="text/html" id="astatus">
+        <input type="checkbox" name="astatus" value="{{d.id}}" title="正常" lay-filter="deitStatus" {{ '正常' == d.astatus ? 'checked' : '' }}>
     </script>
 
     <!-- 头像模板 -->
     <script type="text/html" id="img">
-        <div style="width:100%;height:100%;text-align:center;"><img data-type="{{d.img}}" onclick="view_img($(this))" style="width:30px;height:30px;" title="点击查看大图" src="__UPLOADS__/{{d.img}}" /></div>
+        <div style="width:100%;height:100%;text-align:center;"><img data-type="{{d.img}}" onclick="view_img($(this))" style="width:30px;height:30px;" title="点击查看大图" src="__UPLOADS__/ad/{{d.img}}" /></div>
     </script>
 
     <script>
@@ -144,7 +142,7 @@
                     console.log(data.id)
                     //发异步删除数据
                     $.ajax({
-                        url: 'admin_delete',
+                        url: "{:url('admin/ad/ad_delete')}",
                         type: 'POST',
                         dataType: 'json',
                         data: {id:data.id},
@@ -168,34 +166,6 @@
                 });
             } else if(obj.event === 'edit'){
                 // layer.alert('编辑行：<br>'+ JSON.stringify(data.id))
-            } else if(obj.event === 'reset'){
-                // layer.alert('重置密码：<br>'+ JSON.stringify(data.id))
-                layer.confirm('确认重置密码？',{icon: 3, title:'提示'},function(index){
-                    post={
-                        id:data.id,
-                        field:'password',
-                        name:''
-                    }
-                    $.ajax({
-                        url: "{:url('admin/Admin/admin_edit')}",
-                        type: 'POST',
-                        dataType: 'json',
-                        data: post,
-                        success: function(res) {
-                            //called when successful
-                            if(res.status==1){
-                                layer.msg('密码重置成功！',{icon:1,time:1000});
-                            }else{
-                                layer.msg(res.msg,{icon:1,time:1000});
-                            }
-                            
-                        },
-                        error: function(res) {
-                            //called when there is an error
-                            layer.msg('网络异常，请稍后再试！');
-                        }
-                    });
-                });
             }
         });
 
@@ -210,8 +180,7 @@
             getCheckData: function(){ //批量删除
                 var checkStatus = table.checkStatus('idTest')
                 ,data = checkStatus.data;
-                // layer.alert(JSON.stringify(data));
-                // data=JSON.stringify(data);
+                data=JSON.stringify(data);
                 // console.log(data)
                 if(data.length==0){
                     layer.msg('请选择要删除的数据！');
@@ -219,24 +188,12 @@
                 }else{
                     layer.confirm('确认要删除吗？',{icon: 3, title:'提示'},function(index){
                         arrobj=[];
-                        var str="";
-                        var jsonStr="";
-                        for (var i = 0; i < data.length; i++) {
-                          str="\""+data[i]['id']+"\":"+"\""+data[i]['id']+"\",";
-                          jsonStr+=str;
-                        };
-
-                        substr=jsonStr.slice(0,-1);
-                        
-                        substr="{"+substr+"}";
-                        jsonObj=eval('(' + substr + ')');
-                        console.log(jsonObj)
                         // console.log(data)
                         $.ajax({
-                            url: "{:url('admin/Admin/admin_delete_all')}",
+                            url: "{:url('admin/Ad/delete_all')}",
                             type: 'POST',
                             dataType: 'json',
-                            data: jsonObj,
+                            data: {id:data},
                             success: function(res) {
                                 //called when successful
                                 console.log(res)
@@ -280,7 +237,7 @@
                 }
                 // console.log(post)
                 $.ajax({
-                    url: "{:url('admin/Ad/ad_list_info')}",
+                    url: "{:url('admin/ad/ad_list_info')}",
                     type: 'POST',
                     dataType: 'json',
                     data: post,
@@ -294,7 +251,9 @@
                             }
                             ,where: {
                                 keywords: demoReload.val(),
-                                modules:modules.val()
+                                modules:modules.val(),
+                                start:start.val(),
+                                end:end.val()
                             }
                         });
                     },
@@ -316,15 +275,17 @@
         form.on('checkbox(deitStatus)', function(obj){
             // layer.tips(this.value + ' ' + this.name + '：'+ obj.elem.checked, obj.othis);
             if(obj.elem.checked){
-                is_available=1;
+                status=1;
             }else{
-                is_available=0;
+                status=0;
             }
             post={
                 id:this.value,
                 field:this.name,
-                name:is_available
+                name:status
             }
+
+            console.dir(post);
             $.ajax({
                 url: "{:url('admin/Ad/ad_edit')}",
                 type: 'POST',
@@ -349,11 +310,11 @@
 
     });
 
-    //点击查看头像
+    //点击查看大图
     function view_img(obj){
         layer.open({
             type: 3,
-            content: "<img src='__UPLOADS__/"+obj.data('type')+"' />",
+            content: "<img src='__UPLOADS__/ad/"+obj.data('type')+"' />",
             area: ['300px', '100px'],
             shadeClose: true
         });

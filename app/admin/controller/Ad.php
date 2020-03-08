@@ -4,7 +4,13 @@ use \think\Controller;
 use \think\Request;
 use \think\Db;
 use \think\Image;
-use \app\admin\model\Uploads;
+use \app\admin\model\Ad as advt;
+use \app\admin\model\AdPosition;
+use app\admin\logic\AdLogic;
+use app\admin\logic\PositionLogic;
+
+use app\admin\behavior\Files;
+use app\admin\behavior\Behavior;
 
 class Ad extends Base
 {
@@ -17,7 +23,15 @@ class Ad extends Base
 	    $controller=$request->controller();
 	    $action=$module_name."/".$controller."/".$action;
 	    parent::admin_priv($action);
+
+        if(self::$position==null){
+
+            self::$position=Db::name('ad_position')->where('status=1')->select();
+        }
+        
 	}
+
+    protected static $position=null;
 
     public function ad_list()
     {
@@ -26,122 +40,37 @@ class Ad extends Base
 
     public function ad_list_info()
     {
-        $page=input("get.page")?input("get.page"):1;
-        $page=intval($page);
-        $limit=input("get.limit")?input("get.limit"):1;
-        $limit=intval($limit);
-        $limit=input('limit');
-
-        $where=[];
         //判断搜索
         $post = $this->request->param();
 
-        if(isset($post['start']) && isset($post['end'])){
+        $info=AdLogic::select($post,'ad');
 
-            if(empty($post['start']) && empty($post['end'])){
-                unset($post['start']);
-                unset($post['end']);
-                $data['status']=0;
-                $data['msg']="暂无数据！";
-                return json($data);
-            }
-
-            $post['modules']="create_time";
-            $post['start']=strtotime($post['start']);
-            $post['end']=strtotime($post['end']);
-            // if(isset($post['start']) and !empty($post['start']) and empty($post['end'])){
-            //     $post['start']=strtotime($post['start']);
-            //     $where['create_time'] = ['gt', $post['start']];
-
-            // }
-            // if(isset($post['end']) and !empty($post['end']) and empty($post['start'])){
-            //     $post['end']=strtotime($post['end']);
-            //     $where['create_time'] = ['lt', $post['end']];
-
-            // }
-            // if(isset($post['start']) and !empty($post['start']) and isset($post['end']) and !empty($post['end'])){
-            //     $post['start']=strtotime($post['start']);
-            //     $post['end']=strtotime($post['end']);
-            //     $where['create_time'] = ['between', [$post['start'],$post['end']]];
-
-            // }
-            $where['create_time'] = ['between', [$post['start'],$post['end']]];
-
-            $where[$post['modules']] = $where['create_time'];
-
-            $where['status']=0;
-            $where['msg']="暂无数据！";
-            return json($where);
-
-        }
-
+        if(isset($info['list'])){
+            foreach ($info['list'] as $key => $value) {
         
-
-        if(isset($post['keywords']) && isset($post['modules'])){
-
-            if(empty($post['keywords']) && empty($post['modules'])){
-                unset($post['keywords']);
-                unset($post['modules']);
-                $data['status']=0;
-                $data['msg']="暂无数据！";
-                return json($data);
-            }
-            
-            if($post['modules']=="sex"){
-                if($post['keywords']=="男"){
-                    $post['keywords']=0;
-                }elseif($post['keywords']=="女"){
-                    $post['keywords']=1;
+                if($value['astatus']=="1"){
+                    $info['list'][$key]['astatus']="正常";
                 }else{
-                    $data['status']=0;
-                    $data['msg']="暂无数据！";
-                    return json($data);
+                    $info['list'][$key]['astatus']="禁用";
                 }
-            
-            }
 
-            if($post['modules']=="status"){
-                if($post['keywords']=="已启用"){
-                    $post['keywords']=1;
-                }elseif($post['keywords']=="未启用"){
-                    $post['keywords']=0;
-                }else{
-                   $data['status']=0;
-                   $data['msg']="暂无数据！";
-                   return json($data); 
+                $info['list'][$key]['id']=$value['aid'];
+                
+                if(isset($value['create_time']) && $value['create_time']!=""){
+                    $info['list'][$key]['create_time']=date('Y-m-d H:i:s',$value['create_time']);
                 }
                 
             }
 
-            $where[$post['modules']] = ['like', '%' . $post['keywords'] . '%'];
-            
-        }
-
-        $count=Db::name('ad')->where($where)->count();
-
-        $list=Db::name('ad')->alias('a')->field('a.*,a.name aName,p.*,p.name pName')->join('ad_position p','a.position_id=p.id','LEFT')->page($page,$limit)->where($where)->select();
-
-        if(empty($list)){
-            $data['status']=0;
-            $data['msg']="暂无数据！";
-            return json($data);
-        }
-        
-        foreach ($list as $key => $value) {
-            
-            if($value['is_available']=="1"){
-                $list[$key]['is_available']="正常";
-            }else{
-                $list[$key]['is_available']="禁用";
-            }
-
+        }else{
+            return json($info);
         }
 
         $arr=array();
         $arr['code']=0;
         $arr['msg']="";
-        $arr['count']=$count;
-        $arr['data']=$list;
+        $arr['count']=$info['count'];
+        $arr['data']=$info['list'];
         
         return json_decode(json_encode($arr));
     }
@@ -154,7 +83,7 @@ class Ad extends Base
             if(!empty($data)){
 
                 $arr['name']=$data['name'];
-                $arr['img']=$data['img_url'];
+                
                 $arr['url']=$data['url'];
                 $arr['position_id']=$data['position_id'];
 
@@ -163,37 +92,104 @@ class Ad extends Base
                 if(isset($data['color'])){
                     $arr['color']=$data['color'];
                 }
-                $arr['is_available']=$data['status'];
-                
-                $rows=Db::name('ad')->insert($arr);
+                $arr['status']=$data['status'];
+                $arr['is_available']=1;
 
-                $thumb_image=Uploads::thumb_image($arr['img'],$size['width'],$size['height']);
+                if(isset($data['img_url'])){
 
-                if($rows && $thumb_image){
-                    $info['status']="1";
-                    $info['msg']="添加成功";
-                    return json($info);
-                }else{
-                    $info['status']="0";
-                    $info['msg']="添加失败";
-                    return json($info);
+                    $arr['img']=date('Ymd').DS.$data['img_url'];
+
+                    Files::thumb_image($data['img_url'],'ad'.DS.date('Ymd'),$size['width'],$size['height']);
                 }
+                
+                $rows=advt::create($arr,true);//true排除掉表中不存在的字段
+
+                return Behavior::return_info($rows);
             }
         }
 
-        $position=Db::name('ad_position')->where('status=1')->select();
 
-        $this->assign('position',$position);
+        $this->assign('position',self::$position);
 
         return $this->fetch();
     }
 
-    public function ad_up_img()
+    public function ad_edit()
+    {
+        $id=input('id');
+        
+        $find=Db::name('ad')->where('id='.$id)->find();
+
+        if(Request::instance()->isAjax()){
+            $data=Request::instance()->post();
+            
+            if(!empty($data)){
+
+                if(isset($data['field']) && isset($data['id'])){//只修改状态
+
+                    $array['status']=$data['name'];
+
+                    $rows=advt::where('id',$data['id'])->update($array);
+
+                    return Behavior::return_info($rows);
+                }else{//通用修改
+                    $arr['name']=$data['name'];
+                    
+                    $arr['url']=$data['url'];
+                    $arr['position_id']=$data['position_id'];
+
+                    $size=Db::name('ad_position')->where('id',$arr['position_id'])->find();
+
+                    if(isset($data['color'])){
+                        $arr['color']=$data['color'];
+                    }
+                    $arr['is_available']=$data['status'];
+
+                    if($find['img']!=$data['img_url']){
+
+                        Files::thumb_image($data['img_url'],'ad'.DS.dirname($find['img']),$size['width'],$size['height']);
+
+                        $arr['img']=dirname($find['img']).DS.$data['img_url'];
+
+                        Files::delete_img('ad'.DS.$find['img']);
+                    }
+
+                    $rows=advt::where('id',$data['id'])->update($arr);
+
+                    return Behavior::return_info($rows);
+                }
+                
+            }
+        }
+
+
+        $this->assign('position',self::$position);
+        $this->assign('ad',$find);
+
+        return $this->fetch();
+    }
+
+    public function ad_delete()
     {
         if(Request::instance()->isAjax()){
-            $file=Request::instance()->file('file');
-            $uploads=Uploads::uploads_img($file);
-            return $uploads;
+            $data=Request::instance()->post();
+            
+            if(!empty($data)){
+
+                return Behavior::delete($data['id'],'ad');
+            }
+        }
+    }
+
+    public function delete_all()
+    {
+        if(Request::instance()->isAjax()){
+            $data=Request::instance()->post();
+            
+            if(!empty($data)){
+
+                return Behavior::delete_all($data,'ad');
+            }
         }
     }
 
@@ -205,122 +201,31 @@ class Ad extends Base
 
     public function position_list_info()
     {
-        $page=input("get.page")?input("get.page"):1;
-        $page=intval($page);
-        $limit=input("get.limit")?input("get.limit"):1;
-        $limit=intval($limit);
-        $limit=input('limit');
-
-        $where=[];
         //判断搜索
         $post = $this->request->param();
 
-        if(isset($post['start']) && isset($post['end'])){
+        $info=PositionLogic::select($post,'ad_position');
 
-            if(empty($post['start']) && empty($post['end'])){
-                unset($post['start']);
-                unset($post['end']);
-                $data['status']=0;
-                $data['msg']="暂无数据！";
-                return json($data);
-            }
-
-            $post['modules']="create_time";
-            $post['start']=strtotime($post['start']);
-            $post['end']=strtotime($post['end']);
-            // if(isset($post['start']) and !empty($post['start']) and empty($post['end'])){
-            //     $post['start']=strtotime($post['start']);
-            //     $where['create_time'] = ['gt', $post['start']];
-
-            // }
-            // if(isset($post['end']) and !empty($post['end']) and empty($post['start'])){
-            //     $post['end']=strtotime($post['end']);
-            //     $where['create_time'] = ['lt', $post['end']];
-
-            // }
-            // if(isset($post['start']) and !empty($post['start']) and isset($post['end']) and !empty($post['end'])){
-            //     $post['start']=strtotime($post['start']);
-            //     $post['end']=strtotime($post['end']);
-            //     $where['create_time'] = ['between', [$post['start'],$post['end']]];
-
-            // }
-            $where['create_time'] = ['between', [$post['start'],$post['end']]];
-
-            $where[$post['modules']] = $where['create_time'];
-
-            $where['status']=0;
-            $where['msg']="暂无数据！";
-            return json($where);
-
-        }
-
+        if(isset($info['list'])){
+            foreach ($info['list'] as $key => $value) {
         
-
-        if(isset($post['keywords']) && isset($post['modules'])){
-
-            if(empty($post['keywords']) && empty($post['modules'])){
-                unset($post['keywords']);
-                unset($post['modules']);
-                $data['status']=0;
-                $data['msg']="暂无数据！";
-                return json($data);
-            }
-            
-            if($post['modules']=="sex"){
-                if($post['keywords']=="男"){
-                    $post['keywords']=0;
-                }elseif($post['keywords']=="女"){
-                    $post['keywords']=1;
+                if($value['status']=="1"){
+                    $info['list'][$key]['status']="正常";
                 }else{
-                    $data['status']=0;
-                    $data['msg']="暂无数据！";
-                    return json($data);
+                    $info['list'][$key]['status']="禁用";
                 }
-            
+
             }
 
-            if($post['modules']=="status"){
-                if($post['keywords']=="已启用"){
-                    $post['keywords']=1;
-                }elseif($post['keywords']=="未启用"){
-                    $post['keywords']=0;
-                }else{
-                   $data['status']=0;
-                   $data['msg']="暂无数据！";
-                   return json($data); 
-                }
-                
-            }
-
-            $where[$post['modules']] = ['like', '%' . $post['keywords'] . '%'];
-            
-        }
-
-        $count=Db::name('ad_position')->where($where)->count();
-
-        $list=Db::name('ad_position')->page($page,$limit)->where($where)->select();
-
-        if(empty($list)){
-            $data['status']=0;
-            $data['msg']="暂无数据！";
-            return json($data);
-        }
-        
-        foreach ($list as $key => $value) {
-            
-            if($value['status']=="1"){
-                $list[$key]['status']="正常";
-            }else{
-                $list[$key]['status']="禁用";
-            }
-
+        }else{
+            return json($info);
         }
 
         $arr=array();
         $arr['code']=0;
         $arr['msg']="";
-        $arr['count']=$count;
-        $arr['data']=$list;
+        $arr['count']=$info['count'];
+        $arr['data']=$info['list'];
         
         return json_decode(json_encode($arr));
     }
@@ -341,20 +246,45 @@ class Ad extends Base
                 }
 
                 $arr['status']=$data['status'];
-                $position=Db::name('ad_position')->insert($arr);
-                if($position){
-                    $info['status']='1';
-                    $info['msg']='添加成功';
-                    return json($info);
-                }else{
-                    $info['status']='0';
-                    $info['msg']='添加失败';
-                    return json($info);
-                }
+                
+                $position=AdPosition::create($arr,true);//true排除掉表中不存在的字段
+                
+                return Behavior::return_info($position);
             }
         }
 
         return $this->fetch();
+    }
+
+    public function position_edit()
+    {
+        $id=input('id');
+
+        $position=Db::name('ad_position')->where('id',$id)->find();
+
+        if (Request::instance()->isAjax()){
+            
+            $data=Request::instance()->post();
+            if(!empty($data)){
+                $arr['name']=$data['name'];
+                $arr['width']=$data['width'];
+                $arr['height']=$data['height'];
+                
+                if(isset($data['desc'])){
+                    $arr['desc']=$data['desc'];
+                }
+
+                $arr['status']=$data['status'];
+                
+                $position=AdPosition::where('id',$data['id'])->update($arr);                
+                return Behavior::return_info($position);
+            }
+        }
+
+        $this->assign('position',$position);
+
+        return $this->fetch();
+
     }
 
 

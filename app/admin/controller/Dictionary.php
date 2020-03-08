@@ -7,7 +7,7 @@ use \think\Session;
 
 class Dictionary extends Base
 {
-    
+
 	public function _initialize()//_initialize与__construct有区别
 	{
 	    $request= Request::instance();

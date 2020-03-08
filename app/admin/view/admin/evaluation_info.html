@@ -31,14 +31,14 @@
     </div>
     
     <div class="x-body">
-        <a href="{:url('admin/Admin/evaluation_record')}?id=<php>echo base64_encode($rows[0]['evaluation_id'])</php>" class="layui-btn layui-btn-primary layui-btn-sm"><i class="layui-icon layui-icon-return"></i>返回列表</a>
-        <span class="x-right x-red" style="line-height:40px">总得分：{$count}</span>
+        <a href="{:url('admin/Admin/evaluation_record')}?id={$id}" class="layui-btn layui-btn-primary layui-btn-sm"><i class="layui-icon layui-icon-return"></i>返回列表</a>
+        <span class="x-right x-red" style="line-height:40px">总得分：{$total_score} </span>
         <table class="layui-table" style="table-layout: fixed;">
             <thead>
                 <tr>
                     <th>题目序号</th>
                     <th>题目类型</th>
-                    <th>答案解析</th>
+                    <!-- <th>答案解析</th> -->
                     <th>测评答案</th>
                     <th>题目总分</th>
                     <th>测评得分</th>
@@ -49,10 +49,9 @@
                   <tr>
                     <td>{$rows.id}</td>
                     <td>{$rows.type}</td>
-                    <td onclick="show_detail(this)" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;" title="点击查看详细内容">{$rows.eaAnswer}</td>
                     <td onclick="show_detail(this)" style="white-space: nowrap;overflow: hidden;text-overflow: ellipsis;" title="点击查看详细内容">{$rows.result}</td>
-                    <td>{$rows.eiScore}</td>
-                    <td>{$rows.eaScore}</td>
+                    <td>{$rows.score}</td>
+                    <td>{$rows.real_score}</td>
                   </tr>
                 </volist>
             </tbody>

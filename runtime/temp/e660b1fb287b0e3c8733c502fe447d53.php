@@ -1,4 +1,4 @@
-<?php if (!defined('THINK_PATH')) exit(); /*a:1:{s:34:"../app/admin/view/login\index.html";i:1549685236;}*/ ?>
+<?php if (!defined('THINK_PATH')) exit(); /*a:1:{s:34:"../app/admin/view/login\index.html";i:1552620095;}*/ ?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -78,6 +78,7 @@
                                 return false;
                             }else{
                                 layer.msg(res.msg,{icon:2,offset:'t'},function(){
+                                    $(".verify-img img").click();
                                 });
                             }
 

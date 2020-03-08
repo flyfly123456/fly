@@ -6,7 +6,9 @@ use \think\Session;
 use \think\Request;
 use \think\Db;
 use \think\Config;
-use app\admin\model\Phpmailer;
+
+use app\admin\behavior\Maile;
+
 class Login extends Base
 {
     public function _initialize()//_initialize与__construct有区别
@@ -245,9 +247,10 @@ class Login extends Base
 
             $data=Request::instance()->post();
             if(!empty($data)){
-                $mailer=new Phpmailer();
+
                 $memcache=new \Memcache();
                 $memcache->connect('127.0.0.1',11211) or die('Could not connect');
+                
                 //无邮箱验证码
                 if(!isset($data['email_verify'])){
 
@@ -278,19 +281,22 @@ class Login extends Base
                                 $content.="此邮件为系统发出的，请勿直接回复。";
                                 $title="FlyFly后台管理系统，邮箱验证码。";
                                 
-                                if($mailer->think_send_mail($to=$data['email'], $name="验证码", $subject = $title, $body = $content, $attachment = null)){
+                                $send=Maile::send_mail($to=$data['email'], $name="验证码", $subject = $title, $body = $content, $attachment = null);
+
+                                if($send){
                                     
                                     $memcache->set('email_verify',$verify,0,900);
                                     $memcache->set('admin_info',$rows,0,900);
+
                                     $data['status']='1';
-                                    $data['msg']='验证码发送成功！';
+                                    $data['msg']='验证码已发送，请前往至邮箱查收';
                                     return json($data);
                                 }else{
-                                    $data['status']='0';
-                                    $data['msg']='验证码发送失败，请稍后再试！';
+                                    $data['status']='1';
+                                    $data['msg']='验证码发送失败，请稍后再试';
                                     return json($data);
                                 }
-                                
+
                                 
                             }
                     //验证码不正确
@@ -325,8 +331,8 @@ class Login extends Base
                             $content.="<br>";
                             $content.="<br>";
                             $content.="此邮件为系统发出的，请勿直接回复。";
-
-                            if($mailer->think_send_mail($to=$rest['0']['email'], $name="找回密码", $subject = $title, $body = $content, $attachment = null)){
+                            $send=Maile::send_mail($to=$rest['0']['email'], $name="找回密码", $subject = $title, $body = $content, $attachment = null);
+                            if($send){
                                 $data['status']='1';
                                 $data['msg']='密码已经发至邮箱，请登入查看！';
                                 return json($data);

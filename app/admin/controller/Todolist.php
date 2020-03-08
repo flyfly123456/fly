@@ -6,6 +6,9 @@ use \think\Db;
 use \think\Session;
 use app\admin\model\Delete;
 
+use app\admin\logic\TodolistLogic;
+use app\admin\logic\TodonelistLogic;
+
 class Todolist extends Base
 {
 
@@ -30,60 +33,37 @@ class Todolist extends Base
     //代办事项信息查询
     public function todo_list_info()
     {
-        $page=input("get.page")?input("get.page"):1;
-        $page=intval($page);
-        $limit=input("get.limit")?input("get.limit"):1;
-        $limit=intval($limit);
-        $limit=input('limit');
-
-        $where=[];
-
         //判断搜索
         $post = $this->request->param();
 
-        if(isset($post['keywords']) && isset($post['modules'])){
+        $info=TodolistLogic::select($post,'todo_list');
 
-            if(empty($post['keywords']) && empty($post['modules'])){
-                unset($post['keywords']);
-                unset($post['modules']);
-                $data['status']=0;
-                $data['msg']="暂无数据...";
-                return json($data);
+        if(isset($info['list'])){
+            
+            foreach ($info['list'] as $key => $value) {
+                
+                $info['list'][$key]['create_time']=date('Y-m-d H:i:s',$value['create_time']);
+
+                if($value['status']=='0'){
+                    $info['list'][$key]['status']="待审核";
+                }elseif($value['status']=='1'){
+                    $info['list'][$key]['status']="已取回";
+                }elseif($value['status']=='2'){
+                    $info['list'][$key]['status']="已审核";
+                }else{
+                    $info['list'][$key]['status']="已驳回";
+                }
             }
-            
-            $where[$post['modules']] = ['like', '%' . $post['keywords'] . '%'];
-            
+        }else{
+            return json($info);
         }
-
-        $count=Db::name('todo_list')->where('status !=2 AND is_available =1')->where('sponsor|approve','=',Session::get('login.name'))->where($where)->count();
         
-        $list=Db::name('todo_list')->page($page,$limit)->where('status !=2 AND is_available =1')->where('sponsor|approve','=',Session::get('login.name'))->where($where)->order('id desc')->select();
-
-        if(empty($list)){
-            $data['status']=0;
-            $data['msg']="暂无数据...";
-            return json($data);
-        }
-        foreach ($list as $key => $value) {
-            # code...
-            $list[$key]['time']=date('Y-m-d H:i:s',$value['time']);
-
-            if($value['status']=='0'){
-                $list[$key]['status']="待审核";
-            }elseif($value['status']=='1'){
-                $list[$key]['status']="已取回";
-            }elseif($value['status']=='2'){
-                $list[$key]['status']="已审核";
-            }else{
-                $list[$key]['status']="已驳回";
-            }
-        }
         
         $arr=array();
         $arr['code']=0;
         $arr['msg']="";
-        $arr['count']=$count;
-        $arr['data']=$list;
+        $arr['count']=$info['count'];
+        $arr['data']=$info['list'];
         
         return json_decode(json_encode($arr));
     }
@@ -97,76 +77,36 @@ class Todolist extends Base
     //已办事项信息查询
     public function todone_list_info()
     {
-        $page=input("get.page")?input("get.page"):1;
-        $page=intval($page);
-        $limit=input("get.limit")?input("get.limit"):1;
-        $limit=intval($limit);
-        $limit=input('limit');
-
-        $where=[];
-        $where['is_available']=1;
-        $where['status']=2;
         //判断搜索
         $post = $this->request->param();
 
-        if(isset($post['keywords']) && isset($post['modules'])){
+        $info=TodonelistLogic::select($post,'todo_list');
 
-            if(empty($post['keywords']) && empty($post['modules'])){
-                unset($post['keywords']);
-                unset($post['modules']);
-                $data['status']=0;
-                $data['msg']="暂无数据...";
-                return json($data);
-            }
+        if(isset($info['list'])){
+            foreach ($info['list'] as $key => $value) {
+                
+                $info['list'][$key]['create_time']=date('Y-m-d H:i:s',$value['create_time']);
 
-            if($post['modules']=="status"){
-                if($post['keywords']=="已驳回"){
-                    $post['keywords']=3;
-                }elseif($post['keywords']=="已审核"){
-                    $post['keywords']=2;
-                }elseif($post['keywords']=="已取回"){
-                    $post['keywords']=1;
+                if($value['status']=='0'){
+                    $info['list'][$key]['status']="待审核";
+                }elseif($value['status']=='1'){
+                    $info['list'][$key]['status']="已取回";
+                }elseif($value['status']=='2'){
+                    $info['list'][$key]['status']="已审核";
                 }else{
-                    $data['status']=0;
-                    $data['msg']="暂无数据！";
-                    return json($data);
+                    $info['list'][$key]['status']="已驳回";
                 }
-            
             }
-            
-            $where[$post['modules']] = ['like', '%' . $post['keywords'] . '%'];
-            
-        }
 
-        $count=Db::name('todo_list')->where('sponsor|approve','=',Session::get('login.name'))->where($where)->count();
-
-        $list=Db::name('todo_list')->page($page,$limit)->where('sponsor|approve','=',Session::get('login.name'))->where($where)->order('id desc')->select();
-
-        if(empty($list)){
-            $data['status']=0;
-            $data['msg']="暂无数据...";
-            return json($data);
-        }
-        foreach ($list as $key => $value) {
-            # code...
-            $list[$key]['time']=date('Y-m-d H:i:s',$value['time']);
-
-            if($value['status']=='0'){
-                $list[$key]['status']="待审核";
-            }elseif($value['status']=='1'){
-                $list[$key]['status']="已取回";
-            }elseif($value['status']=='2'){
-                $list[$key]['status']="已审核";
-            }else{
-                $list[$key]['status']="已驳回";
-            }
+        }else{
+            return json($info); 
         }
         
         $arr=array();
         $arr['code']=0;
         $arr['msg']="";
-        $arr['count']=$count;
-        $arr['data']=$list;
+        $arr['count']=$info['count'];
+        $arr['data']=$info['list'];
         
         return json_decode(json_encode($arr));
     }
@@ -200,7 +140,7 @@ class Todolist extends Base
                 if(isset($post['remark'])){
                     $insert['remark']=$post['remark'];
                 }
-                $insert['time']=time();
+                $insert['create_time']=time();
                 $insert['status']='0';
                 $result=Db::name('todo_list')->insert($insert);
 
@@ -444,6 +384,18 @@ class Todolist extends Base
         $this->assign('name',$name);
 
         return $this->fetch('approve');
+    }
+
+    public function delete_all()
+    {
+        if(Request::instance()->isAjax()){
+            $data=Request::instance()->post();
+            
+            if(!empty($data)){
+
+                return Behavior::delete_all($data,'todo_list');
+            }
+        }
     }
 
 }

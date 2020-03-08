@@ -85,109 +85,115 @@
 
         <div class="layui-container">
             <div class="layui-col-md9">
-                <div class="x-body evaluation">
+                <div class="x-body evaluation" style="width:800px;">
 
-                    <volist name="info" id="info">
-                        <if condition="$info.type eq 'single'">
+                    <volist name="info" id="info" key="key">
+                        <if condition="$info.type eq '0'">
                             <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
                                 <legend>单选题</legend>
                             </fieldset>
                             <!-- 单选题目内容 -->
                             <volist name="single" id="single" key='k' empty="暂无数据...">
-                                <if condition="$single.type eq 'single'">
+                                <if condition="$single.type eq '0'">
                                     <div class="layui-elem-quote" style="margin-top: 20px;">
-                                        <p>{$k}、{$single.content}</p>
+                                        <p><a name="{$key+1}">{$k}、{$single.problems}</a></p>
                                     </div>
-                                    <volist name="$single.option" id="option">
-                                        <blockquote class="layui-elem-quote layui-quote-nm">{$option}</blockquote>
+                                    <volist name="$single.options" id="options">
+                                        <blockquote class="layui-elem-quote layui-quote-nm">{$options.index}、{$options.options}</blockquote>
                                     </volist>
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">正确答案</label>
+                                        
                                         <div class="layui-input-block">
-                                            <input type="radio" name="single_answer{$single.id}" value="A" title="A">
-                                            <input type="radio" name="single_answer{$single.id}" value="B" title="B">
-                                            <input type="radio" name="single_answer{$single.id}" value="C" title="C">
-                                            <input type="radio" name="single_answer{$single.id}" value="D" title="D">
+                                            <volist name="$single.options" id="options_list">
+                                                <input type="radio" name="single_answer[{$single.id}]" value="{$options_list.options}" title="{$options_list.index}">
+                                            </volist>
                                         </div>
                                     </div>
                                 </if>
                             </volist>
                             <!-- 单选题目内容结束 -->
                         
-                        <elseif condition="$info.type eq 'multi'" />
+                        <elseif condition="$info.type eq '1'" />
                             <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
                                 <legend>多选题</legend>
                             </fieldset>
                             <!-- 多选题目内容 -->
                             <volist name="multi" id="multi" key='k'>
-                                <if condition="$multi.type eq 'multi'">
+                                <if condition="$multi.type eq '1'">
                                     <div class="layui-elem-quote" style="margin-top: 20px;">
-                                        <p>{$k}、{$multi.content}</p>
+                                        <p><a name="{$key+1}">{$k}、{$multi.problems}</a></p>
                                     </div>
-                                    <volist name="$multi.option" id="option">
-                                        <blockquote class="layui-elem-quote layui-quote-nm">{$option}</blockquote>
+                                    <volist name="$multi.options" id="options">
+                                        <blockquote class="layui-elem-quote layui-quote-nm">{$options.index}、{$options.options}</blockquote>
                                     </volist>
                                     <div class="layui-form-item">
                                         <label class="layui-form-label">正确答案</label>
                                         <div class="layui-input-block">
-                                            <input type="checkbox" name="multi_answer{$multi.id}[]" lay-skin="primary" title="A" value="A">
-                                            <input type="checkbox" name="multi_answer{$multi.id}[]" lay-skin="primary" title="B" value="B">
-                                            <input type="checkbox" name="multi_answer{$multi.id}[]" lay-skin="primary" title="C" value="C">
-                                            <input type="checkbox" name="multi_answer{$multi.id}[]" lay-skin="primary" title="D" value="D">
+                                            <volist name="$multi.options" id="options_list" key='mk'>
+                                                <input type="checkbox" name="multi_answer[{$multi.id}][{$mk}]" lay-skin="primary" title="{$options_list.index}" value="{$options_list.options}">
+                                            </volist>
+                                    
                                         </div>
                                     </div>
                                 </if>
                             </volist>
 
-                        <elseif condition="$info.type eq 'recognized'" />
+                        <elseif condition="$info.type eq '2'" />
                             <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
                                 <legend>判断题</legend>
                             </fieldset>
                             <!-- 判断题目内容 -->
                             <volist name="recognized" id="recognized" key='k'>
-                                <div class="layui-elem-quote" style="margin-top: 20px;">
-                                    <p>{$k}、{$recognized.content}</p>
-                                </div>
-                                <div class="layui-form-item">
-                                    <label class="layui-form-label">正确答案</label>
-                                    <div class="layui-input-block">
-                                        <input type="radio" name="recognized_answer{$recognized.id}" value="0" title="正确">
-                                        <input type="radio" name="recognized_answer{$recognized.id}" value="1" title="错误">
+                                <if condition="$recognized.type eq '2'">
+                                    <div class="layui-elem-quote" style="margin-top: 20px;">
+                                        <p><a name="{$key+1}">{$k}、{$recognized.problems}</a></p>
                                     </div>
-                                </div>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">正确答案</label>
+                                        <div class="layui-input-block">
+                                            <input type="radio" name="recognized_answer[{$recognized.id}]" value="1" title="正确">
+                                            <input type="radio" name="recognized_answer[{$recognized.id}]" value="0" title="错误">
+                                        </div>
+                                    </div>
+                                </if>
                             </volist>
-                        <elseif condition="$info.type eq 'fill'" />
+                        <elseif condition="$info.type eq '3'" />
                             <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
                                 <legend>填空题</legend>
                             </fieldset>
                             <!-- 填空题目内容 -->
                             <volist name="fill" id="fill" key='k'>
-                                <div class="layui-elem-quote" style="margin-top: 20px;">
-                                    <p>{$k}、{$fill.content}</p>
-                                </div>
-                                <div class="layui-form-item layui-form-text">
-                                    <label class="layui-form-label">正确答案</label>
-                                    <div class="layui-input-block">
-                                        <textarea placeholder="请输入内容" class="layui-textarea" name="fill_answer{$fill.id}"></textarea>
+                                <if condition="$fill.type eq '3'">
+                                    <div class="layui-elem-quote" style="margin-top: 20px;">
+                                        <p><a name="{$key+1}">{$k}、{$fill.problems}</a></p>
                                     </div>
-                                </div>
+                                    <div class="layui-form-item layui-form-text">
+                                        <label class="layui-form-label">正确答案</label>
+                                        <div class="layui-input-block">
+                                            <textarea placeholder="请输入内容" class="layui-textarea" name="fill_answer[{$fill.id}]"></textarea>
+                                        </div>
+                                    </div>
+                                </if>
                             </volist>
 
-                        <elseif condition="$info.type eq 'short'" />
+                        <elseif condition="$info.type eq '4'" />
                             <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
                                 <legend>简答题</legend>
                             </fieldset>
                             <!-- 简答题目内容 -->
                             <volist name="short" id="short" key='k'>
-                                <div class="layui-elem-quote" style="margin-top: 20px;">
-                                    <p>{$k}、{$short.content}</p>
-                                </div>
-                                <div class="layui-form-item layui-form-text">
-                                    <label class="layui-form-label">正确答案</label>
-                                    <div class="layui-input-block">
-                                        <textarea placeholder="请输入内容" class="layui-textarea" name="short_answer{$short.id}"></textarea>
+                                <if condition="$short.type eq '4'">
+                                    <div class="layui-elem-quote" style="margin-top: 20px;">
+                                        <p><a name="{$key+1}">{$k}、{$short.problems}</a></p>
                                     </div>
-                                </div>
+                                    <div class="layui-form-item layui-form-text">
+                                        <label class="layui-form-label">正确答案</label>
+                                        <div class="layui-input-block">
+                                            <textarea placeholder="请输入内容" class="layui-textarea" rows="20" cols="10" name="short_answer[{$short.id}]"></textarea>
+                                        </div>
+                                    </div>
+                                </if>
                             </volist>
                         </if>
                     </volist>
@@ -198,7 +204,7 @@
                 <div class="list">
                     <div class="index">
                         <volist name="rows" id="rows" key="k">
-                            <span class="layui-btn layui-btn-sm button-index">{$k}</span>
+                            <a href="#{$k}"><span class="layui-btn layui-btn-sm button-index">{$k}</span></a>
                         </volist>
                     </div>
                 </div>
@@ -220,9 +226,10 @@
             ,$ = layui.jquery
             ,element = layui.element
             ,layer = layui.layer;
-            
+
             //提示开始答题
             (function(){
+
                 // 窗口移动至 top=0, left=0
                 window.moveTo(0, 0);
                 window.resizeTo(screen.availWidth, screen.availHeight);
@@ -249,6 +256,14 @@
                 
                 $(".button-index").eq(index).addClass('layui-btn-warm');
                 
+            })
+
+            $(".layui-layedit-iframe").click(function(){
+
+                // index=$(this).parents('.layui-form-item').index('.layui-form-item');
+                
+                // $(".button-index").eq(index).addClass('layui-btn-warm');
+                console.log('ok')
             })
 
             $(".button-index").click(function(){
@@ -279,18 +294,18 @@
 
             //交卷监听提交
             form.on('submit(sreach)', function(data){
-                // console.log(data.field);
+                console.log(data.field);
                 //用户首次触发
                 if(window.localStorage.getItem("start_evaluation"+"{$login_id}") == "start" && window.localStorage.getItem("stop_evaluation"+"{$login_id}")=="stop"){
                     
-                    layer.confirm('确认要交卷吗？',{icon: 3, title:'提示',scrollbar : false},function(index){
+                    layer.confirm('确认要交卷吗？',{icon: 3, title:'系统提示',scrollbar : false},function(index){
 
                         sendForm(data,timer);
                     });
 
                 //重复提交
                 }else if(window.localStorage.getItem("start_evaluation"+"{$login_id}") == "stop" && window.localStorage.getItem("stop_evaluation"+"{$login_id}")=="start"){
-                    layer.alert('您已经交卷了,请不要重复提交！', {icon: 5,scrollbar : false},function () {
+                    layer.alert('您已经交卷了,请不要重复提交！', {icon: 5,title:'系统提示',scrollbar : false},function () {
                         layer.closeAll();
                         
                     });
@@ -314,6 +329,12 @@
                     data: data.field,
                     success: function(res) {
 
+                        if(res.status==1){
+                            var info=6;
+                        }else{
+                            var info=5;
+                        }
+                        // console.dir(res)
                         window.localStorage.setItem("start_evaluation"+"{$login_id}","stop");
                         window.localStorage.setItem("stop_evaluation"+"{$login_id}","start");
                         if(window.localStorage.getItem("start_evaluation"+"{$login_id}")=="stop" && window.localStorage.getItem("stop_evaluation"+"{$login_id}")=="start"){
@@ -322,7 +343,7 @@
                             $('.evaluation_status').html('当前正在考试结束...');
                             clearInterval(timer);
                             
-                            layer.alert(res.msg, {icon: 6,scrollbar : false},function () {
+                            layer.alert(res.msg, {icon: info,title:'系统提示',scrollbar : false},function () {
                                 layer.closeAll('dialog');
                             
                             });

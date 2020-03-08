@@ -45,7 +45,7 @@
       </div>
       <xblock>
         <button class="layui-btn layui-btn-danger" onclick="f_delete_all()"><i class="layui-icon"></i>批量删除</button>
-        <button class="layui-btn" onclick="x_admin_show('添加类型','type_add',700,500)"><i class="layui-icon">&#xe608;</i>添加</button>
+        <button class="layui-btn" onclick="x_admin_show('添加类型','type_add')"><i class="layui-icon">&#xe608;</i>添加</button>
         <span class="x-right" style="line-height:40px">共有数据：{$count_type} 条</span>
       </xblock>
       <table class="layui-table">
@@ -56,6 +56,7 @@
                   </th>
                   <th>ID</th>
                   <th>类型</th>
+                  <th>描述</th>
                   <th>操作</th>
                 </tr>
               </thead>
@@ -67,8 +68,9 @@
                       </td>
                       <td>{$type.id}</td>
                       <td>{$type.type}</td>
+                      <td>{$type.desc}</td>
                       <td class="td-manage">
-                        <a title="编辑"  onclick="x_admin_show('编辑','type_add?id={$type.id}',700,500)" href="javascript:;">
+                        <a title="编辑"  onclick="x_admin_show('编辑','type_add?id={$type.id}')" href="javascript:;">
                           <i class="layui-icon">&#xe642;</i>
                         </a>
                         <a title="删除" id="del_{$type.id}" onclick="type_del(this,'{$type.id}')" href="javascript:;">

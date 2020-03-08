@@ -7,6 +7,9 @@ use \think\Session;
 use \think\Config;
 use app\admin\model\Pdf;
 
+use app\admin\behavior\Behavior;
+use app\admin\behavior\Files;
+
 class System extends Base
 {
     public function _initialize()//_initialize与__construct有区别
@@ -21,64 +24,79 @@ class System extends Base
     }
 
     //系统管理基础设置模板显示
-	public function web_info()
+    public function base_info()
     {
-        $memcache=new \Memcache();
-        $memcache->connect('127.0.0.1',11211) or die('Could not connect');
-
         if(Request::instance()->isAjax()){
             $data=Request::instance()->post();
             if(!empty($data)){
-                $arr['id']="1";
+                
                 $arr['web_title']=$data['title'];
                 $arr['web_name']=$data['name'];
                 $arr['web_version']=$data['version'];
                 $arr['web_desc']=$data['desc'];
                 $arr['web_record']=$data['record'];
-                $memcache->replace('web_info',$arr);
-                $rows=Db::name('web_info')->update($arr);
-                
-                if($rows){
 
-                    $data['status']="1";
-                    $data['msg']="设置成功";
-                    return json($data);
+                //判断是前台设置还是后台设置
+                if(isset($data['img_url'])){
+                    $arr['type']='1';
+
+                    $arr['logo']=$data['img_url'];
+
                 }else{
-                    $data['status']="0";
-                    $data['msg']="设置失败";
-                    return json($data);
+
+                    $arr['type']='0';
+
                 }
+                
+                $rest=Db::name('web_info')->where('type',$arr['type'])->find();
+                
+                if($rest){
+
+                    $rows=Db::name('web_info')->where('id='.$rest['id'])->update($arr);
+                }else{
+                    
+                    $rows=Db::name('web_info')->insert($arr);
+                }
+
+                if($arr['type']=='1' && $arr['logo']!=$rest['logo']){
+
+                    Files::thumb_image($data['img_url'],'logo',$width=200,$height=90);
+
+                    $logo_img=ROOT_PATH . 'public' . DS . 'uploads'.DS.'logo'.DS.$rest['logo'];
+                    
+                    if(file_exists($logo_img)){
+                        unlink(ROOT_PATH . 'public' . DS . 'uploads'.DS.'logo'.DS.$rest['logo']);
+                    }
+                }
+
+
+                
+                return Behavior::return_info($rows);
             }
         }else{
             
-            $rows=$memcache->get('web_info');
-            $rest=$memcache->get('smtp_config');
-            
-            if(!$rows && !$rest){
-                $rows=Db::name('web_info')->where('id','1')->limit('0,1')->find();
-                $rest=Db::name('smtp_config')->where('id','1')->limit('0,1')->find();
-                $memcache->set('web_info', $rows);
-                $memcache->set('smtp_config', $rest);
-            }
+            $home=Db::name('web_info')->where('type','1')->limit('0,1')->find();
+            $admin=Db::name('web_info')->where('type','0')->limit('0,1')->find();
+
+            $rest=Db::name('smtp_config')->where('id','1')->limit('0,1')->find();
             
             $this->assign('rest',$rest);
-            $this->assign('rows',$rows);
-            return $this->fetch('web_info');
+            $this->assign('home',$home);
+            $this->assign('admin',$admin);
+
+            return $this->fetch('base_info');
         }
-		
-	}
+        
+    }
+
 
     //配置邮件基础信息
     public function set_email()
     {
-        $memcache=new \Memcache();
-        $memcache->connect('127.0.0.1',11211) or die('Could not connect');
-
         if(Request::instance()->isAjax()){
             $data=Request::instance()->post();
             if(!empty($data)){
 
-                $arr['id']="1";
                 $arr['smtp_name']=$data['email_name'];
                 $arr['smtp_port']=$data['email_port'];
                 $arr['author_code']=$data['author_code'];
@@ -86,17 +104,16 @@ class System extends Base
                 $arr['send_nickname']=$data['send_email_nickname'];
                 $arr['email_pass']=$data['email_pass'];
                 
-                $rows=Db::name('smtp_config')->update($arr);
-                $memcache->replace('smtp_config',$arr);
-                if($rows){
-                    $data['status']="1";
-                    $data['msg']="设置成功";
-                    return json($data);
+                $rest=Db::name('smtp_config')->where('id=1')->find();
+
+                if($rest){
+                    $rows=Db::name('smtp_config')->where('id=1')->update($arr);
                 }else{
-                    $data['status']="0";
-                    $data['msg']="没有做任何改变";
-                    return json($data);
+                    $rows=Db::name('smtp_config')->insert($arr);
                 }
+                
+                
+                return Behavior::return_info($rows);
             }
         }
     }

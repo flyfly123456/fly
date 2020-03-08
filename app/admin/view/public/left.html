@@ -30,6 +30,34 @@
                     </if>
                 </volist>
             </ul>
+        <elseif condition="$menu_sort.sort_name_en eq 'Shop' and $menu_sort.select eq 1"/>
+            <ul class="nav hidden-nav" data-type="{$menu_sort.sort_name_en}" style="display:none;">
+                <volist name="menu" id="left_menu">
+                    <if condition="$left_menu.isShow eq 1 and $left_menu.sort eq $menu_sort.sort_name_en">
+                        <li>
+                            <a href="javascript:;">
+                                <i class="layui-icon {$left_menu.icon}"></i>
+                                <cite>{$left_menu.name}</cite>
+                                <i class="iconfont nav_right">&#xe697;</i>
+                            </a>
+                            <ul class="sub-menu">
+                                <if condition="$left_menu.hasSub eq 1">
+                                    <volist name="$left_menu.sub" id="sub">
+                                        <if condition="$sub.isShow eq 1">
+                                            <li>
+                                                <a _href="{$sub.url}">
+                                                    <i class="iconfont">&#xe6a7;</i>
+                                                    <cite>{$sub.name}</cite>
+                                                </a>
+                                            </li >
+                                        </if>
+                                    </volist>
+                                </if>
+                            </ul>
+                        </li>
+                    </if>
+                </volist>
+            </ul>
         <elseif condition="$menu_sort.sort_name_en eq 'Hr' and $menu_sort.select eq 1"/>
             <ul class="nav hidden-nav" data-type="{$menu_sort.sort_name_en}" style="display:none;">
                 <volist name="menu" id="left_menu">

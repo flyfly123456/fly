@@ -36,13 +36,10 @@
     <div class="x-body">
         <blockquote class="layui-elem-quote">当前分类父id='0'时，为顶级分类，有子分类的前面加收缩图标<i class="layui-icon x-show" status='true'>&#xe623;</i></blockquote>
         <xblock>
-            <button class="layui-btn layui-btn-danger layui-btn-sm" onclick="delAll()"><i class="layui-icon layui-icon-delete"></i>批量删除</button>
+            <button class="layui-btn layui-btn-danger layui-btn-sm delete-all"><i class="layui-icon layui-icon-delete"></i>批量删除</button>
             <button class="layui-btn layui-btn-sm" onclick="x_admin_show('添加分类','cate_add')"><i class="layui-icon layui-icon-add-circle-fine"></i>添加</button>
 
-            <button class="layui-btn layui-btn-primary layui-btn-sm up-all">全部收起</button>
-            <button class="layui-btn layui-btn-primary layui-btn-sm down-all">全部展开</button>
-            <button class="layui-btn layui-btn-primary layui-btn-sm get-checked">获取选中</button>
-
+            <button class="layui-btn layui-btn-sm up-down">展开 / 收起</button>
             <span class="x-right" style="line-height:40px">共有数据：{$count} 条</span>
         </xblock>
     
@@ -91,24 +88,25 @@
                         title: 'ID',
                         width: '20%'
                     },
-                    // {
-                    //     title: '状态',
-                    //     width: '20%',
-                    //     template: function(item){
-                    //         return '<input type="checkbox" lay-skin="switch" lay-filter="status" lay-text="开启|关闭">';
-
-                            
-                    //     }
-                    // },
-                    {
-                        field: 'is_available',
-                        title: '状态',
-                        width: '20%',
-                    },
                     {
                         field: 'pid',
                         title: '父ID',
                         width: '15%',
+                    },
+                    {
+                        field: 'status',
+                        title: '状态',
+                        width: '15%',
+                        template: function(item){
+                            if(item.status=='已启用'){
+
+                                return '<input type="checkbox" name="status" value="'+item.id+'" lay-skin="switch" lay-filter="status" lay-text="已启用|已禁用" checked>';
+                            }else{
+
+                                return '<input type="checkbox" name="status" value="'+item.id+'" lay-skin="switch" lay-filter="status" lay-text="已启用|已禁用">';
+                            }
+                            
+                        }
                     },
                     {
                         field: 'actions',
@@ -133,18 +131,21 @@
             });
             
             treetable.on('treetable(add)',function(data){
-                layer.msg('添加操作');
+                // layer.msg('添加操作');
                 console.dir(data);
+                x_admin_show('添加分类',"{:url('admin/cate/cate_add')}?pid="+data.item.pid+"&id="+data.item.id);
             })
             
             treetable.on('treetable(edit)',function(data){
                 // layer.msg('编辑操作');
-                console.dir(data.item);
-                window.location.href="{:url('admin/cate/cate_edit')}?id="+data.item.id
+                // console.dir(data.item);
+
+                x_admin_show('编辑分类',"{:url('admin/cate/cate_edit')}?id="+data.item.id);
+
             })
 
             treetable.on('treetable(del)',function(data){
-                layer.msg('删除中，请稍后...',{icon:6},function(){
+                layer.confirm('确定要删除么？',{icon:3,title:'系统提示'},function(){
                     // console.dir(data.item)
                     $.ajax({
                       url: "{:url('admin/cate/cate_delete')}",
@@ -171,21 +172,63 @@
                 
             })
             
-            o('.up-all').click(function(){
-                treetable.all('up');
+            o('.up-down').click(function(){
+                if($(this).data('down')==true){
+                    treetable.all('up');
+                    $(this).data('down',false);
+                }else{
+                    treetable.all('down');
+                    $(this).data('down',true);
+                }
             })
             
-            o('.down-all').click(function(){
-                treetable.all('down');
-            })
-            
-            o('.get-checked').click(function(){
-                console.dir(treetable.all('checked'));
+            o('.delete-all').click(function(){
+                console.dir(treetable.all('checked').data);
+                data=treetable.all('checked').data;
+                data=JSON.stringify(data);
+
+                if(treetable.all('checked').data.length==0 && treetable.all('checked').ids.length==0){
+                    layer.alert("请选择要删除的数据",{icon:2,title:'系统提示'});
+                }else{
+                    layer.confirm('确定要删除么？',{icon:3,title:'系统提示'},function(){
+                        $.ajax({
+                            url: "{:url('admin/cate/delete_all')}",
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {id:data},
+                            success: function(res) {
+                                //called when successful
+                                layer.msg(res.msg,{icon:6});
+                                location.replace(location.href);
+                            },
+                            error: function(res) {
+                                //called when there is an error
+                                layer.msg("网络异常，请稍后再试");
+                            }
+                        });
+                        
+                    })
+                }
             })
             
             form.on('switch(status)',function(data){
-                layer.msg('监听状态操作');
-                console.dir(data);
+                // layer.msg('监听状态操作');
+                // console.dir(data.value);
+                $.ajax({
+                    url: "{:url('admin/cate/cate_toggle')}",
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {id:data.value},
+                    success: function(res) {
+                        //called when successful
+                        layer.msg(res.msg,{icon:6});
+                    },
+                    error: function(res) {
+                        //called when there is an error
+                        layer.msg("网络异常，请稍后再试");
+                    }
+                });
+                
             })
         })
     </script>

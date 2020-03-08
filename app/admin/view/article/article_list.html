@@ -44,6 +44,8 @@
                         <select name="modules" lay-verify="" lay-search="">
                             <option value="">选择搜索条件</option>
                             <option value="title">标题</option>
+                            <option value="owner">作者</option>
+                            <option value="cate">分类</option>
                             <option value="desc">描述</option>
                             <option value="content">内容</option>
                             <option value="status">状态</option>
@@ -68,6 +70,7 @@
                     <th lay-data="{field:'desc', width:200}">描述</th>
                     <th lay-data="{field:'content', width:300}">内容</th>
                     <th lay-data="{field:'owner', width:180}">添加者</th>
+                    <th lay-data="{field:'cate', width:180}">分类</th>
                     <th lay-data="{field:'create_time', width:180}">添加时间</th>
                     <th lay-data="{fixed: 'right', field:'status'}">状态</th>
                     <th lay-data="{fixed: 'right', width:210, align:'center', toolbar: '#barDemo'}">操作</th>
@@ -79,9 +82,8 @@
     <!-- 头部导出筛选 -->
     <script type="text/html" id="demoTable">
            
-        <button class="layui-btn layui-btn-danger layui-btn-sm delete_all" data-type="getCheckData"><i class="layui-icon layui-icon-delete"></i>批量删除</button>
+        <button class="layui-btn layui-btn-danger layui-btn-sm delete_all" data-type="batchdelete"><i class="layui-icon layui-icon-delete"></i>批量删除</button>
         <button class="layui-btn layui-btn-sm" onclick="x_admin_show('添加文章','article_add')"><i class="layui-icon">&#xe608;</i>添加</button>
-        <button class="layui-btn layui-btn-primary layui-btn-sm" onclick="f_article_export()"><i class="layui-icon layui-icon-export"></i>导出</button>
     </script>
 
     <script type="text/html" id="barDemo">
@@ -136,7 +138,7 @@
                     console.log(data.id)
                     //发异步删除数据
                     $.ajax({
-                        url: 'delete_article_list',
+                        url: 'article_delete',
                         type: 'POST',
                         dataType: 'json',
                         data: {id:data.id},
@@ -195,36 +197,22 @@
         });
       
         var $ = layui.$, active = {
-            getCheckData: function(){ //获取选中数据
+            batchdelete: function(){ //获取选中数据
                 var checkStatus = table.checkStatus('idTest')
                 ,data = checkStatus.data;
-                // layer.alert(JSON.stringify(data));
-                // data=JSON.stringify(data);
-                // console.log(data)
+                data=JSON.stringify(data);
+                
                 if(data.length==0){
                     layer.msg('请选择要删除的数据！');
                     return false;
                 }else{
                     layer.confirm('确认要删除吗？',{icon: 3, title:'提示'},function(index){
-                        arrobj=[];
-                        var str="";
-                        var jsonStr="";
-                        for (var i = 0; i < data.length; i++) {
-                          str="\""+data[i]['id']+"\":"+"\""+data[i]['id']+"\",";
-                          jsonStr+=str;
-                        };
-
-                        substr=jsonStr.slice(0,-1);
                         
-                        substr="{"+substr+"}";
-                        jsonObj=eval('(' + substr + ')');
-                        console.log(jsonObj)
-                        // console.log(data)
                         $.ajax({
                             url: "{:url('admin/Article/delete_all')}",
                             type: 'POST',
                             dataType: 'json',
-                            data: jsonObj,
+                            data: {id:data},
                             success: function(res) {
                                 //called when successful
                                 console.log(res)
@@ -241,15 +229,6 @@
                 }
                 
             }
-            ,getCheckLength: function(){ //获取选中数目
-                var checkStatus = table.checkStatus('idTest')
-                ,data = checkStatus.data;
-                layer.msg('选中了：'+ data.length + ' 个');
-            }
-            ,isAll: function(){ //验证是否全选
-                var checkStatus = table.checkStatus('idTest');
-                layer.msg(checkStatus.isAll ? '全选': '未全选')
-            }
             ,reload: function(){
                 var demoReload = $('#demoReload');
                 var modules=$("select[name='modules']");
@@ -262,7 +241,13 @@
                     start:start.val(),
                     end:end.val()
                 }
-                console.log(post)
+
+                if(start.val()=="" && end.val()=="" && demoReload.val()=="" && modules.val()==""){
+                    layer.msg('请选择或输入关键字进行搜索',{icon:2});
+                    return false;
+                }
+
+                // console.log(post)
                 $.ajax({
                     url: "{:url('admin/Article/article_list_info')}",
                     type: 'POST',
@@ -278,7 +263,9 @@
                             }
                             ,where: {
                                 keywords: demoReload.val(),
-                                modules:modules.val()
+                                modules:modules.val(),
+                                start:start.val(),
+                                end:end.val()
                             }
                         });
                     },
@@ -304,15 +291,6 @@
 
     });
 
-    //会员导出
-    function f_article_export(){
-      layer.confirm('确认要导出吗？',function(){
-          window.location="{:url('admin/Article/article_export')}";
-          layer.msg('导出成功', {icon: 1});
-
-      })
-    }
-    
     </script>
 </body>
 </html>

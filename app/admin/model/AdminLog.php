@@ -15,7 +15,7 @@ class AdminLog extends Model
 
         $logarr['operation']=$operation;
         
-        $logarr['time']=time();
+        $logarr['create_time']=time();
         
         $rows=Db::name('admin_log')->insert($logarr);
         if($rows){
