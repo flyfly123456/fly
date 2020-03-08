@@ -1,0 +1,17 @@
+<aside class="Hui-aside">
+	<div class="menu_dropdown bk_2">
+		<foreach name="menu" item="menu">
+			<dl>
+				<dt><i class="Hui-iconfont">{$menu.icon}</i> {$menu.name}<i class="Hui-iconfont menu_dropdown-arrow">&#xe6d5;</i></dt>
+				<dd>
+					<ul>
+						<volist name="$menu.children" id="sub_menu">
+							<li><a data-href="{:url($sub_menu.url)}" data-title="{$sub_menu.name}" href="javascript:void(0)">{$sub_menu.name}</a></li>
+						</volist>
+					</ul>
+
+				</dd>
+			</dl>
+		</foreach>
+	</div>
+</aside>

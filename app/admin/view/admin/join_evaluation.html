@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎使用 FlyFly v1.0在线测评系统</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="__ACSS__/font.css">
+    <link rel="stylesheet" href="__ACSS__/xadmin.css">
+    <link rel="stylesheet" href="__ACSS__/evaluation.css">
+    <script type="text/javascript" src="__AJS__/jquery.min.js"></script>
+    <script type="text/javascript" src="__LAYUI__/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="__AJS__/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+        .layui-col-md3{
+            position: fixed;
+            top:80px;
+            right: 30px;
+            text-align: left;
+        }
+        .list .index,.evaluation{
+            float: left;
+            padding: 5px;
+            border: 1px solid #f0f0f0;
+            widows: 100%;
+        }
+        .evaluation{
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .layui-btn+.layui-btn {
+            margin-left: 0px;
+        }
+        .button-index{
+            margin-top: 5px;
+        }
+        .layui-elem-quote{
+            border-left: none;
+        }
+        .layui-nav .layui-this:after,.layui-nav-bar,.layui-nav-tree .layui-nav-itemed:after {
+            background-color: #393D49!important;
+        }
+        .top{
+            position: fixed;
+            right: 20px;
+            bottom: 50px;
+        }
+        .top:hover i{
+            color: #009688;
+        }
+        .submit{
+            width: 100%;
+            margin:0 auto;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body class="">
+    <form class="layui-form layui-col-md12 x-so">
+        <div class="fly-header layui-bg-black">
+            <div class="layui-container">
+                <ul class="layui-nav fly-nav">
+                    <li class="layui-nav-item">
+                        <a href="javascript:;">您好，{$Request.session.login.name}！欢迎使用FlyFly在线考试系统</a>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;" class="evaluation_status">当前正在考试中...</a>
+                    </li>
+                </ul>
+                <ul class="layui-nav fly-nav-user"> 
+                    <li class="layui-nav-item"><a href="javascript:;">剩余时间：<span class="countdown">00小时：00分钟：00秒</span></a></li>
+                    <li class="layui-nav-item"><button class="layui-btn join" lay-submit="" lay-filter="sreach"><a href="javascript:;">立即交卷</a></button></li> 
+                </ul>
+            </div>
+        </div>
+
+        <div class="layui-container">
+            <div class="layui-col-md9">
+                <div class="x-body evaluation">
+
+                    <volist name="info" id="info">
+                        <if condition="$info.type eq 'single'">
+                            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                                <legend>单选题</legend>
+                            </fieldset>
+                            <!-- 单选题目内容 -->
+                            <volist name="single" id="single" key='k' empty="暂无数据...">
+                                <if condition="$single.type eq 'single'">
+                                    <div class="layui-elem-quote" style="margin-top: 20px;">
+                                        <p>{$k}、{$single.content}</p>
+                                    </div>
+                                    <volist name="$single.option" id="option">
+                                        <blockquote class="layui-elem-quote layui-quote-nm">{$option}</blockquote>
+                                    </volist>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">正确答案</label>
+                                        <div class="layui-input-block">
+                                            <input type="radio" name="single_answer{$single.id}" value="A" title="A">
+                                            <input type="radio" name="single_answer{$single.id}" value="B" title="B">
+                                            <input type="radio" name="single_answer{$single.id}" value="C" title="C">
+                                            <input type="radio" name="single_answer{$single.id}" value="D" title="D">
+                                        </div>
+                                    </div>
+                                </if>
+                            </volist>
+                            <!-- 单选题目内容结束 -->
+                        
+                        <elseif condition="$info.type eq 'multi'" />
+                            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                                <legend>多选题</legend>
+                            </fieldset>
+                            <!-- 多选题目内容 -->
+                            <volist name="multi" id="multi" key='k'>
+                                <if condition="$multi.type eq 'multi'">
+                                    <div class="layui-elem-quote" style="margin-top: 20px;">
+                                        <p>{$k}、{$multi.content}</p>
+                                    </div>
+                                    <volist name="$multi.option" id="option">
+                                        <blockquote class="layui-elem-quote layui-quote-nm">{$option}</blockquote>
+                                    </volist>
+                                    <div class="layui-form-item">
+                                        <label class="layui-form-label">正确答案</label>
+                                        <div class="layui-input-block">
+                                            <input type="checkbox" name="multi_answer{$multi.id}[]" lay-skin="primary" title="A" value="A">
+                                            <input type="checkbox" name="multi_answer{$multi.id}[]" lay-skin="primary" title="B" value="B">
+                                            <input type="checkbox" name="multi_answer{$multi.id}[]" lay-skin="primary" title="C" value="C">
+                                            <input type="checkbox" name="multi_answer{$multi.id}[]" lay-skin="primary" title="D" value="D">
+                                        </div>
+                                    </div>
+                                </if>
+                            </volist>
+
+                        <elseif condition="$info.type eq 'recognized'" />
+                            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                                <legend>判断题</legend>
+                            </fieldset>
+                            <!-- 判断题目内容 -->
+                            <volist name="recognized" id="recognized" key='k'>
+                                <div class="layui-elem-quote" style="margin-top: 20px;">
+                                    <p>{$k}、{$recognized.content}</p>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">正确答案</label>
+                                    <div class="layui-input-block">
+                                        <input type="radio" name="recognized_answer{$recognized.id}" value="0" title="正确">
+                                        <input type="radio" name="recognized_answer{$recognized.id}" value="1" title="错误">
+                                    </div>
+                                </div>
+                            </volist>
+                        <elseif condition="$info.type eq 'fill'" />
+                            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                                <legend>填空题</legend>
+                            </fieldset>
+                            <!-- 填空题目内容 -->
+                            <volist name="fill" id="fill" key='k'>
+                                <div class="layui-elem-quote" style="margin-top: 20px;">
+                                    <p>{$k}、{$fill.content}</p>
+                                </div>
+                                <div class="layui-form-item layui-form-text">
+                                    <label class="layui-form-label">正确答案</label>
+                                    <div class="layui-input-block">
+                                        <textarea placeholder="请输入内容" class="layui-textarea" name="fill_answer{$fill.id}"></textarea>
+                                    </div>
+                                </div>
+                            </volist>
+
+                        <elseif condition="$info.type eq 'short'" />
+                            <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+                                <legend>简答题</legend>
+                            </fieldset>
+                            <!-- 简答题目内容 -->
+                            <volist name="short" id="short" key='k'>
+                                <div class="layui-elem-quote" style="margin-top: 20px;">
+                                    <p>{$k}、{$short.content}</p>
+                                </div>
+                                <div class="layui-form-item layui-form-text">
+                                    <label class="layui-form-label">正确答案</label>
+                                    <div class="layui-input-block">
+                                        <textarea placeholder="请输入内容" class="layui-textarea" name="short_answer{$short.id}"></textarea>
+                                    </div>
+                                </div>
+                            </volist>
+                        </if>
+                    </volist>
+                </div>
+            </div>
+
+            <div class="layui-col-md3">
+                <div class="list">
+                    <div class="index">
+                        <volist name="rows" id="rows" key="k">
+                            <span class="layui-btn layui-btn-sm button-index">{$k}</span>
+                        </volist>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="id" value="{$id}">
+            
+            <!-- 回到顶部 -->
+            <div class="top"><i class="layui-icon layui-icon-top" style="font-size:45px;"></i></div>
+        </div>
+    </form>
+<script>
+    $(function(){
+
+        //设置离开窗口次数
+        var leave=3;
+        layui.use(['element','form','layer'], function(){
+            var form = layui.form
+            form.render()
+            ,$ = layui.jquery
+            ,element = layui.element
+            ,layer = layui.layer;
+            
+            //提示开始答题
+            (function(){
+                // 窗口移动至 top=0, left=0
+                window.moveTo(0, 0);
+                window.resizeTo(screen.availWidth, screen.availHeight);
+
+                layer.alert("点击确认按钮之后开始计时，剩余时间或者剩余离开次数为零时，系统将强制收卷！", {icon: 0,title:'开始答题',closeBtn : 0,shade : 0.9,scrollbar : false,anim: -1,area: ['350px', '200px'],},function (index) {
+                    layer.close(index);
+                    
+                    //开始计时
+                    countDown({$rest.duration})
+                    //异步发送信息
+                    sendInfo();
+                });
+
+
+                // alert("点击确认按钮之后开始计时，剩余时间或者剩余离开次数为零时，系统将强制收卷！");
+                //     //开始计时
+                //     countDown({$rest.duration})
+                //     //异步发送信息
+                //     sendInfo();
+            })();
+
+            $(".layui-form-item").click(function(){
+                index=$(this).index('.layui-form-item');
+                
+                $(".button-index").eq(index).addClass('layui-btn-warm');
+                
+            })
+
+            $(".button-index").click(function(){
+                $(this).toggleClass("layui-btn-danger");
+            })
+
+            function sendInfo(){
+                //发送异步开始考试
+                $.ajax({
+                    url: "{:url('admin/Evaluation/start_exams')}",
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {join_evaluation: '1'},
+                    success: function(res) {
+                        
+                        layer.msg('开始计时...');
+                        window.localStorage.setItem("start_evaluation"+"{$login_id}","start");
+                        window.localStorage.setItem("stop_evaluation"+"{$login_id}","stop");
+
+                    },
+                    error: function(res) {
+                        
+                        layer.msg('网络异常，请稍后再试！');
+                    }
+                });
+                
+            }
+
+            //交卷监听提交
+            form.on('submit(sreach)', function(data){
+                // console.log(data.field);
+                //用户首次触发
+                if(window.localStorage.getItem("start_evaluation"+"{$login_id}") == "start" && window.localStorage.getItem("stop_evaluation"+"{$login_id}")=="stop"){
+                    
+                    layer.confirm('确认要交卷吗？',{icon: 3, title:'提示',scrollbar : false},function(index){
+
+                        sendForm(data,timer);
+                    });
+
+                //重复提交
+                }else if(window.localStorage.getItem("start_evaluation"+"{$login_id}") == "stop" && window.localStorage.getItem("stop_evaluation"+"{$login_id}")=="start"){
+                    layer.alert('您已经交卷了,请不要重复提交！', {icon: 5,scrollbar : false},function () {
+                        layer.closeAll();
+                        
+                    });
+                    
+                }else{
+                    //系统自动触发
+                    sendForm(data,timer);
+                    window.localStorage.removeItem("start_evaluation"+"{$login_id}");
+                    window.localStorage.removeItem("stop_evaluation"+"{$login_id}");
+                    
+                }
+                return false;
+            });
+
+            function sendForm(data,timer){
+                //发异步，把数据提交给php
+                $.ajax({
+                    url: "{:url('admin/Admin/join_evaluation')}",
+                    type: 'POST',
+                    dataType: 'json',
+                    data: data.field,
+                    success: function(res) {
+
+                        window.localStorage.setItem("start_evaluation"+"{$login_id}","stop");
+                        window.localStorage.setItem("stop_evaluation"+"{$login_id}","start");
+                        if(window.localStorage.getItem("start_evaluation"+"{$login_id}")=="stop" && window.localStorage.getItem("stop_evaluation"+"{$login_id}")=="start"){
+
+                            $('.countdown').html("00小时：00分钟：00秒");
+                            $('.evaluation_status').html('当前正在考试结束...');
+                            clearInterval(timer);
+                            
+                            layer.alert(res.msg, {icon: 6,scrollbar : false},function () {
+                                layer.closeAll('dialog');
+                            
+                            });
+                        }
+
+                    },
+                    error: function(res) {
+                        
+                        layer.msg('网络异常，请稍后再试！');
+                        
+                    }
+                });
+            }
+            
+            //倒计时
+            var timer=null;
+            function countDown(times){
+                timer=setInterval(function(){
+                    var day=0,
+                    hour=0,
+                    minute=0,
+                    second=0;//时间默认值
+                    if(times > 0){
+                        day = Math.floor(times / (60 * 60 * 24));
+                        hour = Math.floor(times / (60 * 60)) - (day * 24);
+                        minute = Math.floor(times / 60) - (day * 24 * 60) - (hour * 60);
+                        second = Math.floor(times) - (day * 24 * 60 * 60) - (hour * 60 * 60) - (minute * 60);
+                    }
+                    if (day <= 9) day = '0' + day;
+                    if (hour <= 9) hour = '0' + hour;
+                    if (minute <= 9) minute = '0' + minute;
+                    if (second <= 9) second = '0' + second;
+
+                    // console.log(day+"天:"+hour+"小时："+minute+"分钟："+second+"秒");
+                    $('.countdown').html(hour+"小时："+minute+"分钟："+second+"秒");
+                    times--;
+
+                    // 时间到交卷了
+                    if(times<0){
+                        times=0;
+                        clearInterval(timer);
+
+                        //系统自动触发
+                        window.localStorage.setItem("start_evaluation"+"{$login_id}","end");
+                        window.localStorage.setItem("stop_evaluation"+"{$login_id}","end");
+
+                        layer.alert('考试时间到，交卷了！',{icon: 4,title:'系统提示',closeBtn : 0,scrollbar : false},function () {
+                            layer.closeAll();
+                            $('.join').click();
+                        });
+                    }
+
+                    if(leave<0){
+                        times=0;
+                        clearInterval(timer);
+                        //系统自动触发
+                        window.localStorage.setItem("start_evaluation"+"{$login_id}","end");
+                        window.localStorage.setItem("stop_evaluation"+"{$login_id}","end");
+
+                        layer.alert('你离开太多次数了，系统已经强制收卷了！',{icon: 4,title:'系统提示',closeBtn : 0,scrollbar : false,zIndex: layer.zIndex},function () {
+                            layer.closeAll();
+                            $('.join').click();
+                        });
+                    }
+
+                },1000);
+              
+            }
+
+            //用户按键禁用
+
+            $(window).keydown(function(even){
+                //禁止f12
+                if(even.keyCode==123){
+                  return false;
+                }
+                //禁止刷新
+                if ( even.keyCode==116){   
+                    even.keyCode = 0;
+                    even.cancelBubble = true;
+                    return false;
+                }
+                
+                if(even.ctrlKey && even.keyCode == 82){
+                    //Ctrl + R
+                    return false;
+                }
+                if(even.ctrlKey && even.keyCode == 85){
+                    //Ctrl + U
+                    return false;
+                }
+                if(even.ctrlKey && even.keyCode == 78){
+                    //屏蔽Ctrl+n
+                    return false;
+                 }
+                 
+                if(even.ctrlKey && even.keyCode == 87){
+                    //屏蔽Ctrl+w
+                    return false;
+                }   
+                    
+                if(even.shiftKey && even.keyCode==121){
+                    //屏蔽 shift+F10
+                    return false;
+                }
+                  
+                if(even.srcElement.tagName == "A" && even.shiftKey){
+                    //屏蔽 shift 加鼠标左键新开一网页
+                    return false;
+                }
+                
+                if(even.altKey && even.keyCode == 115){
+                    //屏蔽Alt+F4
+                    window.showModelessDialog("about:blank","","dialogWidth:1px;dialogheight:1px");   
+                       return false;
+                }
+                if(even.altKey && (even.keyCode == 37 || even.keyCode == 39))
+                {
+                    //屏蔽 Alt+ 方向键→  //屏蔽 Alt+方向键 ←   
+                    return false;     
+                }        
+
+              })
+
+            //控制离开次数，强制收卷
+            window.onblur=function(){
+                if(window.localStorage.getItem("start_evaluation"+"{$login_id}") == "start" && window.localStorage.getItem("stop_evaluation"+"{$login_id}")=="stop"){
+                    leave--;
+                    // layer.alert('共有：3次机会离开，还剩：'+leave+'次，请不要切换或者移动窗口！',{icon: 5,title:'系统提示',closeBtn : 0,scrollbar : false},function (notice) {
+                    //     layer.close(notice);
+
+                    // });
+                    layer.open({
+                      type: 1,
+                      shade: false,
+                      area: ['300px', '200px'],
+                      maxmin: false,
+                      content: '共有：3次机会离开，还剩：'+leave+'次，请不要切换或者移动窗口！',
+                      zIndex: layer.zIndex, //重点1
+                      success: function(layero){
+                        layer.setTop(layero); //重点2
+                      }
+                    });
+                    
+                    return false
+                }
+            }
+
+            //禁止点击后退和前进按钮
+            if (window.history && window.history.pushState) {
+                $(window).on('popstate', function () {
+                    // 当点击浏览器的 后退和前进按钮 时才会被触发， 
+                    window.history.pushState('forward', null, ''); 
+                    window.history.forward(1);
+                });
+            }
+    　　　　　　　　　　
+            window.history.pushState('forward', null, '');  //在IE中必须得有这两行
+            window.history.forward(1);
+
+            //禁止右键
+            $(document).bind("contextmenu",function(e){
+                return false;
+            });
+
+            window.onresize = function() {
+                if(window.localStorage.getItem("start_evaluation"+"{$login_id}") == "start" && window.localStorage.getItem("stop_evaluation"+"{$login_id}")=="stop"){
+                    var window_width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+                    var window_height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+                    if(window_width < screen.width || window_height < screen.height) {
+                        leave--;
+                        // 部分浏览器需要延迟
+                        setTimeout(function() {
+                            // 窗口最大化
+                            window.resizeTo(screen.availWidth, screen.availHeight);
+                            // 窗口移动至 top=0, left=0
+                            window.moveTo(0, 0);
+                        }, 100);
+
+                        // layer.alert('共有：3次机会，还剩：'+leave+'次，请不要切换或者移动窗口！',{icon: 5,title:'系统提示',closeBtn : 0,scrollbar : false},function (notice) {
+                        //     layer.close(notice);
+
+                        // });
+                        layer.open({
+                          type: 1,
+                          shade: false,
+                          area: ['300px', '200px'],
+                          maxmin: false,
+                          content: '共有：3次机会离开，还剩：'+leave+'次，请不要切换或者移动窗口！',
+                          zIndex: layer.zIndex, //重点1
+                          success: function(layero){
+                            layer.setTop(layero); //重点2
+                          }
+                        });
+                    }
+                }
+
+            };
+
+            //监听窗口移动
+            var x=window.screenLeft || window.screenX;
+            var y=window.screenTop || window.screenY;
+            
+            setInterval(function(){
+                if(window.localStorage.getItem("start_evaluation"+"{$login_id}") == "start" && window.localStorage.getItem("stop_evaluation"+"{$login_id}")=="stop"){
+                    if(((window.screenLeft || window.screenX)!=x) || ((window.screenTop || window.screenY)!=y)){
+                        leave--;
+                        
+                        // 窗口最大化
+                        window.resizeTo(screen.width, screen.height);
+                        // 窗口移动至 top=0, left=0
+                        window.moveTo(0, 0);
+                        x=window.screenLeft || window.screenX;
+                        y=window.screenTop || window.screenY;
+
+                        // layer.alert('共有：3次机会，还剩：'+leave+'次，请不要切换或者移动窗口！',{icon: 5,title:'系统提示',closeBtn : 0,scrollbar : false},function (notice) {
+                        //     layer.close(notice);
+
+                        // });
+                        layer.open({
+                          type: 1,
+                          shade: false,
+                          area: ['300px', '200px'],
+                          maxmin: false,
+                          content: '共有：3次机会离开，还剩：'+leave+'次，请不要切换或者移动窗口！',
+                          zIndex: layer.zIndex, //重点1
+                          success: function(layero){
+                            layer.setTop(layero); //重点2
+                          }
+                        });
+                    }
+                }
+                
+            },300);
+
+            window.onbeforeunload=function(e){
+
+                window.localStorage.removeItem("join_evaluation"+"{$login_id}");
+                window.localStorage.removeItem("start_evaluation"+"{$login_id}");
+                window.localStorage.removeItem("stop_evaluation"+"{$login_id}");
+            　　var e = window.event||e;  
+            　　e.returnValue=("确定离开当前页面吗？");
+            }
+
+            //回到顶部
+            var scrollTop = $(document).scrollTop();
+            $(".top").on('click',function(){
+                var speed=10;
+                
+                $('body,html').animate({scrollTop:0},scrollTop/speed);
+
+            })
+
+        });
+    })
+    
+
+</script>
+</body>
+
+</html>

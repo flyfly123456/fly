@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head> 
+    <meta charset="UTF-8" /> 
+    <title>新增素材</title> 
+    <meta name="renderer" content="webkit" /> 
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /> 
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" /> 
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" /> 
+    <link rel="stylesheet" href="__ACSS__/font.css" /> 
+    <link rel="stylesheet" href="__ACSS__/xadmin.css" /> 
+    <script type="text/javascript" src="__AJS__/jquery.min.js"></script> 
+    <script type="text/javascript" src="__LAYUI__/layui.js" charset="utf-8"></script> 
+    <script type="text/javascript" src="__AJS__/xadmin.js"></script> 
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 --> 
+    <!--[if lt IE 9]>
+        <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+        <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]--> 
+</head> 
+<body class="layui-anim layui-anim-up"> 
+    <div class="x-nav"> 
+        <span class="layui-breadcrumb">
+            <a href="">首页</a>
+            <a href="">微信管理</a>
+            <a><cite>新增素材</cite></a>
+        </span> 
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新"> <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a> 
+    </div> 
+    <div class="x-body">
+        <blockquote class="layui-elem-quote">注意：临时素材的有效期为3天，3天之后将自动失效！</blockquote>
+        <form class="layui-form" enctype="multipart/form-data">
+            <div class="layui-form-item">
+                <label class="layui-form-label">类型</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="forever" value="1" lay-filter="forever" title="永久素材" checked>
+                    <input type="radio" name="forever" value="0" lay-filter="forever" title="临时素材">
+                </div>
+            </div>
+            <div class="layui-form-item"> 
+                <label for="title" class="layui-form-label"> <span class="x-red">*</span>标题</label> 
+                <div class="layui-input-inline"> 
+                    <input type="text" id="title" name="title" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" /> 
+                </div> 
+                <div class="layui-form-mid layui-word-aux"> 
+                    <span class="x-red">*</span>素材的标题...
+                </div> 
+            </div>
+            <div class="layui-form-item"> 
+                <label for="type" class="layui-form-label"><span class="x-red">*</span>多媒体</label> 
+                <div class="layui-input-inline"> 
+                    <select name="type" lay-verify="required" id="type">
+                        <option value="">请选择多媒体类别</option>
+                        <option value="image">图片</option>
+                        <option value="voice">语音</option>
+                        <option value="video">视频</option>
+                        <option value="thumb">缩略图</option>
+                    </select>
+                </div> 
+            </div>
+            <div class="layui-form-item"> 
+                <label class="layui-form-label"><span class="x-red">*</span>多媒体</label> 
+                <div class="layui-input-inline"> 
+                    <input name="media" lay-verify="required" id="media" placeholder="文件地址" value="" required="" autocomplete='off' class="layui-input" /> 
+                </div> 
+                <div class="layui-input-inline" style="width: auto;"> 
+                    <div class="layui-upload"> 
+                        <button type="button" class="layui-btn" id="up_media">上传文件</button>
+                        <button type="button" class="layui-btn" id="send_media">开始上传</button> 
+                    </div> 
+                </div> 
+            </div> 
+            <div class="layui-form-item"> 
+                <div class="layui-upload-list" style="margin-left:66px"> 
+                    <img class="layui-upload-img" id="up_imgs" /> 
+                    <span id="up_text"></span> 
+                </div> 
+            </div>
+            <div class="layui-form-item layui-form-text"> 
+                <label for="remark" class="layui-form-label">备注</label> 
+                <div class="layui-input-block"> 
+                    <textarea name="remark" placeholder="请输入内容" class="layui-textarea" lay-verify="remark"></textarea> 
+                </div> 
+            </div> 
+            <div class="layui-form-item">
+                <label for="push" class="layui-form-label">
+                </label>
+                <button class="layui-btn layui-btn-sm" id="send" lay-filter="send" lay-submit="">立即新增</button>
+                <button type="reset" class="layui-btn layui-btn-sm layui-btn-warm" lay-filter="">重置</button>
+            </div> 
+        </form> 
+    </div> 
+    <script>
+    layui.use(['form','layer','upload'], function(){
+        $ = layui.jquery
+        var form = layui.form
+        ,layer = layui.layer
+        ,upload = layui.upload;
+            
+        upload.render({
+            elem: '#up_media'
+            ,url: "{:url('admin/Wechat/get_uploads_media')}"
+            ,accept: 'file' //视频
+            ,auto:false
+            ,size: 10240 //限制文件大小，单位 KB
+            ,bindAction: '#send_media'
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#up_imgs').attr('src', result); //图片链接（base64）
+                });
+                layer.msg('文件上传中...',{icon:1});
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code > 0){
+                    return layer.msg('上传失败！');
+                }
+                if(res.status==1){
+                    
+                    //上传成功
+                    setTimeout(function(){
+                        $("#media").val(res.message);
+                        layer.msg('文件上传成功...',{icon:1});
+                    },1000)
+                }else{
+                    return layer.msg('上传失败！',{icon:1});
+                }
+                
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#up_text');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-danger demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
+
+        //监听提交
+        form.on('submit(send)', function(data){
+
+            console.log(data.field);
+            //发异步，把数据提交给php
+            layer.msg('正在新建素材中...',{icon:1});
+            $.ajax({
+                url: "{:url('admin/Wechat/material_add')}",
+                type: 'POST',
+                dataType: 'json',
+                data: data.field,
+                success: function(res) {
+                    // console.log(res)
+                    //called when successful
+                    console.log(res.errcode)
+                    console.log(res.errmsg)
+                    if(res.status=="1"){
+                        layer.alert(res.msg, {icon: 6},function () {
+                            layer.closeAll();
+                        });
+                    
+                    }else{
+                        layer.alert(res.msg, {icon: 5},function () {
+                            layer.closeAll();
+                        });
+                    }
+                },
+                error: function(res) {
+                    //called when there is an error
+                    layer.alert("网络异常，请稍后再试！", {icon: 5},function () {
+                        layer.closeAll();
+                    });
+                }
+            });
+            
+            return false;
+        });
+      
+      
+    });
+
+    </script>
+
+</body>
+</html>

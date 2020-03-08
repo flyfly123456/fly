@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=0">
+
+		<title>地址管理</title>
+
+		<link href="__AMAZE__/css/admin.css" rel="stylesheet" type="text/css">
+		<link href="__AMAZE__/css/amazeui.css" rel="stylesheet" type="text/css">
+
+		<link href="__ICSS__/personal.css" rel="stylesheet" type="text/css">
+		<link href="__ICSS__/addstyle.css" rel="stylesheet" type="text/css">
+		<script src="__AMAZE__/js/jquery.min.js" type="text/javascript"></script>
+		<script src="__AMAZE__/js/amazeui.js"></script>
+		<script src="__LAYER__/layer.js"></script>
+
+	</head>
+
+	<body>
+		<!--头 -->
+		<include file="public/header1" /><!-- 包含头部模版header1 -->
+		<include file="public/plug1" /><!-- 包含插件模版plug1 -->
+		<b class="line"></b>
+
+		<div class="center">
+			<div class="col-main">
+				<div class="main-wrap">
+
+					<div class="user-address">
+						<!--标题 -->
+						<div class="am-cf am-padding">
+							<div class="am-fl am-cf"><strong class="am-text-danger am-text-lg">地址管理</strong> / <small>Address&nbsp;list</small></div>
+						</div>
+						<hr/>
+						<ul class="am-avg-sm-1 am-avg-md-3 am-thumbnails">
+							<volist name="address" id="address">
+								<if condition="$address.is_default">
+									<li class="user-addresslist defaultAddr">
+								<else />
+									<li class="user-addresslist">
+								</if>
+									<span class="new-option-r default-address" data-type="{$address.id}"><i class="am-icon-check-circle"></i>默认地址</span>
+									<p class="new-tit new-p-re">
+										<span class="new-txt" data-type="{$address.id}">{$address.consignee}</span>
+										<span class="new-txt-rd2" data-type="{$address.telephone}">{$address.mobile}</span>
+									</p>
+									<div class="new-mu_l2a new-p-re">
+										<p class="new-mu_l2cw">
+											<span class="title">地址：</span>
+											<span class="province" data-type="{$address.province_id}">{$address.province}</span>
+											<span class="city" data-type="{$address.city_id}">{$address.city}</span>
+											<span class="dist" data-type="{$address.country}">{$address.area}</span>
+											<span class="street" data-type="{$address.address}">{$address.address}</span>
+											<span class="zipcode" data-type="{$address.zipcode}">{$address.zipcode}</span>
+										</p>
+									</div>
+									<div class="new-addr-btn">
+										<a href="javascript:;" class="edit-address"><i class="am-icon-edit"></i>编辑</a>
+										<span class="new-addr-bar">|</span>
+										<a href="javascript:void(0);" class="del-address" data-type="{$address.id}"><i class="am-icon-trash"></i>删除</a>
+									</div>
+								</li>
+							</volist>
+							
+						</ul>
+						<div class="clear"></div>
+						<a class="new-abtn-type" data-am-modal="{target: '#doc-modal-1', closeViaDimmer: 0}">添加新地址</a>
+						<!--例子-->
+						<div class="am-modal am-modal-no-btn" id="doc-modal-1">
+
+							<div class="add-dress">
+
+								<!--标题 -->
+								<div class="am-cf am-padding">
+									<div class="am-fl am-cf"><strong class="am-text-danger am-text-lg">新增地址</strong> / <small>Add&nbsp;address</small></div>
+								</div>
+								<hr/>
+
+								<div class="am-u-md-12 am-u-lg-8" style="margin-top: 20px;">
+									<form class="am-form am-form-horizontal">
+
+										<div class="am-form-group">
+											<label for="user-name" class="am-form-label">收货人</label>
+											<div class="am-form-content">
+												<input type="text" id="user-name" placeholder="收货人" name="consignee">
+											</div>
+										</div>
+
+										<div class="am-form-group">
+											<label for="user-phone" class="am-form-label">手机号码</label>
+											<div class="am-form-content">
+												<input id="user-phone" placeholder="手机号必填" type="tel" name="mobile">
+											</div>
+										</div>
+										<div class="am-form-group">
+											<label for="user-address" class="am-form-label">所在地</label>
+											<div class="am-form-content address">
+												<select data-am-selected="{maxHeight: 250}" id="provinces" name="provinces">
+													<option value="p">请选择省份</option>
+												</select>
+												<select data-am-selected="{maxHeight: 250}" id="citys" name="citys">
+													<option value="c">请选择市</option>
+												</select>
+												<select data-am-selected="{maxHeight: 250}" id="countys" name="countys">
+													<option value="a">请选择县</option>
+												</select>
+											</div>
+										</div>
+
+										<div class="am-form-group">
+											<label for="user-intro" class="am-form-label">详细地址</label>
+											<div class="am-form-content">
+												<textarea class="detailed_address" rows="3" id="user-intro" name="detailed_address" placeholder="输入详细地址"></textarea>
+												<small>100字以内写出你的详细地址...</small>
+											</div>
+										</div>
+
+										<div class="am-form-group">
+											<label for="zipcode" class="am-form-label">邮编</label>
+											<div class="am-form-content">
+												<input id="zipcode" placeholder="邮政编码" type="tel" name="zipcode">
+											</div>
+										</div>
+
+										<div class="am-form-group">
+											<div class="am-u-sm-9 am-u-sm-push-3">
+												<a class="am-btn am-btn-danger save">保存</a>
+												<a href="javascript: void(0)" class="am-close am-btn am-btn-danger" data-am-modal-close>取消</a>
+											</div>
+										</div>
+									</form>
+								</div>
+
+							</div>
+
+						</div>
+
+					</div>
+
+					<script type="text/javascript">
+						$(document).ready(function() {							
+							$(".new-option-r").click(function() {
+								$(this).parent('.user-addresslist').addClass("defaultAddr").siblings().removeClass("defaultAddr");
+							});
+							
+							var $ww = $(window).width();
+							if($ww>640) {
+								$("#doc-modal-1").removeClass("am-modal am-modal-no-btn")
+							}
+							
+						})
+					</script>
+
+					<div class="clear"></div>
+
+				</div>
+				<!--底部-->
+				<include file="public/footer" /><!-- 包含底部模版footer -->
+			</div>
+
+			<include file="public/left" /><!-- 包含左侧菜单模版left -->
+		</div>
+
+	</body>
+
+	<script>
+		$(function() {  
+		    //页面初始，加载所有的省份  
+		    $.ajax({  
+		        type: "post",  
+		        url: "{:url('index/person/get_area')}",
+		        data: {"type":1},
+		        dataType: "json",
+		        success: function(data) {  
+		            //遍历json数据，组装下拉选框添加到html中
+		            $("#provinces").html("<option value='p'>请选择省</option>");  
+		            $.each(data, function(i, item) {  
+		                $("#provinces").append("<option value='" + item.province_num + "'>" + item.province_name + "</option>");  
+		            });
+		        }  
+		    });  
+
+		    //监听省select框
+		    $("#provinces").change(function() {  
+		        $.ajax({  
+		            type: "post",  
+		            url: "{:url('index/person/get_area')}",
+		            data: {"pnum": $(this).val(),"type":2},  
+		            dataType: "json",  
+		            success: function(data) {  
+		                //遍历json数据，组装下拉选框添加到html中
+		                $("#citys").html("<option value='c'>请选择市</option>");  
+		                $.each(data, function(i, item) {  
+		                    $("#citys").append("<option value='" + item.city_num + "'>" + item.city_name + "</option>");  
+		                });  
+		            }  
+		        });  
+		    });  
+
+		    //监听市select框
+		    $("#citys").change(function() {  
+		        $.ajax({  
+		            type: "post",  
+		            url: "{:url('index/person/get_area')}",
+		            data: {"cnum": $(this).val(),"type":3},  
+		            dataType: "json",  
+		            success: function(data) {  
+		                //遍历json数据，组装下拉选框添加到html中
+		                $("#countys").html("<option value='a'>请选择区</option>");  
+		                $.each(data, function(i, item) {  
+		                    $("#countys").append("<option value='" + item.id + "'>" + item.area_name + "</option>");  
+		                });  
+		            }  
+		        });  
+		    });
+
+
+		    $(".save").click(function(){
+		    	var consignee=$("input[name=consignee]").val();
+		    	var mobile=$("input[name=mobile]").val();
+		    	var provinces=$("select[name=provinces]").val();
+		    	var citys=$("select[name=citys]").val();
+		    	var countys=$("select[name=countys]").val();
+		    	var address=$(".detailed_address").val();
+		    	var zipcode=$("input[name=zipcode]").val();
+
+		    	var post={
+		    		consignee:consignee,
+		    		mobile:mobile,
+		    		provinces:provinces,
+		    		citys:citys,
+		    		countys:countys,
+		    		address:address,
+		    		zipcode:zipcode
+		    	}
+
+		    	console.dir(post)
+
+		    	$.ajax({
+					url: "{:url('index/person/address')}",
+					type: 'POST',
+					dataType: 'json',
+					data: post,
+					success: function(data) {
+						//called when successful
+						layer.msg(data.msg,{icon:6},function(){
+							window.location.replace(location.href);
+						});
+						
+					},
+					error: function(res) {
+						//called when there is an error
+						layer.msg('网络连接异常，请稍后再试');
+					}
+		    	});
+		    	
+		    })
+			
+			$(".del-address").click(function(){
+				
+				var obj=$(this);
+
+				layer.confirm('确定删除此地址？',{icon:3,title:'系统提示'},function(){
+					$.ajax({
+						url: "{:url('index/person/delete_address')}",
+						type: 'POST',
+						dataType: 'json',
+						data: {id: obj.data('type')},
+						success: function(data) {
+							//called when successful
+							layer.msg(data.msg,{icon:6},function(){
+								window.location.replace(location.href);
+							});
+						},
+						error: function(res) {
+							//called when there is an error
+							layer.msg('网络连接异常，请稍后再试');
+						}
+					});
+
+				})
+
+			})
+
+			$(".default-address").click(function(){
+				var obj=$(this);
+				$.ajax({
+					url: "{:url('index/person/set_default')}",
+					type: 'POST',
+					dataType: 'json',
+					data: {id: obj.data('type')},
+					success: function(data) {
+						//called when successful
+						layer.msg(data.msg,{icon:6},function(){
+							// window.location.replace(location.href);
+						});
+					},
+					error: function(res) {
+						//called when there is an error
+						layer.msg('网络连接异常，请稍后再试');
+					}
+				});
+				
+			})
+
+			$(".edit-address").click(function(){
+				var id=$(this).parents('div').prev('div').prev('p').children('span').first().data('type');
+				var consignee=$(this).parents('div').prev('div').prev('p').children('span').first().html();
+				var telephone=$(this).parents('div').prev('div').prev('p').children('span').last().data('type');
+				var province=$(this).parents('div').prev('div').children('p').children('span').eq(1).data('type');
+				var city=$(this).parents('div').prev('div').children('p').children('span').eq(2).data('type');
+				var area=$(this).parents('div').prev('div').children('p').children('span').eq(3).data('type');
+				var address=$(this).parents('div').prev('div').children('p').children('span').eq(4).data('type');
+				var zipcode=$(this).parents('div').prev('div').children('p').children('span').last().data('type');
+
+				var url = "{:url('index/person/edit_address')}/id/"+id+"/consignee/"+consignee+"/mobile/"+telephone+"/province/"+province+"/city/"+city+"/area/"+area+"/address/"+address+"/zipcode/"+zipcode;// 修改地址
+
+				layer.open({
+					type: 2,
+					title: '修改收货地址',
+					shadeClose: true,
+					shade: 0.8,
+					area: ['1050px', '580px'],
+					content: url,
+				});
+			})
+			
+		});
+		
+
+	</script>
+
+</html>

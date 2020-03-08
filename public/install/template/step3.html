@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>flyfly安装程序</title>
+<script type="text/javascript" src="./lib/js/jquery-1.8.2.min.js"></script>
+<link rel="stylesheet" type="text/css" href="./lib/layui/css/layui.css">
+<script type="text/javascript" src="./lib/layui/layui.js"></script>
+<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<style>
+    html,body{
+        height:100%;
+        overflow-x: hidden;
+    }
+    .content-box{
+        width: 100%;
+        height: 100%; 
+        background-color: #F2F2F2;
+    }
+    .content{
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        border-radius: 5px;
+        transform: translate(-50%, -50%);
+    }
+    .layui-form-label{
+        width: 90px;
+    }
+    .layui-card{
+        border: 1px solid #ccc;
+        border-radius:10px;
+    }
+</style>
+<body>
+    <div class="content-box">
+        <div style="padding: 20px; background-color: #F2F2F2;">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md8 layui-col-md-offset2">
+                    <div class="layui-card">
+                        <div class="layui-card-body">
+                            <div class="layui-card-header" style="margin-bottom:20px;"><h2>• 安装完成！</h2></div>
+                            <h3>为了安全起见，请删除 public/install 目录！</h3>
+                            <div style="text-align:center;padding:20px;">
+                                <a href="../" class="layui-btn layui-btn-sm layui-btn-primary">去网站前台</a>
+                                <a href="../Admin/login/index" class="layui-btn layui-btn-sm">登入后台管理</a>
+                            </div>
+                        </div>
+                    </div>
+                    <?php require './template/footer.html'; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    layui.use(['element','layer'], function(){
+        var $ = layui.jquery
+        ,element = layui.element
+        ,layer = layui.layer;
+
+
+    });
+    $(function(){
+        $.ajax({
+          url: "<?php echo $_SERVER['PHP_SELF']; ?>?install=step3",
+          type: 'POST',
+          dataType: 'json',
+          data: {create: '1'},
+          success: function(res) {
+            //called when successful
+          },
+          error: function(res) {
+            //called when there is an error
+            layer.alert("数据库创建失败，请稍后重试...", {icon: 5});
+          }
+        });
+        
+    })
+
+</script>
+</html>

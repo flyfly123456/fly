@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>编辑商品</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="__ACSS__/font.css">
+    <link rel="stylesheet" href="__ACSS__/xadmin.css">
+    <script type="text/javascript" src="__AJS__/jquery.min.js"></script>
+    <script type="text/javascript" src="__LAYUI__/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="__AJS__/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+        <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+          <![endif]-->
+</head>
+      
+<body class="layui-anim layui-anim-up">
+    <div class="x-nav">
+        <span class="layui-breadcrumb">
+            <a href="">首页</a>
+            <a href="">商品管理</a>
+            <a><cite>编辑商品</cite></a>
+        </span>
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+            <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
+    </div>
+    <div class="x-body">
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <label for="name" class="layui-form-label">
+                    <span class="x-red">*</span>名称
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="name" name="name" required="" lay-verify="required"
+                      autocomplete="off" class="layui-input" value="{$shop.name}">
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    <span class="x-red">*</span>商品名称
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="x-red">*</span>所属分类</label>
+                <div class="layui-input-inline">
+                    <select name="cate_id" lay-verify="required">
+                        <option value="">请选择所属分类</option>
+                            <volist name="cate" id="cate">
+
+                                <if condition="$shop.cate_id eq $cate.id">
+                                    <option value="{$cate.id}" selected>{$cate.title}</option>
+                                <else />
+                                    <option value="{$cate.id}">{$cate.title}</option>
+                                </if>
+                            </volist>
+                    </select>
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    <span class="x-red">*</span>商品所属顶级分类
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="x-red">*</span>所属品牌</label>
+                <div class="layui-input-inline">
+                    <select name="brand_id" lay-verify="required">
+                        <option value="">请选择所属品牌</option>
+                            <volist name="brand" id="brand">
+                                <if condition="$shop.brand_id eq $brand.id">
+                                    <option value="{$brand.id}" selected>{$brand.name}</option>
+                                <else />
+                                    <option value="{$brand.id}">{$brand.name}</option>
+                                </if>
+                            </volist>
+                    </select>
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    <span class="x-red">*</span>商品所属品牌
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label for="number" class="layui-form-label">
+                    <span class="x-red">*</span>库存
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="number" name="number" required="" lay-verify="number"
+                      autocomplete="off" class="layui-input" value="{$shop.number}">
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    <span class="x-red">*</span>商品库存数量
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="price" class="layui-form-label">
+                    <span class="x-red">*</span>价格
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="price" name="price" required="" lay-verify="price"
+                      autocomplete="off" class="layui-input" value="{$shop.price}">
+                </div>
+            </div>
+
+            <div class="layui-form-item layui-form-text"> 
+                <label class="layui-form-label"><span class="x-red">*</span>商品描述</label> 
+                <div class="layui-input-block"> 
+                    <textarea name="desc" placeholder="请输入内容" class="layui-textarea">{$shop.desc}</textarea> 
+                </div> 
+            </div>
+
+            <div class="layui-form-item layui-form-text"> 
+                <label class="layui-form-label"><span class="x-red">*</span>产品参数</label> 
+                <div class="layui-input-block"> 
+                    <textarea name="parameter" placeholder="请输入内容" class="layui-textarea">{$shop.parameter}</textarea> 
+                </div> 
+            </div>
+
+            <div class="layui-form-item"> 
+                <label class="layui-form-label"><span class="x-red">*</span>封面</label> 
+                <div class="layui-input-inline"> 
+                    <div class="layui-upload">
+                        <button type="button" class="layui-btn" id="cover">上传图片</button>
+                        <div class="layui-upload-list">
+                            <img class="layui-upload-img" id="coverImg" src="__UPLOADS__/{$shop.cover}">
+                            <p id="coverText"></p>
+                        </div>
+                    </div>  
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    <span class="x-red">*</span>请选择商品封面
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label for="price" class="layui-form-label">
+                    <span class="x-red">*</span>图片
+                </label>
+                <div class="layui-input-block">
+                    <div class="layui-upload">
+                        <button type="button" class="layui-btn layui-btn-normal" id="testList">选择图片</button>
+                        <div class="layui-upload-list">
+                            <table class="layui-table">
+                                <thead>
+                                    <tr>
+                                        <th>文件名</th>
+                                        <th>大小</th>
+                                        <th>状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="demoList">
+                                    <foreach name="shop_img" item="shop_img">
+                                        <tr>
+                                           <td><img src="__UPLOADS__/shop/{$shop_img.img_url}"></td> 
+                                           <td>未知</td> 
+                                           <td>正在使用中...</td> 
+                                           <td><span data-type="{$shop_img.id}" class="layui-btn layui-btn-sm layui-btn-danger delete-img">删除</span></td> 
+                                        </tr>
+                                    </foreach>
+                                </tbody>
+                            </table>
+                        </div>
+                        <button type="button" class="layui-btn" id="testListAction">开始上传</button>
+                    </div> 
+                </div>
+            </div>
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="x-red">*</span>热销
+                </label>
+                <div class="layui-input-block">
+                    <if condition="$shop.is_hot eq 1">
+                        <input type="radio" name="is_hot" value="1" title="是" checked="">
+                        <input type="radio" name="is_hot" value="0" title="否">
+                    <else />
+                        <input type="radio" name="is_hot" value="1" title="是">
+                        <input type="radio" name="is_hot" value="0" title="否" checked="">
+                    </if>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="x-red">*</span>状态
+                </label>
+                <div class="layui-input-block">
+                    <if condition="$shop.is_available eq 1">
+                        <input type="radio" name="status" value="1" title="上架" checked="">
+                        <input type="radio" name="status" value="0" title="下架">
+                    <else />
+                        <input type="radio" name="status" value="1" title="上架">
+                        <input type="radio" name="status" value="0" title="下架" checked="">
+                    </if>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label for="name" class="layui-form-label">
+                </label>
+                <button  class="layui-btn layui-btn-sm" lay-filter="edit" lay-submit="">立即修改</button>
+                <button  class="layui-btn layui-btn-sm layui-btn-warm" lay-filter="" type="reset">重置</button>
+            </div>
+            <input type="hidden" name="cover" value="" class="cover">
+            <input type="hidden" name="id" value="{$id}">
+        </form>
+    </div>
+<script>
+layui.use(['form','layer','upload'], function(){
+    $ = layui.jquery;
+    var form = layui.form
+    ,layer = layui.layer
+    ,upload = layui.upload;
+
+    //自定义验证规则
+    form.verify({
+        name: function(value){
+            if(value.length < 2){
+                return '名称至少得2个字符啊';
+            }
+        }
+        ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+        ,repass: function(value){
+            if($('#L_pass').val()!=$('#L_repass').val()){
+                return '两次密码不一致';
+            }
+        }
+    });
+
+    //普通图片上传
+    var uploadInst = upload.render({
+        elem: '#cover'
+        ,url: "{:url('admin/Shop/shop_upload_img')}"
+        ,before: function(obj){
+            //预读本地文件示例，不支持ie8
+            obj.preview(function(index, file, result){
+                $('#coverImg').attr('src', result); //图片链接（base64）
+            });
+        }
+        ,done: function(res){
+            //如果上传失败
+            if(res.code > 0){
+                return layer.msg('上传失败');
+            }
+            $('.cover').val(res.img);
+            //上传成功
+        }
+        ,error: function(){
+            //演示失败状态，并实现重传
+            var demoText = $('#coverText');
+            demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+            demoText.find('.demo-reload').on('click', function(){
+                uploadInst.upload();
+            });
+        }
+    });
+
+    //多文件列表示例
+    var demoListView = $('#demoList')
+        ,uploadListIns = upload.render({
+        elem: '#testList'
+        ,url: "{:url('admin/Shop/shop_upload_img')}"
+        ,accept: 'file'
+        ,multiple: true
+        ,auto: false
+        ,bindAction: '#testListAction'
+        ,choose: function(obj){   
+            var files = this.files = obj.pushFile(); //将每次选择的文件追加到文件队列
+            //读取本地文件
+            obj.preview(function(index, file, result){
+                var tr = $(['<tr id="upload-'+ index +'">'
+                ,'<td>'+ file.name +'</td>'
+                ,'<td>'+ (file.size/1014).toFixed(1) +'kb</td>'
+                ,'<td>等待上传</td>'
+                ,'<td>'
+                    ,'<button class="layui-btn layui-btn-xs demo-reload layui-hide">重传</button>'
+                    ,'<button class="layui-btn layui-btn-xs layui-btn-danger demo-delete">删除</button>'
+                ,'</td>'
+                ,'</tr>'].join(''));
+            
+                //单个重传
+                tr.find('.demo-reload').on('click', function(){
+                    obj.upload(index, file);
+                });
+            
+                //删除
+                tr.find('.demo-delete').on('click', function(){
+                    delete files[index]; //删除对应的文件
+                    tr.remove();
+                    uploadListIns.config.elem.next()[0].value = ''; //清空 input file 值，以免删除后出现同名文件不可选
+                });
+            
+                demoListView.append(tr);
+            });
+        }
+        ,done: function(res, index, upload){
+            if(res.code == 0){ //上传成功
+                console.dir(res.img);
+                var tr = demoListView.find('tr#upload-'+ index)
+                ,tds = tr.children();
+                tds.eq(2).html('<span style="color: #5FB878;">上传成功</span>');
+                tds.eq(3).html("<input type='hidden' name='img[]' value='"+res.img+"'>"); //清空操作
+                return delete this.files[index]; //删除文件队列已经上传成功的文件
+            }
+
+            this.error(index, upload);
+        }
+        ,error: function(index, upload){
+            var tr = demoListView.find('tr#upload-'+ index)
+            ,tds = tr.children();
+            tds.eq(2).html('<span style="color: #FF5722;">上传失败</span>');
+            tds.eq(3).find('.demo-reload').removeClass('layui-hide'); //显示重传
+        }
+    });
+
+
+    //监听提交
+    form.on('submit(edit)', function(data){
+        console.log(data.field);
+        //发异步，把数据提交给php
+        $.ajax({
+            url: "{:url('admin/Shop/shop_edit')}",
+            type: 'POST',
+            dataType: 'json',
+            data: data.field,
+            success: function(res) {
+            //called when successful
+            console.log(res);
+            if(res.status=="1"){
+                layer.alert(res.msg, {icon: 6},function () {
+                    // 获得frame索引
+                    var index = parent.layer.getFrameIndex(window.name);
+                    //关闭当前frame
+                    parent.layer.close(index);
+                    parent.location.reload(); // 父页面刷新
+                });
+            }else{
+                layer.alert(res.msg, {icon: 5},function () {
+                    // 获得frame索引
+                    var index = parent.layer.getFrameIndex(window.name);
+                    //关闭当前frame
+                    parent.layer.close(index);
+                    
+                });
+            }
+        },
+        error: function(res) {
+            //called when there is an error
+            layer.alert("网络异常，请稍后再试", {icon: 5},function () {
+                // 获得frame索引
+                var index = parent.layer.getFrameIndex(window.name);
+                //关闭当前frame
+                parent.layer.close(index);
+            });
+        }
+    });
+
+    return false;
+});
+
+
+//删除商品图片
+$(".delete-img").click(function(){
+    // console.log($(this).data('type'));
+    var obj=$(this);
+    var type=$(this).data('type');
+    var post={
+        id:type
+    };
+    $.ajax({
+        url: "{:url('admin/Shop/delete_img')}",
+        type: 'POST',
+        dataType: 'json',
+        data: post,
+        success: function(res) {
+            //called when successful
+            if(res.status==1){
+                layer.alert(res.msg, {icon: 6},function () {
+                    obj.parents('tr').remove();
+                    layer.closeAll();
+                });
+            }
+        },
+        error: function(res) {
+            //called when there is an error
+            layer.msg("网络异常，请稍后再试", {icon: 5});
+        }
+    })
+    
+})
+
+
+});
+</script>
+</body>
+
+</html>

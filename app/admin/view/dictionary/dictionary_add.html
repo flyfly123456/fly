@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <meta charset="UTF-8">
+    <title>新增数据字典</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="__ACSS__/font.css">
+    <link rel="stylesheet" href="__ACSS__/xadmin.css">
+    <script type="text/javascript" src="__AJS__/jquery.min.js"></script>
+    <script type="text/javascript" src="__LAYUI__/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="__AJS__/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+  
+<body class="layui-anim layui-anim-up">
+    <div class="x-nav"> 
+        <span class="layui-breadcrumb">
+            <a href="">首页</a>
+            <a href="">数据字典</a>
+            <a><cite>新增字典</cite></a>
+        </span> 
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新"> <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a> 
+    </div> 
+    <div class="x-body">
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <label for="name" class="layui-form-label">
+                    <span class="x-red">*</span>名称</label>
+                <div class="layui-input-inline">
+                  <input type="text" id="name" name="name" required="" lay-verify="name" autocomplete="off" class="layui-input" value="" placeholder="请输入字典名称">
+                </div>
+            </div>
+            <div class="layui-form-item layui-form-text">
+                <label for="desc" class="layui-form-label">
+                    <span class="x-red">*</span>描述</label>
+                <div class="layui-input-block">
+                    <textarea placeholder="请输入内容" lay-verify="desc" required="" name="desc" class="layui-textarea"></textarea>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="" class="layui-form-label">
+                </label>
+                <button  class="layui-btn layui-btn-sm" lay-filter="add" lay-submit="">立即新增</button>
+                <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
+            </div>
+      </form>
+    </div>
+    <script>
+    layui.use(['form','layer','laydate'], function(){
+        $ = layui.jquery;
+        var form = layui.form
+        var laydate = layui.laydate
+        ,layer = layui.layer;
+        
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#start' //指定元素
+            ,type: 'datetime'
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#end' //指定元素
+            ,type: 'datetime'
+        });
+
+        //自定义验证规则
+        form.verify({
+            name: function(value){
+                if(value.length < 2){
+                    return '名称至少得2个字符啊';
+                }
+            }
+            ,desc: function(value){
+                if(value.length < 2){
+                    return '描述至少得2个字符啊';
+                }
+            }
+            
+        });
+
+        //监听提交
+        form.on('submit(add)', function(data){
+            console.log(data.field);
+            // console.log(typeof data.field);
+            //发异步，把数据提交给php
+            $.ajax({
+                url: "{:url('admin/Dictionary/dictionary_add')}",
+                type: 'POST',
+                dataType: 'json',
+                data: data.field,
+                success: function(res) {
+                    if(res.status=='1'){
+                        layer.alert(res.msg, {icon: 6},function () {
+                            layer.closeAll();
+                        });
+                    }else{
+                        layer.alert(res.msg, {icon: 5},function () {
+                            layer.closeAll();
+                        });
+                    }
+                },
+                error: function(res) {
+                    layer.msg('网络异常，请稍后再试...');
+                }
+            });
+            
+            return false;
+        });
+          
+          
+    });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,540 @@
+<style>
+    /*锁屏*/
+    .admin-header-lock{width: 320px; height: 170px; padding: 20px; position: relative; text-align: center;}
+    .admin-header-lock-img{width: 60px; height: 60px; margin: 0 auto;}
+    .admin-header-lock-img img{width: 60px; height: 60px; border-radius: 100%;}
+    .admin-header-lock-name{color: #009688;margin: 8px 0 15px 0;}
+    .input_btn{ overflow: hidden; margin-bottom: 10px; }
+    .admin-header-lock-input{width: 170px; color: #fff;background-color: #009688; float: left; margin:0 10px 0 40px; border:none;}
+    .admin-header-lock-input::-webkit-input-placeholder {color:#fff;}
+    .admin-header-lock-input::-moz-placeholder {color:#fff;}
+    .admin-header-lock-input::-ms-input-placeholder {color:#fff;}
+    .admin-header-lock-input:-moz-placeholder {color:#fff;}
+    #unlock{ float: left; }
+    #lock-box p{ color:#e60000; }
+    /*便签和换肤*/
+    .demo-class textarea {background:#fff;width:200px;color:#000;border:0;}
+    .color-class .layui-layer-btn {position: absolute;top: 50px;}
+    /*锁屏禁止选中*/
+    .unselect{-moz-user-select: none; -o-user-select:none; -webkit-user-select:none; -ms-user-select:none; user-select:none;}
+</style>
+
+<div class="container">
+    <div class="logo"><a href="__ROOT__">{$web_info.web_name}&nbsp;{$web_info.web_version}</a></div>
+        <div class="left_open">
+            <i title="展开/收起左侧栏" class="layui-icon layui-icon-shrink-right"></i>
+        </div>
+        <ul class="layui-nav left fast-add" lay-filter="">
+            <volist name="system_sort" id="system_sort" key="k">
+                <if condition="$system_sort.select eq 1">
+                    <if condition="$k eq 1">
+                        <li data-type="{$system_sort.sort_name_en}" class="layui-nav-item layui-this menu-other"><a href="javascript:;">{$system_sort.sort_name}</a></li>
+                    <else />
+                        <li data-type="{$system_sort.sort_name_en}" class="layui-nav-item menu-other"><a href="javascript:;">{$system_sort.sort_name}</a></li>
+                    </if>
+                </if>
+            </volist>
+        </ul>
+        <ul class="layui-nav right" lay-filter="">
+            <!-- <li class="layui-nav-item" onclick="view_message()" title="系统消息">
+                <a href="javascript:;" id="system_mess" onclick="x_admin_show('系统消息','{:url('admin/System/system_message')}')"><i class="layui-icon layui-icon-notice" style=""><if condition="$exits_id"><else /><span class="layui-badge-dot point"></span></if></i>
+                </a>
+            </li> -->
+            <!-- <li class="layui-nav-item">
+                <a href="javascript:;"><i class="layui-icon layui-icon-notice"></i>系统消息
+                    <dl class="layui-nav-child">
+                        <dd><a onclick="x_admin_show('添加文章','{:url('admin/Article/article_add')}')"><i class="iconfont">&#xe6a2;</i>资讯</a></dd>
+                        <dd><a onclick="x_admin_show('图片','http://www.baidu.com')"><i class="iconfont">&#xe6a8;</i>图片</a></dd>
+                        <dd><a onclick="x_admin_show('添加用户','{:url('admin/Member/member_add')}')"><i class="iconfont">&#xe6b8;</i>用户</a></dd>
+                    </dl>
+                </a>
+            </li> -->
+            <li class="layui-nav-item" title="全屏"><a href="javascript:;" id="FullScreen"><i class="layui-icon layui-icon-screen-full" style=""></i></a></li>
+            <li class="layui-nav-item lockcms" title="锁屏"><a href="javascript:;"><i class="iconfont" style="">&#xe82b;</i></a></li>
+            <li class="layui-nav-item"><a href="javascript:;" title="便签" id="tag"><i class="layui-icon layui-icon-note" aria-hidden="true"></i></a></li>
+            <li class="layui-nav-item"><a href="javascript:;" id="color" title="皮肤"><span class="layui-icon layui-icon-theme"></span></a></li>
+            <li class="layui-nav-item"><a href="javascript:;"><i class="iconfont icon-richangqingli"></i>&nbsp;清理缓存</a>
+                <dl class="layui-nav-child" id="deletecache">
+                    <dd><a href="javascript:;" data-type="all">一键清理缓存</a></dd>
+                    <dd><a href="javascript:;" data-type="data">清理数据缓存</a></dd>
+                    <dd><a href="javascript:;" data-type="template">清理模板缓存</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item">
+                <a href="javascript:;"><i class="layui-icon layui-icon-more-vertical"></i>&nbsp;页面操作</a>
+                <dl class="layui-nav-child">
+                    <dd><a href="javascript:;" class="closePageThis"><i class="layui-icon layui-icon-close"></i>&nbsp;关闭当前</a></dd>
+                    <dd><a href="javascript:;" class="closePageOther"><i class="layui-icon layui-icon-close"></i>&nbsp;关闭其他</a></dd>
+                    <dd><a href="javascript:;" class="closePageAll"><i class="layui-icon layui-icon-close"></i>&nbsp;关闭全部</a></dd>
+                    <dd><a href="javascript:;" class="refreshPageThis refreshThis"><i class="layui-icon layui-icon-refresh"></i>&nbsp;刷新当前</a></dd>
+                    <dd><a href="javascript:;" class="refreshPageOther refreshOther"><i class="layui-icon layui-icon-refresh"></i>&nbsp;刷新其他</a></dd>
+                    <dd><a href="javascript:;" class="refreshPageAll refreshAll"><i class="layui-icon layui-icon-refresh"></i>&nbsp;刷新所有</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item"><a href="javascript:;">
+                <if condition="$admin_info.img_url">
+                    <img class="layui-nav-img userAvatar" width="35" height="35" src="__UPLOADS__/{$admin_info.img_url}" />
+                <else />
+                    <img class="layui-nav-img userAvatar" width="35" height="35" src="__AIMG__/face.jpg" />
+                </if>{$admin_name}</a>
+                <dl class="layui-nav-child"> <!-- 二级菜单 -->
+                    <dd><a onclick="x_admin_show('个人资料','{:url('admin/Admin/admin_info')}')"><i class="layui-icon layui-icon-username"></i>个人资料</a></dd>
+                    <dd><a onclick="x_admin_show('锁屏密码','{:url('admin/System/clock_pass')}',700,500)"><i class="layui-icon layui-icon-password"></i>锁屏密码</a></dd>
+                    <dd><a onclick="x_admin_show('休眠时间','{:url('admin/System/sleep_timeout')}',700,500)" href="javascript:;"><i class="layui-icon layui-icon-log"></i>休眠时间</a></dd>
+                    <dd><hr></dd>
+                    <dd><a href="javascript:;" onclick="logout(this)"><i class="layui-icon layui-icon-face-cry"></i>退出系统</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item to-index" title="前台首页"><a href="/" target="view_window"><i class="layui-icon layui-icon-website"></i></a></li>
+        </ul>
+
+    </div>
+
+    <!-- 锁屏start -->
+    <div class="admin-header-lock" id="lock-box" style="display:none;">
+        <div class="admin-header-lock-img">
+            <if condition="$admin_info.img_url">
+                <img src="__UPLOADS__/{$admin_info.img_url}" />
+            <else />
+                <img src="__AIMG__/face.jpg" />
+            </if>
+        </div>
+        <div class="admin-header-lock-name" id="lockUserName">欢迎使用{$web_info.web_name}系统</div>
+        <div class="input_btn">
+            <form class="layui-form">
+                <input type="password" class="admin-header-lock-input layui-input" placeholder="请输入密码解锁.." autocomplete="off" autofocus="autofocus" name="lockPwd" id="lockPwd" />
+                <button class="layui-btn" id="unlock" lay-filter="edit_lockPass" lay-submit="">解锁</button>
+            </form>
+        </div>
+        <p>初始密码“123456”，请前往个人中心进行修改...</p>
+    </div>
+    <!-- 锁屏end -->
+
+<script>
+    layui.use(['element', 'layer', 'jquery','form'], function () {
+        $ = layui.jquery;
+        var element = layui.element;
+        var $ = layui.$;
+        var form = layui.form;
+
+        //锁屏
+        function lockPage(){
+            layer.open({
+                title : false,
+                type : 1,
+                content : $("#lock-box"),
+                closeBtn : 0,
+                shade : 1,
+                anim : 0
+            })
+            //禁止f12
+            $(window).keydown(function(even){
+                if(even.keyCode==123){
+                    return false;
+                }
+                //禁止刷新
+                if ( even.keyCode==116){   
+                    even.keyCode = 0;
+                    even.cancelBubble = true;
+                    return false;
+                }
+
+            })
+            //禁止点击后退和前进按钮
+            if (window.history && window.history.pushState) {
+                $(window).on('popstate', function () {
+                    // 当点击浏览器的 后退和前进按钮 时才会被触发， 
+                    window.history.pushState('forward', null, ''); 
+                    window.history.forward(1);
+                });
+            }
+  　　　　　　　　　　
+            window.history.pushState('forward', null, '');  //在IE中必须得有这两行
+            window.history.forward(1);
+
+            //禁止右键
+            $(document).bind("contextmenu",function(e){
+                return false;
+            });
+
+            $('body,html').addClass('unselect');
+
+        }
+
+        //绑定锁屏事件
+        $(".lockcms").on("click",function(){
+
+            if(window.sessionStorage.getItem("lockcms") == ""||window.sessionStorage.getItem("lockcms") == null||window.sessionStorage.getItem("lockcms")=="false"||window.sessionStorage.getItem("lockcms") == undefined){
+                window.sessionStorage.setItem("lockcms",true);
+                lockPage();
+            }
+  
+        })
+        
+        // 判断是否显示锁屏
+        if(window.sessionStorage.getItem("lockcms") == "true"){
+            lockPage();
+
+            $(document).on('keydown', function() {
+                if(event.keyCode == 13) {
+                    $("#unlock").click();
+                }
+            });
+        }
+        // 解锁
+        $("#unlock").on("click",function(){
+            if($(this).siblings(".admin-header-lock-input").val() == ''){
+                // layer.msg("请输入解锁密码！");
+                return false;
+            }else{
+                if($(this).siblings(".admin-header-lock-input").val() == "{$Request.session.clock_pass}"){
+                    window.sessionStorage.setItem("lockcms",false);
+                    $(this).siblings(".admin-header-lock-input").val('');
+                    $('body,html').removeClass('unselect');
+                  
+                    //监听提交
+                    form.on('submit(edit_lockPass)', function(data){
+
+                        // console.log(data.field);
+                        //发异步，把数据提交给php
+                        // $.ajax({
+                        //   url: "{:url('admin/System/unlock')}",
+                        //   type: 'POST',
+                        //   dataType: 'json',
+                        //   data: data.field,
+                        //   success: function(res) {
+                        //     //called when successful
+                        //     if(res.status=='1'){
+                        //         layer.alert(res.msg, {icon: 6},function () {
+                        //             layer.closeAll('dialog'); 
+                        //         });
+                        //     }else{
+                        //        layer.alert(res.msg, {icon: 5},function () {
+                        //            layer.closeAll('dialog'); 
+                        //        }); 
+                        //     }
+                            
+                        //   },
+                        //   error: function(res) {
+                        //     //called when there is an error
+                        //     layer.alert("网络异常，请稍后再试", {icon: 5},function () {
+                        //         layer.closeAll('dialog'); 
+                        //     });
+                        //   }
+                        // });
+                        
+                        return false;
+                    });
+
+                    layer.closeAll("page");
+                    return false;
+                }else{
+                    layer.msg("密码错误，请重新输入！");
+                    return false;
+                }
+            }
+            return false;
+        });
+
+    })
+
+
+    $('#deletecache dd a').on('click',function(){
+        var scrollTop = $(document).scrollTop();
+        $('body,html').animate({
+            scrollTop: 0
+        }, 0);
+
+        var type=$(this).data("type");
+        //清除所有本地缓存
+        if(type=='template'){
+            sessionStorage.clear();
+        }
+        console.log(type)
+        layer.confirm('确认要清理缓存吗？',{icon: 3, title:'提示'},function(index){
+            //发异步删除数据
+            $.ajax({
+                url: "{:url('admin/Index/clear_cache')}",
+                type: 'POST',
+                dataType: 'json',
+                data: {type:type},
+                cache:false,
+                success: function(res) {
+                    //called when successful
+                    if(res.status=='1'){
+                        layer.msg(res.msg,{icon:1,time:1000},function(){
+                            window.location.replace(location.href);
+                        });
+                    }else{
+                        layer.msg(res.msg,{icon:2,time:1000});
+                    }
+                
+                },
+                error: function(res) {
+                    //called when there is an error
+                    layer.msg('清除失败，请稍后再试!',{icon:2,time:1000});
+                }
+            });
+        },function(index){
+            $('body,html').animate({
+                scrollTop: scrollTop
+            }, 2);
+        });
+    })
+
+
+    function logout(obj){
+        var scrollTop = $(document).scrollTop();
+            $('body,html').animate({
+                scrollTop: 0
+            }, 0);
+        layer.confirm('确认要退出系统吗？',{icon: 3, title:'提示'},function(index){
+            window.location.href="{:url('admin/Login/logout')}";
+        },function(index){
+            $('body,html').animate({
+                scrollTop: scrollTop
+            }, 2);
+        });
+    }
+
+    // 进入全屏：
+    function entryFullScreen() {
+        var docE = document.documentElement;
+        if (docE.requestFullScreen) {
+            docE.requestFullScreen();
+        } else if (docE.mozRequestFullScreen) {
+            docE.mozRequestFullScreen();
+        } else if (docE.webkitRequestFullScreen) {
+            docE.webkitRequestFullScreen();
+        }
+    }
+
+    // 退出全屏
+    function exitFullScreen() {
+        var docE = document;
+        if (docE.exitFullscreen) {
+            docE.exitFullscreen();
+        } else if (docE.mozCancelFullScreen) {
+            docE.mozCancelFullScreen();
+        } else if (docE.webkitCancelFullScreen) {
+            docE.webkitCancelFullScreen();
+        }
+    }
+
+    // 全屏切换
+    $('#FullScreen').bind('click', function() {
+        var fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement;
+        if (fullscreenElement == null) {
+            entryFullScreen();
+            $(this).html('<i class="layui-icon layui-icon-screen-restore"></i>');
+        } else {
+            exitFullScreen();
+            $(this).html('<i class="layui-icon layui-icon-screen-full"></i>');
+        }
+    });
+
+</script>
+
+
+  <script>
+  layui.use(['form','layer','laydate'], function() {
+        var app = layui.app,
+        $ = layui.jquery,
+        layer = layui.layer;
+          
+        $('dl.skin > dd').on('click', function() {
+            var $that = $(this);
+            var skin = $that.children('a').data('skin');
+            switchSkin(skin);
+        });
+        var setSkin = function(value) {
+            layui.data('kit_skin', {
+                key: 'skin',
+                value: value
+            });
+        },
+        getSkinName = function() {
+            return layui.data('kit_skin').skin;
+        },
+        switchSkin = function(value) {
+            var _target = $('link[kit-skin]')[0];
+            _target.href = _target.href.substring(0, _target.href.lastIndexOf('/') + 1) + value + _target.href.substring(_target.href.lastIndexOf('.'));
+            setSkin(value);
+        },
+        initSkin = function() {
+            var skin = getSkinName();
+            switchSkin(skin === undefined ? 'default' : skin);
+        }();
+              
+        $('#color').click(function(){
+            layer.open({
+                type:1,
+                title:'配色方案',
+                area: ['290px', 'calc(100% - 52px)'],
+                offset: 'rb',
+                shadeClose:true,
+                id:'colors',
+                anim: 2,
+                shade:0.2,
+                closeBtn:0,
+                isOutAnim:false,
+                resize:false,
+                move: false,
+                skin: 'color-class',
+                btn:['黑白格','橘子橙','原谅绿','少女粉','天空蓝','枫叶红'],
+                yes: function(index, layero){
+                    switchSkin('default');
+                }
+                ,btn2: function(index, layero){
+                    switchSkin('orange');
+                    return false;
+                }
+                ,btn3: function(index, layero){
+                    switchSkin('green');
+                    return false;
+                }
+                ,btn4: function(index, layero){
+                    switchSkin('pink');
+                    return false;
+                }
+                ,btn5: function(index, layero){
+                    switchSkin('blue.1');
+                    return false;
+                }
+                ,btn6: function(index, layero){
+                    switchSkin('red');
+                    return false;
+                }
+
+            });
+        })
+    });
+
+</script>
+
+<script type="text/javascript">
+    layui.use('layer', function(){
+        var layer = layui.layer;
+        var remember = '';
+      
+        $('#tag').click(function(){
+            var tag = localStorage.getItem("tag");
+            layer.prompt({
+                formType: 2,
+                anim: 1,
+                offset: ['52px', 'calc(100% - 500px)'],
+                value: tag,
+                title: '便签',
+                skin: 'demo-class',
+                area: ['280px', '150px'],
+                id: 'remember' ,//设定一个id，防止重复弹出
+                btn: ['写好了', '忘了吧'],
+                shade: 0,
+                moveType: 1, //拖拽模式，0或者1
+                btn2: function(index, layero){
+                    localStorage.removeItem("tag");
+                    $('#remember textarea').val(''); 
+                    return false;
+                }
+                },function(value, index, elem){
+                    localStorage.setItem("tag",value); 
+                })
+        });
+    });              
+</script>
+<script>
+    function view_message(){
+        $('.point').remove();
+        $.post("{:url('admin/Index/index')}",{"view_message":'1'},function(result){
+            // location.replace(location.href);
+        });
+                 
+    }
+
+    //关闭当前页面
+    $('.closePageThis').on('click',function(){
+        var findli=$(".layui-tab-title .layui-this");
+        if(findli.attr('lay-id')>'1'){
+          element.tabDelete("xbs_tab", findli.attr('lay-id')); 
+        }
+    })
+
+    //关闭所有页面
+    $('.closePageAll').on('click',function(){
+        var findli=$(".layui-tab-title li");
+        findli.each(function(){
+            
+            if($(this).attr('lay-id')!=1){
+                element.tabDelete("xbs_tab",$(this).attr('lay-id'));
+            }
+            
+        })
+    })
+
+    //关闭其他页面
+    $('.closePageOther').on('click',function(){
+        var findli=$(".layui-tab-title li");
+        findli.each(function(){
+            
+            if(!$(this).hasClass('layui-this') && $(this).attr('lay-id')!=1){
+                element.tabDelete("xbs_tab",$(this).attr('lay-id'));
+            }
+            
+        })
+    })
+
+    //刷新当前页面
+    $(".refreshThis").on("click",function(){
+        if($(this).hasClass("refreshPageThis")){
+            $(this).removeClass("refreshPageThis");
+            // 方法一有刷新不了的概率
+            // $(".layui-tab-content .layui-show").find("iframe")[0].contentWindow.location.reload(true);
+             //方法二基本上没有刷新失败的概率
+            $(".layui-tab-content .layui-show").find("iframe").attr('src', $(".layui-tab-content .layui-show").find("iframe").attr('src'))
+            layer.msg("刷新成功");
+            setTimeout(function(){
+                $(".refreshThis").addClass("refreshPageThis");
+            },2000)
+        }else{
+            layer.msg("您点击的速度超过了服务器的响应速度，还是等两秒再刷新吧！");
+        } 
+    })
+
+
+    //刷新所有页面
+    $('.refreshAll').on('click',function(){
+
+        if($(this).hasClass("refreshPageAll")){
+            $(this).removeClass("refreshPageAll");
+            $(".layui-tab-content .layui-tab-item").find("iframe").each(function(){
+                $(this).attr('src', $(this).attr('src'))
+            })
+            layer.msg("刷新成功");
+
+            setTimeout(function(){
+                $(".refreshAll").addClass("refreshPageAll");
+            },2000)
+        }else{
+            layer.msg("您点击的速度超过了服务器的响应速度，还是等两秒再刷新吧！");
+        } 
+       
+    })
+
+    //刷新其他页面
+    $('.refreshOther').on('click',function(){
+
+        if($(this).hasClass("refreshPageOther")){
+            $(this).removeClass("refreshPageOther");
+            $(".layui-tab-content .layui-show").siblings('div').find("iframe").each(function(){
+                $(this).attr('src', $(this).attr('src'))
+            })
+            layer.msg("刷新成功");
+            setTimeout(function(){
+                $(".refreshOther").addClass("refreshPageOther");
+            },2000)
+        }else{
+            layer.msg("您点击的速度超过了服务器的响应速度，还是等两秒再刷新吧！");
+        } 
+       
+    })
+</script>

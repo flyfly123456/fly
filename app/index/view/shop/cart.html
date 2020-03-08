@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>购物车页面</title>
+
+		<link href="__AMAZE__/css/amazeui.css" rel="stylesheet" type="text/css" />
+		<link href="__BASIC__/css/demo.css" rel="stylesheet" type="text/css" />
+		<link href="__ICSS__/cartstyle.css" rel="stylesheet" type="text/css" />
+		<link href="__ICSS__/optstyle.css" rel="stylesheet" type="text/css" />
+
+		<script type="text/javascript" src="__IJS__/jquery.js"></script>
+		<script src="__LAYER__/layer.js"></script>
+
+	</head>
+
+	<body>
+
+		<!--顶部导航条 -->
+		<include file="public/header" /><!-- 包含头部模版header -->
+
+			<div class="clear"></div>
+
+			<!--购物车 -->
+			<div class="concent">
+				<div id="cartTable">
+					<div class="cart-table-th">
+						<div class="wp">
+							<div class="th th-chk">
+								<div id="J_SelectAll1" class="select-all J_SelectAll">
+
+								</div>
+							</div>
+							<div class="th th-item">
+								<div class="td-inner">商品信息</div>
+							</div>
+							<div class="th th-price">
+								<div class="td-inner">单价</div>
+							</div>
+							<div class="th th-amount">
+								<div class="td-inner">数量</div>
+							</div>
+							<div class="th th-sum">
+								<div class="td-inner">金额</div>
+							</div>
+							<div class="th th-op">
+								<div class="td-inner">操作</div>
+							</div>
+						</div>
+					</div>
+					<div class="clear"></div>
+
+					<tr class="item-list">
+						<div class="bundle  bundle-last ">
+							<div class="bundle-hd">
+								<div class="bd-promos">
+									<div class="bd-has-promo">已享优惠:<span class="bd-has-promo-content">省￥19.50</span>&nbsp;&nbsp;</div>
+									<div class="act-promo">
+										<a href="#" target="_blank">第二支半价，第三支免费<span class="gt">&gt;&gt;</span></a>
+									</div>
+									<span class="list-change theme-login">编辑</span>
+								</div>
+							</div>
+							<div class="clear"></div>
+							<div class="bundle-main">
+								<volist name="cart_info" id="cart_info">
+									<ul class="item-content clearfix">
+										<li class="td td-chk">
+											<div class="cart-checkbox">
+												<input class="check" id="" name="items[]" value="{$cart_info.id}" type="checkbox">
+												<label for=""></label>
+											</div>
+										</li>
+										<li class="td td-item">
+											<div class="item-pic">
+												<a href="#" target="_blank" data-title="{$cart_info.goods_name}" class="J_MakePoint" data-point="tbcart.8.12">
+													<img style="width:80px;height:80px;" src="__UPLOADS__/{$cart_info.cover}" class="itempic J_ItemImg"></a>
+											</div>
+											<div class="item-info">
+												<div class="item-basic-info">
+													<a href="#" target="_blank" title="{$cart_info.goods_name}" class="item-title J_MakePoint" data-point="tbcart.8.11">{$cart_info.goods_name}</a>
+												</div>
+											</div>
+										</li>
+										<li class="td td-info">
+											<div class="item-props item-props-can">
+												<volist name="cart_info.model" id="model">
+													<span class="sku-line" data-type="{$model.param}">{$model.name}</span>
+												</volist>
+												
+												<span tabindex="0" class="btn-edit-sku theme-login" data-type="{$cart_info.goods_id}" data-cart="{$cart_info.id}">修改</span>
+												<i class="theme-login am-icon-sort-desc"></i>
+											</div>
+										</li>
+										<li class="td td-price">
+											<div class="item-price price-promo-promo">
+												<div class="price-content">
+													<if condition="$cart_info.promotion">
+														<div class="price-line">
+															<em class="price-original">{$cart_info.price}</em>
+														</div>
+														<div class="price-line">
+															<em class="J_Price price-now" tabindex="0">{$cart_info.promotion}</em>
+														</div>
+													<else />
+														<div class="price-line">
+															&yen;<em class="J_Price price-now" tabindex="0">{$cart_info.price}</em>
+														</div>
+													</if>
+												</div>
+											</div>
+										</li>
+										<li class="td td-amount">
+											<div class="amount-wrapper ">
+												<div class="item-amount ">
+													<div class="sl">
+														<input class="min am-btn" name="" type="button" data-type="{$cart_info.key_info}" value="-" />
+														<input class="text_box" name="" type="text" value="{$cart_info.number}" min="1" style="width:30px;text-align:center;" />
+														<input class="add am-btn" name="" type="button" data-type="{$cart_info.key_info}" value="+" />
+													</div>
+												</div>
+											</div>
+										</li>
+										<li class="td td-sum">
+											<div class="td-inner">
+												&yen;<em tabindex="0" class="J_ItemSum number">{$cart_info.price*$cart_info.number}</em>
+											</div>
+										</li>
+										<li class="td td-op">
+											<div class="td-inner">
+												<a title="移入收藏夹" class="btn-fav" href="#">移入收藏夹</a>
+												<a href="javascript:;" data-point-url="#" class="delete" data-type="{$cart_info.key_info}">删除</a>
+											</div>
+										</li>
+									</ul>
+								</volist>
+							</div>
+						</div>
+					</tr>
+					<div class="clear"></div>
+
+				</div>
+				<div class="clear"></div>
+
+				<div class="float-bar-wrapper">
+					<div id="J_SelectAll2" class="select-all J_SelectAll">
+						<div class="cart-checkbox">
+							<input class="check-all check" id="J_SelectAllCbx2" name="select-all" value="true" type="checkbox">
+							<label for="J_SelectAllCbx2"></label>
+						</div>
+						<span>全选</span>
+					</div>
+					<div class="operations">
+						<a href="#" hidefocus="true" class="deleteAll">删除</a>
+						<a href="#" hidefocus="true" class="J_BatchFav">移入收藏夹</a>
+					</div>
+					<div class="float-bar-right">
+						<div class="amount-sum">
+							<span class="txt">已选商品</span>
+							<em id="J_SelectedItemsCount">0</em><span class="txt">件</span>
+							<div class="arrow-box">
+								<span class="selected-items-arrow"></span>
+								<span class="arrow"></span>
+							</div>
+						</div>
+						<div class="price-sum">
+							<span class="txt">合计:</span>
+							<strong class="price">¥<em id="J_Total">0.00</em></strong>
+						</div>
+						<div class="btn-area" id="J_Go">
+							<a class="submit-btn submit-btn-disabled" aria-label="请注意如果没有选择宝贝，将无法结算">
+								<span>结&nbsp;算</span></a>
+						</div>
+					</div>
+
+				</div>
+
+				<!--底部-->
+				<include file="public/footer" /><!-- 包含底部模版footer -->
+
+			</div>
+
+			<!--操作页面-->
+
+			<div class="theme-popover-mask"></div>
+
+			<div class="theme-popover">
+				<div class="theme-span"></div>
+				<div class="theme-poptit h-title">
+					<a href="javascript:;" title="关闭" class="close">×</a>
+				</div>
+				<div class="theme-popbod dform">
+					<form class="theme-signin" name="loginform" action="" method="post">
+
+						<div class="theme-signin-left">
+							
+							<div class="theme-options">
+								<div class="cart-title number">数量</div>
+								<dd>
+									<input class="min am-btn am-btn-default" name="" type="button" value="-" />
+									<input class="text_box edit-number" name="" type="text" value="1" style="width:30px;" />
+									<input class="add am-btn am-btn-default" name="" type="button" value="+" />
+									<span  class="tb-hidden">库存<span class="stock">1000</span>件</span>
+								</dd>
+
+							</div>
+							<div class="clear"></div>
+							<div class="btn-op">
+								<div class="btn am-btn am-btn-warning update-cart">确认</div>
+								<div class="btn close am-btn am-btn-warning">取消</div>
+							</div>
+
+						</div>
+						<div class="theme-signin-right">
+							<div class="img-info">
+								<img src="__IIMG__/kouhong.jpg_80x80.jpg" />
+							</div>
+							<div class="text-info">
+								<span class="J_Price price-now">¥<em>39.00</em></span>
+								<span id="Stock" class="tb-hidden">库存<span class="stock">1000</span>件</span>
+							</div>
+						</div>
+
+					</form>
+				</div>
+			</div>
+		<!--引导 -->
+		<include file="public/mobile" /><!-- 包含移动端模版mobile -->
+	</body>
+
+	<script>
+
+		$(function(){
+
+			//初始所有购物车商品的总价格
+			function total_price()
+			{
+				var price=0;
+
+				$(".J_ItemSum").each(function(){
+					var content=$(this).html();
+					price+=parseFloat(content);
+				})
+
+				price=price.toFixed(2);
+
+				return price;
+			}
+
+
+			function get_text_box(model_info,method)
+			{
+
+				var post={
+					model_info:model_info,
+					method:method
+				}
+
+				$.ajax({
+					url: "{:url('index/shop/change_number')}",
+					type: 'POST',
+					dataType: 'json',
+					data: post,
+
+					success: function(res) {
+						//called when successful
+						if(res.status==1){
+							// layer.alert(res.msg)
+						}else{
+							// layer.alert('no');
+						}
+					},
+					error: function(res) {
+						//called when there is an error
+					}
+				});
+			}
+
+			$(".min").click(function(){
+				var text_box_value=parseInt($(this).next('input').val());
+
+				var model_info=$(this).data('type');
+
+				var shop_number=$(this).next().val();
+				shop_number=parseInt(shop_number)-1;
+				var shop_price=$(this).parents('li').prev().find('em').html();
+				var total_price=shop_number*shop_price;
+				$(this).parents('li').next().find('em').html(total_price);
+
+				if(text_box_value<=1){
+					
+					return false;
+				}
+
+				get_text_box(model_info,'min');
+
+			})
+
+			$(".add").click(function(){
+
+				var model_info=$(this).data('type');
+				var shop_number=$(this).prev().val();
+				shop_number=parseInt(shop_number)+1;
+				var shop_price=$(this).parents('li').prev().find('em').html();
+				var total_price=shop_number*shop_price;
+				$(this).parents('li').next().find('em').html(total_price);
+				get_text_box(model_info,'add');
+
+			})
+
+			//删除商品
+			$(".delete").click(function(){
+
+				var model_info=$(this).data('type');
+				var obj=$(this);
+
+				layer.confirm('确定永久从购物车中删除此商品？',{icon:3,title:'系统提示'},function(){
+
+					obj.parents('ul').fadeOut(200);
+
+					get_text_box(model_info,'delete');
+
+					layer.closeAll();
+
+				})
+
+			})
+
+			$("#J_SelectAllCbx2").click(function(){
+
+				var count_number=$(".check").size()-1;
+
+				if($(this).prop('checked')){
+
+					$("#J_Total").html(total_price())
+
+					$(".check").prop('checked',true)
+					$("#J_SelectedItemsCount").html(count_number)
+				}else{
+					$("#J_Total").html('0.00')
+					$(".check").prop('checked',false)
+					$("#J_SelectedItemsCount").html('0')
+				}
+			})
+
+
+			$(".btn-edit-sku").click(function(){
+				// $("body").parent().css("overflow-y","auto");
+				// $("body").css("overflow-y","auto");
+
+				var obj=$(this);
+				var shop_id=$(this).data('type');
+				var cart_id=$(this).data('cart');
+
+				var post={
+					id:shop_id,
+					cart_id:cart_id
+				}
+				$.ajax({
+					url: "{:url('index/shop/find_shop')}",
+					type: 'POST',
+					dataType: 'json',
+					data: post,
+					success: function(res) {
+						//called when successful
+						// console.log(res)
+						$(".stock").html(res.number)
+						$(".text-info .J_Price em").html(res.price)
+						$(".img-info img").attr("src","__UPLOADS__/"+res.cover)
+						$(".img-info img").attr("data-type",res.id)
+						$(".img-info img").attr("data-cart",res.cart_id)
+
+						var li="";
+						// console.log(res)
+						for (var i = 0; i < res.model.length; i++) {
+							
+							var param=res.model[i].model_info.param;
+							var sub_li="";
+							array=param.split("@");
+							for (var j = 0; j < array.length; j++) {
+								
+								sub_li+="<li class='sku-line'><em data-type='"+res.model[i].model_info.name+"'>"+array[j]+"</em><i></i></li>";
+							};
+
+							li+="<li class='theme-options'><div class='cart-title'>"+res.model[i].model_info.name+"</div><ul>"+sub_li+"</ul></li>";
+
+						};
+
+						$(".theme-signin-left").children('li').remove();
+
+						$(".theme-signin-left").prepend(li);
+						
+						$('.theme-options li').each(function(){
+							var li_obj=$(this);
+							var em_obj=$(this).children('em');
+
+							obj.siblings('span').each(function(){
+								
+								if($(this).data('type')==em_obj.html()){
+									li_obj.addClass('selected');
+								}
+							})
+							
+						})
+					},
+					error: function(res) {
+						//called when there is an error
+					}
+				});
+				
+			})
+
+
+			$('.theme-signin-left').delegate('li','click',function(){
+			    $(this).siblings('li').removeClass('selected');
+			    $(this).addClass('selected');
+			})
+
+			$(".update-cart").click(function(){
+				var temp="";
+				var model="";
+
+				var cart_id=$(".img-info img").data("cart");
+
+				var number=$(".theme-signin-left .edit-number").val()
+				
+
+				$(".theme-signin-left li ul .selected em").each(function(){
+					temp=$(this).data('type')+":"+$(this).html();
+
+					model+="@"+temp;
+
+				})
+				model=model.substring(1);
+
+				var post={
+					id:cart_id,
+					content:model,
+					number:number
+				}
+
+				// console.dir(post)
+				
+				$.ajax({
+					url: "{:url('index/shop/edit_cart')}",
+					type: 'POST',
+					dataType: 'json',
+					data: post,
+					success: function(res) {
+						//called when successful
+						if(res.status==1){
+							location.replace(location.href);
+						}
+					},
+					error: function(res) {
+						//called when there is an error
+					}
+				});
+				
+			})
+
+			$('.clearfix .cart-checkbox input').click(function(){
+				
+				if($(this).attr('checked')){
+					$("#J_SelectedItemsCount").html(parseInt($("#J_SelectedItemsCount").html())+1);
+
+					$("#J_Total").html(parseFloat($("#J_Total").html())+parseFloat($(this).parents('ul').children('li').eq(-2).find('em').html()));
+				}else{
+					$("#J_SelectedItemsCount").html(parseInt($("#J_SelectedItemsCount").html())-1);
+					$("#J_Total").html(parseFloat($("#J_Total").html())-parseFloat($(this).parents('ul').children('li').eq(-2).find('em').html()));
+				}
+			})
+
+			$("#J_Go").click(function(){
+				var shop_number=$("#J_SelectedItemsCount").html();
+				if(parseInt(shop_number)==0){
+					layer.alert('请选择商品进行提交')
+				}else{
+					var arr=new Array();
+					var json = [];
+
+					$('.clearfix .cart-checkbox input').each(function(){
+						if($(this).attr('checked')){
+
+							arr.push($(this).val());
+
+						}
+						
+					})
+
+					for (var i = 0; i < arr.length; i++) {
+					    var j = {};
+					    j.id = arr[i];
+					    json.push(j);
+					}
+					var obj = JSON.stringify(json);
+
+					var post={
+						id:obj
+					}
+
+					console.log(post)
+
+					$.ajax({
+						url: "{:url('index/shop/order')}",
+						type: 'POST',
+						dataType: 'json',
+						data: post,
+						success: function(res) {
+							//called when successful
+
+							console.dir(res)
+							if(res.status==1){
+								window.location.href="{:url('index/shop/pay')}";
+							}else{
+								layer.msg(res.msg,{icon:5});
+							}
+
+						},
+						error: function(res) {
+							//called when there is an error
+							layer.msg('网络连接失败，请稍后再试',{icon:5});
+						}
+					});
+					
+				}
+			})
+
+
+
+		})
+
+	</script>
+
+</html>

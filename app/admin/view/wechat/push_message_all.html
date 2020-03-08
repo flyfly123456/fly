@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+    <meta charset="UTF-8">
+    <title>批量推送</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="__ACSS__/font.css">
+    <link rel="stylesheet" href="__ACSS__/xadmin.css">
+    <script type="text/javascript" src="__AJS__/jquery.min.js"></script>
+    <script type="text/javascript" src="__LAYUI__/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="__AJS__/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+  
+<body class="layui-anim layui-anim-up">
+    <div class="x-nav">
+        <span class="layui-breadcrumb">
+            <a href="">首页</a>
+            <a href="">微信管理</a>
+            <a>
+                <cite>批量推送</cite></a>
+        </span>
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+            <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
+    </div>
+
+    <div class="x-body">
+        <div class="layui-tab">
+            <ul class="layui-tab-title">
+                <li class="layui-this">昵称推送</li>
+                <li>标签推送</li>
+            </ul>
+            <div class="layui-tab-content">
+                <!-- 根据openid推送 -->
+                <div class="layui-tab-item layui-show">
+                    <form class="layui-form">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label"><span class="x-red">*</span>粉丝列表</label>
+                            <div class="layui-input-inline" id="openid_list"></div>
+                            <div class="layui-form-mid layui-word-aux notice">
+                                <span class="x-red">*</span>选择相应的粉丝进行推送
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="title" class="layui-form-label">
+                                <span class="x-red">*</span>消息类型
+                            </label>
+                            <div class="layui-input-inline"> 
+                                <select name="type" lay-verify="required" lay-filter="type1" id="type1">
+                                    <option value="">请选择消息类型</option>
+                                    <option value="mpnews">图文消息</option>
+                                    <option value="text">文本消息</option>
+                                    <option value="voice">语音消息</option>
+                                    <option value="image">图片消息</option>
+                                    <option value="mpvideo">视频消息</option>
+                                    <option value="wxcard">卡券消息</option>
+                                </select>
+                            </div> 
+                        </div>
+                  
+                        <div class="content-box"></div>
+                        <div class="layui-form-item">
+                            <label for="" class="layui-form-label"></label>
+                            <button  class="layui-btn layui-btn-sm" lay-filter="push_all_openid_message" lay-submit="">立即推送</button>
+                            <button  class="layui-btn layui-btn-sm layui-btn-warm" type="reset">重置</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- 根据标签推送 -->
+                <div class="layui-tab-item">
+                    <form class="layui-form">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label"><span class="x-red">*</span>全部发送</label>
+                            <div class="layui-input-block">
+                                <input type="radio" name="is_to_all" value="1" title="是">
+                                <input type="radio" name="is_to_all" value="0" title="否" checked="">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label"><span class="x-red">*</span>标签列表</label>
+                            <div class="layui-input-inline"> 
+                                <select name="tag_id" lay-verify="required" id="tag_id">
+                                    <option value="">请选择标签进行推送</option>
+                                    <volist name="tags" id="tags">
+                                        <option value="{$tags.tag_id}">{$tags.name}</option>
+                                    </volist>
+                                </select>
+                            </div>
+                            <div class="layui-form-mid layui-word-aux">
+                                <span class="x-red">*</span>选择相应的标签进行推送
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label for="title" class="layui-form-label">
+                                <span class="x-red">*</span>消息类型
+                            </label>
+                            <div class="layui-input-inline"> 
+                                <select name="type" lay-verify="required" lay-filter="type2" id="type2">
+                                    <option value="">请选择消息类型</option>
+                                    <option value="mpnews">图文消息</option>
+                                    <option value="text">文本消息</option>
+                                    <option value="voice">语音消息</option>
+                                    <option value="image">图片消息</option>
+                                    <option value="mpvideo">视频消息</option>
+                                    <option value="wxcard">卡券消息</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="tag-box"></div>
+                        <div class="layui-form-item">
+                            <label for="" class="layui-form-label"></label>
+                            <button  class="layui-btn layui-btn-sm" lay-filter="push_all_tag_message" lay-submit="">立即推送</button>
+                            <button  class="layui-btn layui-btn-sm layui-btn-warm" type="reset">重置</button>
+                        </div>
+                    </form>
+                </div>
+            
+            </div>
+        </div>
+
+    </div><!-- x-body:end -->
+    <script>
+
+        var tagData={$rows};
+        var notice="<span class='x-red'>*</span>暂无数据...";
+
+        var text="<div class='layui-form-item content'><label for='content' class='layui-form-label'><span class='x-red'>*</span>内容</label><div class='layui-input-block'><textarea placeholder='请输入内容' class='layui-input layui-textarea' required='' name='content' value=''></textarea></div></div>";
+        var file1="<div class='layui-form-item'><label for='title' class='layui-form-label'><span class='x-red'>*</span>选择多媒体</label><div class='layui-input-inline'><select name='media_id' lay-verify='required' lay-filter='media_id' id='media_id1'><option value=''>请选择推送文件</option></select></div></div>";
+        var file2="<div class='layui-form-item'><label for='title' class='layui-form-label'><span class='x-red'>*</span>选择多媒体</label><div class='layui-input-inline'><select name='media_id' lay-verify='required' lay-filter='media_id' id='media_id2'><option value=''>请选择推送文件</option></select></div></div>";
+
+        if(tagData.length==0){
+            $('.notice').html(notice);
+        }
+
+        layui.config({
+            base: '__LAYUI__/module/',
+        })
+
+        layui.use(['form','layer','selectM','upload'], function(){
+            $ = layui.jquery;
+            var form = layui.form
+            ,selectM = layui.selectM
+            ,upload = layui.upload
+            ,layer = layui.layer;
+          
+            //多选标签-基本配置
+            var tagIns = selectM({
+                //元素容器【必填】
+                elem: '#openid_list'
+                //候选数据【必填】
+                ,data: tagData
+                ,max:tagData.length
+                ,width:400
+                //添加验证
+                ,verify:'required'
+                //默认值
+                ,selected: []
+            });
+
+            form.on('select(type1)', function(data){
+                // console.log(data.value);
+                // layer.alert($('#media_id').html())
+                if(data.value=="text"){
+
+                    $('.content-box').empty().append(text);
+
+                }else{
+
+                    if(data.value=="voice" || data.value=="image" || data.value=="mpvideo"){
+
+                        $('.content-box').empty().append(file1);
+                        form.render('select');
+                               
+                    }else if(data.value=="mpnews"){
+                        $('.content-box').empty().append(file1+text);
+                        form.render('select');
+                    }
+
+                    send_form(data,tag=false);
+                 
+                }
+
+            });
+
+            form.on('select(type2)', function(data){
+              // console.log(data.value);
+              // layer.alert($('#media_id').html())
+              if(data.value=="text"){
+
+                $('.tag-box').empty().append(text);
+
+              }else{
+
+                if(data.value=="voice" || data.value=="image" || data.value=="mpvideo"){
+
+                  $('.tag-box').empty().append(file2);
+                  form.render('select');
+                             
+                }else if(data.value=="mpnews"){
+                  $('.tag-box').empty().append(file2+text);
+                  form.render('select');
+                }
+
+                send_form(data,tag=true);
+               
+            }
+
+            });
+
+            function send_form(data,tag){
+                $.ajax({
+                    url: 'select_media_id',
+                    type: 'POST',
+                    dataType: 'json',
+                    data: {type: data.value},
+                    success: function(res) {
+                        //called when successful
+                        // console.dir(res.data)
+                        // layer.alert(res.data.length)
+                        var html="<option value=''>请选择推送文件</option>";
+                        for (var i = 0; i < res.data.length; i++) {
+
+                            if(res.data[i]['media_id']=="undefined" || res.data[i]['media_id']==null){
+                                  html+="<option value="+res.data[i]['thumb_media_id']+">"+res.data[i]['title']+"</option>";
+                            }else{
+                                  html+="<option value="+res.data[i]['media_id']+">"+res.data[i]['title']+"</option>";
+                            }
+                         
+                        };
+
+                        if(tag){
+                            $('#media_id2').html(html);
+                            form.render('select');
+                        }else{
+                            $('#media_id1').html(html);
+                            form.render('select');
+                        }
+                    },
+                    error: function(res) {
+                        //called when there is an error
+                        layer.alert("网络异常，请稍后再试", {icon: 5},function () {
+                            layer.closeAll();
+                        });
+                    }
+                });
+            }
+
+
+            //根据openID推送消息提交
+            form.on('submit(push_all_openid_message)', function(data){
+                // console.log(data.field);
+                //发异步，把数据提交给php
+                $.ajax({
+                    url: "{:url('admin/Wechat/push_message_all')}",
+                    type: 'POST',
+                    dataType: 'json',
+                    data: data.field,
+                    success: function(res) {
+                        //called when successful
+                        console.dir(res.errcode);
+                        if(res.status=="1"){
+                        layer.alert(res.msg, {icon: 6},function () {
+                            layer.closeAll();
+                        });
+                    }else{
+                        layer.alert(res.msg, {icon: 5},function () {
+                            layer.closeAll();
+                        });
+                    }
+                },
+                error: function(res) {
+                    //called when there is an error
+                    layer.alert("网络异常，请稍后再试", {icon: 5},function () {
+                        layer.closeAll();
+                    });
+                }
+            });
+            
+            return false;
+        });
+
+
+        //根据tags推送消息提交
+        form.on('submit(push_all_tag_message)', function(data){
+            console.log(data.field);
+            //发异步，把数据提交给php
+            $.ajax({
+                url: "{:url('admin/Wechat/push_all_tag_message')}",
+                type: 'POST',
+                dataType: 'json',
+                data: data.field,
+                success: function(res) {
+                    //called when successful
+                    console.log(res)
+                    console.log(res.info)
+                    if(res.status=="1"){
+                        layer.alert(res.msg, {icon: 6},function () {
+                            layer.closeAll();
+                        });
+                    }else{
+                        layer.alert(res.msg, {icon: 5},function () {
+                            layer.closeAll();
+                        });
+                    }
+                },
+                error: function(res) {
+                    //called when there is an error
+                    layer.alert("网络异常，请稍后再试", {icon: 5},function () {
+                        layer.closeAll();
+                    });
+                }
+            });
+            
+            return false;
+        });
+
+        //监听重置按钮
+        $('form').find(':reset').click(function(){
+            
+            for (var i = 0; i < $('form').size(); i++){
+                $('form')[i].reset();
+                tagIns.set();//默认值
+            };
+
+            return false;
+        });
+          
+    });
+</script>
+
+</body>
+
+</html>

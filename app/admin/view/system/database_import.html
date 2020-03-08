@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>数据库恢复</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="__ACSS__/font.css">
+    <link rel="stylesheet" href="__ACSS__/xadmin.css">
+    <script type="text/javascript" src="__AJS__/jquery.min.js"></script>
+    <script type="text/javascript" src="__LAYUI__/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="__AJS__/xadmin.js"></script>
+
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <style>
+        #edui1_iframeholder{
+            min-height: 200px!important;
+        }
+        .f-min{
+            font-size: 12px;
+            border: 1px solid #f0f0f0;
+            border-radius: 5px;
+            padding: 5px;
+            margin-left: 5px;
+        }
+  </style>
+  <body class="layui-anim layui-anim-up">
+    <div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">数据恢复</a>
+        <a>
+          <cite>网站系统数据还原</cite></a>
+      </span>
+      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
+    </div>
+    <div class="x-body">
+        <blockquote class="layui-elem-quote">
+                注意：数据还原, 点击恢复选项进行数据库导入，导入的SQL文件语句必须按照MYSQL的语法编写。
+        </blockquote>
+        <form class="layui-form">
+          <div class="layui-form-item">
+              <div class="layui-upload">
+                <button type="button" class="layui-btn layui-btn-normal" id="selete_sql">选择sql文件</button>
+                <button type="button" class="layui-btn" id="recover">开始恢复</button>
+              </div>
+          </div>
+      </form>
+      <table class="layui-table">
+        <thead>
+          <tr>
+            <th>
+              <div class="layui-unselect header layui-form-checkbox" lay-skin="primary">
+                <i class="layui-icon">&#xe605;</i>
+              </div>
+            </th>
+            <th>文件名称</th>
+            <th>卷号</th>
+            <th>压缩</th>
+            <th>数据大小</th>
+            <th>备份时间</th>
+            <th>状态</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="list">
+                <volist name="info" id="info">
+                      <tr class="hide_{$info.name}" id="{$info.id}">
+                      <td>
+                        <div class="layui-unselect layui-form-checkbox" lay-skin="primary" data-id=''><i class="layui-icon">&#xe605;</i></div>
+                      </td>
+                      <td>{$info.name}</td>
+                      <td>-</td>
+                      <td>-</td>
+                      <td>{$info.size}</td>
+                      <td>{$info.ctime}</td>
+                      <td>-</td>
+                      <td class="td-manage">
+                        <a class="f-min" title="恢复"  onclick="x_admin_show('恢复','member_edit',700,500)" href="javascript:;">
+                          <i class="layui-icon">&#xe642;</i>恢复
+                        </a>
+                        <a class="f-min" title="下载" href="{:url('admin/System/downdload_files')}?files={$info.href}">
+                          <i class="layui-icon">&#xe631;</i>下载
+                        </a>
+                        <a class="f-min" id="del_{$info.name}" onclick="file_del(this,'{$info.href}')" title="删除" href="javascript:;">
+                          <i class="layui-icon">&#xe631;</i>删除
+                        </a>
+                      </td>
+                    </tr>
+                </volist>
+        </tbody>
+      </table>
+    </div>
+
+    <script>
+        layui.use(['form','layer','upload'], function(){
+          $ = layui.jquery;
+          var form = layui.form
+          ,layer = layui.layer
+          ,upload = layui.upload;
+        
+          //选完文件后不自动上传
+          upload.render({
+            elem: '#selete_sql'
+            ,url: "{:url('admin/System/database_import')}"
+            ,auto: false
+            ,accept:"file"
+            ,exts:'sql'
+            ,drag:true
+            ,bindAction: '#recover'
+            ,before: function(obj){
+              layer.msg('数据库正在恢复中...',{icon:1});
+            }
+            ,done: function(res){
+              
+              layer.msg(res.msg,{icon:1,time:1000});
+            }
+            ,error: function(index, upload){
+              layer.msg("网络连接失败，请稍后再试...",{icon:1,time:1000});
+            }
+          });
+        });
+
+        /*文件-删除*/
+        function file_del(obj,href){
+          var scrollTop = $(document).scrollTop();
+          $('body,html').animate({
+              scrollTop: 0
+          }, 0);
+            layer.confirm('确认要删除吗？',{icon: 3, title:'提示'},function(index){
+                //发异步删除数据
+                // console.log(id);
+                id=$(obj).parents('tr').attr('id');
+                post={
+                  id:id,
+                  href:href
+                }
+                $.ajax({
+                  url: "{:url('admin/System/file_delete')}",
+                  type: 'POST',
+                  dataType: 'json',
+                  data: post,
+                  success: function(res) {
+                      // console.log(res.id)
+                    //called when successful
+                    if(res.status=="1"){
+                      $('hide_'+res.id).css({'display':'none'}).remove();
+                      layer.msg(res.msg,{icon:1,time:1000});
+                    }else{
+                      layer.msg(res.msg,{icon:2,time:1000});
+                    }
+                    
+                  },
+                  error: function(res) {
+                    //called when there is an error
+                    layer.msg('删除失败!',{icon:2,time:1000});
+                  }
+                });
+            },function(index){
+              $('body,html').animate({
+                scrollTop: scrollTop
+              }, 2);
+            });
+        }
+    </script>
+</body>
+</html>

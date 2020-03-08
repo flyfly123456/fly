@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>忘记密码</title>
+	<meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="__ACSS__/font.css">
+	<link rel="stylesheet" href="__ACSS__/xadmin.css">
+    <script type="text/javascript" src="__AJS__/jquery.min.js"></script>
+    <script src="__LAYUI__/layui.all.js" charset="utf-8"></script>
+    <script type="text/javascript" src="__AJS__/xadmin.js"></script>
+
+</head>
+<body class="login-bg">
+    
+    <div class="login layui-anim layui-anim-up">
+        <div class="message" style="background:none;color:#000;margin:0 auto;font-size:20px;">FlyFly v1.0-忘记密码</div>
+        <div id="darkbannerwrap" style="background:none"></div>
+        
+        <form method="post" class="layui-form" >
+            <input name="email" placeholder="输入邮箱获取验证码"  type="email" lay-verify="required" class="layui-input" value="">
+            <hr class="hr15">
+            <input name="img_verify" lay-verify="required" placeholder="图片验证码"  type="text" class="layui-input verify" style="width:45%;float:left;">
+            <div class="verify-img"><img src="{:captcha_src()}" alt="captcha" onclick="this.src=this.src" /></div>
+            <hr class="hr15">
+            <input name="email_verify" lay-verify="required" placeholder="邮箱验证码"  type="text" class="layui-input verify" style="width:45%;float:left;">
+            <div class="email-verify" style="float:left;height:50px;line-height:50px;margin-left:18px;"><span class="layui-btn layui-btn-primary layui-btn-big" style="height:48px;width:169px;line-height:48px;margin-bottom:4px" id="get_verify">获取验证码</span></div>
+            <hr class="hr15">
+            <input value="找回密码" lay-submit lay-filter="remember" style="width:100%;" type="submit" class="find_pass">
+            <hr class="hr20" >
+            <div class="layui-form-item">
+                <label class="layui-form-label"><a style="text-decoration:underline" href="{:url('admin/Login/index')}">返回登录</a></label>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            layui.use(['form','layer'], function(){
+              var form = layui.form
+               ,layer = layui.layer;
+              //监听提交
+              form.on('submit(remember)', function(data){
+                console.log(data)
+                $.ajax({
+                  url: "{:url('admin/Login/remember_pass')}",
+                  type: 'POST',
+                  dataType: 'json',
+                  data: data.field,
+                  success: function(res) {
+                    //called when successful
+                    console.log(res)
+                    if(res.status=='1'){
+                        layer.alert(res.msg,{icon: 6,title:'系统提示',closeBtn : 0},function (){
+                                 layer.closeAll();
+                                 
+                            });
+                    }else{
+                        layer.alert(res.msg,{icon: 5,title:'系统提示',closeBtn : 0},function (){
+                                 layer.closeAll();
+                                 
+                            });
+                    }
+
+                  },
+                  error: function(res) {
+                    //called when there is an error
+                    layer.alert("网络连接失败，请稍后再试！",{icon: 5,title:'系统提示',closeBtn : 0},function (){
+                            layer.closeAll();
+                                 
+                        });
+                  }
+                });
+                
+                return false;
+              });
+            });
+        })
+        
+        //初始按钮
+        $('.find_pass').attr("disabled",true);
+
+        //get_email_verify
+        $("#get_verify").on('click',function(){
+            
+            var reg=/^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/;
+
+            var email=$('input[name=email]').val();
+            var img_verify=$('input[name=img_verify]').val();
+            if($("#get_verify").html()!="获取验证码"){
+                return false;
+            }
+            if(email==""||email=="undefind"||email==null){
+                layer.msg("邮箱不能为空！",function(){
+                });
+                return false;
+            }
+            if(!reg.test(email)){
+                layer.msg("邮箱格式不正确...",function(){
+                });
+                return false;
+            }
+            if(img_verify==""||img_verify=="undefind"||img_verify==null){
+                layer.msg("验证码不能为空！",function(){
+                });
+                return false;
+            }
+            post={
+                email:email,
+                img_verify:img_verify
+            }
+            // console.log(post)
+            $.ajax({
+              url: "{:url('admin/Login/remember_pass')}",
+              type: 'POST',
+              dataType: 'json',
+              data: post,
+              success: function(res) {
+                //called when successful
+                if(res.status=='1'){
+                    setIntval();
+                    layer.msg(res.msg,function(){
+                        $('.find_pass').attr("disabled",false);
+                    });
+                }else{
+                    layer.msg(res.msg,function(){
+                    });
+                }
+
+              },
+              error: function(res) {
+                //called when there is an error
+                layer.msg('网络连接失败,请稍后再试',function(){
+                    });
+              }
+            });
+            
+        })
+
+
+        function setIntval(){
+            var num=60;
+            
+            var setInt=setInterval(function(){
+                    
+                if(num >= 0){
+                    $("#get_verify").addClass('layui-btn-disabled');
+                    $("#get_verify").html(num+'s');
+                    
+                    num=num-1;
+                }else{
+                    clearInterval(setInt);
+                    $("#get_verify").removeClass('layui-btn-disabled');
+                    $("#get_verify").html("获取验证码");
+
+                }
+            },1000);
+
+        }
+
+        
+    </script>
+
+    
+    <!-- 底部结束 -->
+</body>
+</html>

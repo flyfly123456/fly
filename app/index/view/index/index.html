@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>商城首页</title>
+
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+
+	<link href="__AMAZE__/css/amazeui.css" rel="stylesheet" type="text/css" />
+	<link href="__AMAZE__/css/admin.css" rel="stylesheet" type="text/css" />
+
+	<link href="__BASIC__/css/demo.css" rel="stylesheet" type="text/css" />
+
+	<link href="__ICSS__/hmstyle.css" rel="stylesheet" type="text/css" />
+	<script src="__AMAZE__/js/jquery.min.js"></script>
+	<script src="__AMAZE__/js/amazeui.min.js"></script>
+
+</head>
+
+<body>
+	<div class="hmtop">
+		<!--顶部导航条 -->
+		<include file="public/header" /><!-- 包含头部模版header -->
+
+		<b class="line"></b>
+		<div class="shopNav">
+			<div class="slideall" style="height: auto;">
+
+				<include file="public/plug" /><!-- 包含插件模版plug -->
+
+				<div class="bannerTwo">
+					<!--轮播 -->
+					<div class="am-slider am-slider-default scoll" data-am-flexslider id="demo-slider-0">
+						<ul class="am-slides">
+							<volist name="ad" id="ad" key="k">
+								<li class="banner{$k}"><a href="{$ad.url}"><img src="__UPLOADS__/{$ad.img}" /></a></li>
+							</volist>
+						</ul>
+					</div>
+					<div class="clear"></div>	
+				</div>
+
+				<!--侧边导航 -->
+				<div id="nav" class="navfull" style="position: static;">
+					<div class="area clearfix">
+						<div class="category-content" id="guide_2">
+
+							<div class="category" style="box-shadow:none ;margin-top: 2px;">
+								<ul class="category-list navTwo" id="js_climit_li">
+									<volist name="cate" id="cate">
+										<li>
+											<div class="category-info">
+												<h3 class="category-name b-category-name"><i><img src="__UPLOADS__/{$cate.img}"></i><a class="ml-22" title="{$cate.title}">{$cate.title}</a></h3>
+												<em>&gt;</em>
+											</div>
+											<div class="menu-item menu-in top">
+												<div class="area-in">
+													<div class="area-bg">
+														<div class="menu-srot">
+															<div class="sort-side">
+																<volist name="$cate.child" id="cate1">
+																	<dl class="dl-sort">
+																		<dt>
+																			<span title="{$cate1.title}">{$cate1.title}</span>
+																		</dt>
+																		<!-- 三级分类 -->
+																		<volist name="$cate1.child" id="cate2">
+																			<dd>
+																				<a title="{$cate2.title}" href="{:url('index/shop/sort',array('id'=>$cate2.id))}"><span>{$cate2.title}</span></a>
+																			</dd>
+																		</volist>
+																	</dl>
+																</volist>
+															</div>
+															<!-- 实力商家 -->
+																<!-- <div class="brand-side">
+																	<dl class="dl-sort"><dt><span>实力商家</span></dt>
+																		<dd><a rel="nofollow" title="呵官方旗舰店" target="_blank" href="#" rel="nofollow"><span  class="red" >呵官方旗舰店</span></a></dd>
+																		<dd><a rel="nofollow" title="格瑞旗舰店" target="_blank" href="#" rel="nofollow"><span >格瑞旗舰店</span></a></dd>
+																		<dd><a rel="nofollow" title="飞彦大厂直供" target="_blank" href="#" rel="nofollow"><span  class="red" >飞彦大厂直供</span></a></dd>
+																		<dd><a rel="nofollow" title="红e·艾菲妮" target="_blank" href="#" rel="nofollow"><span >红e·艾菲妮</span></a></dd>
+																		<dd><a rel="nofollow" title="本真旗舰店" target="_blank" href="#" rel="nofollow"><span  class="red" >本真旗舰店</span></a></dd>
+																		<dd><a rel="nofollow" title="杭派女装批发网" target="_blank" href="#" rel="nofollow"><span  class="red" >杭派女装批发网</span></a></dd>
+																	</dl>
+																</div> -->
+															</div>
+														</div>
+													</div>
+												</div>
+												<b class="arrow"></b>	
+											</li>
+										</volist>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!--导航 -->
+					<script type="text/javascript">
+					(function() {
+						$('.am-slider').flexslider();
+					});
+					$(document).ready(function() {
+						$("li").hover(function() {
+							$(".category-content .category-list li.first .menu-in").css("display", "none");
+							$(".category-content .category-list li.first").removeClass("hover");
+							$(this).addClass("hover");
+							$(this).children("div.menu-in").css("display", "block")
+						}, function() {
+							$(this).removeClass("hover")
+							$(this).children("div.menu-in").css("display", "none")
+						});
+					})
+					</script>
+
+
+					<!--小导航 -->
+					<div class="am-g am-g-fixed smallnav">
+						<div class="am-u-sm-3">
+							<a href="{:url('index/shop/sort')}"><img src="__IIMG__/navsmall.jpg" />
+								<div class="title">商品分类</div>
+							</a>
+						</div>
+						<div class="am-u-sm-3">
+							<a href="#"><img src="__IIMG__/huismall.jpg" />
+								<div class="title">大聚惠</div>
+							</a>
+						</div>
+						<div class="am-u-sm-3">
+							<a href="{:url('index/person/index')}"><img src="__IIMG__/mansmall.jpg" />
+								<div class="title">个人中心</div>
+							</a>
+						</div>
+						<div class="am-u-sm-3">
+							<a href="#"><img src="__IIMG__/moneysmall.jpg" />
+								<div class="title">投资理财</div>
+							</a>
+						</div>
+					</div>
+
+					
+					<div class="clear"></div>
+					<!--走马灯 -->
+
+					<div class="marqueenTwo">
+						<span class="marqueen-title"><i class="am-icon-volume-up am-icon-fw"></i>商城头条<em class="am-icon-angle-double-right"></em></span>
+						<div class="demo">
+							<ul>
+								<li class="title-first"><a target="_blank" href="#">
+									<img src="__IIMG__/TJ2.jpg"></img>
+									<span>[特惠]</span>洋河年末大促，低至两件五折							
+								</a></li>
+								<li class="title-first"><a target="_blank" href="#">
+									<span>[公告]</span>商城与广州市签署战略合作协议
+									<img src="__IIMG__/TJ.jpg"></img>
+									<p>XXXXXXXXXXXXXXXXXX</p>
+								</a></li>
+
+								<li><a target="_blank" href="#"><span>[特惠]</span>女生节商城爆品1分秒	</a></li>
+								<li><a target="_blank" href="#"><span>[公告]</span>华北、华中部分地区配送延迟</a></li>
+								<li><a target="_blank" href="#"><span>[特惠]</span>家电狂欢千亿礼券 买1送1！</a></li>
+								<li><a target="_blank" href="#"><span>[特惠]</span>洋河年末大促，低至两件五折</a></li>
+								<li><a target="_blank" href="#"><span>[公告]</span>华北、华中部分地区配送延迟</a></li>
+								<li><a target="_blank" href="#"><span>[公告]</span>华北、华中部分地区配送延迟</a></li>
+								<li><a target="_blank" href="#"><span>[公告]</span>华北、华中部分地区配送延迟</a></li>
+								<li><a target="_blank" href="#"><span>[公告]</span>华北、华中部分地区配送延迟</a></li>
+								<li><a target="_blank" href="#"><span>[公告]</span>华北、华中部分地区配送延迟</a></li>
+								<li><a target="_blank" href="#"><span>[公告]</span>华北、华中部分地区配送延迟</a></li>
+								<li><a target="_blank" href="#"><span>[公告]</span>华北、华中部分地区配送延迟</a></li>
+								<li><a target="_blank" href="#"><span>[公告]</span>华北、华中部分地区配送延迟</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="clear"></div>
+
+				</div>
+				
+				<!--各类活动-->
+				<div class="row">
+					<div class="am-container">
+						<volist name="buy" id="buy" key="k">
+							<if condition="$k eq 1">
+								<li class="title">
+							<else />
+								<li class="index">
+							</if>
+							<a href="{$buy.url}"><img src="__UPLOADS__/{$buy.img}" /></a></li>
+						</volist>
+					</div>
+					
+				</div>
+
+
+				<script type="text/javascript">
+				if ($(window).width() < 640) {
+					function autoScroll(obj) {
+						$(obj).find("ul").animate({
+							marginTop: "-39px"
+						}, 500, function() {
+							$(this).css({
+								marginTop: "0px"
+							}).find("li:first").appendTo(this);
+						})
+					}
+					$(function() {
+						setInterval('autoScroll(".demo")', 3000);
+					})
+				}
+				</script>
+			</div>
+			<div class="shopMainbg">
+				<div class="shopMain" id="shopmain">
+
+					<!--热门活动 -->
+
+					<div class="am-container">
+
+						<div class="sale-mt">
+							<i></i>
+							<em class="sale-title">限时秒杀</em>
+							<div class="s-time" id="countdown">
+								<span class="hh">01</span>
+								<span class="mm">20</span>
+								<span class="ss">59</span>
+							</div>
+						</div>
+
+
+						<div class="am-g am-g-fixed sale">
+							<div class="am-u-sm-3 sale-item">
+								<div class="s-img">
+									<a href="# "><img src="__IIMG__/sale3.jpg" /></a>
+								</div>
+								<div class="s-info">
+									<a href="#"><p class="s-title">ZEK 原味海苔</p></a>
+									<div class="s-price">￥<b>9.90</b>
+										<a class="s-buy" href="#">秒杀</a>
+									</div>                          	  
+								</div>								
+							</div>
+
+							<div class="am-u-sm-3 sale-item">
+								<div class="s-img">
+									<a href="# "><img src="__IIMG__/sale2.jpg" /></a>
+								</div>
+								<div class="s-info">
+									<a href="#"><p class="s-title">ZEK 原味海苔</p></a>
+									<div class="s-price">￥<b>9.90</b>
+										<a class="s-buy" href="#">秒杀</a>
+									</div>                          	  
+								</div>								
+							</div>					
+
+							<div class="am-u-sm-3 sale-item">
+								<div class="s-img">
+									<a href="# "><img src="__IIMG__/sale1.jpg" /></a>
+								</div>
+								<div class="s-info">
+									<a href="#"><p class="s-title">ZEK 原味海苔</p></a>
+									<div class="s-price">￥<b>9.90</b>
+										<a class="s-buy" href="#">秒杀</a>
+									</div>                          	  
+								</div>								
+							</div>
+
+							<div class="am-u-sm-3 sale-item">
+								<div class="s-img">
+									<a href="# "><img src="__IIMG__/sale2.jpg " /></a>
+								</div>
+								<div class="s-info">
+									<a href="#"><p class="s-title">ZEK 原味海苔</p></a>
+									<div class="s-price">￥<b>9.90</b>
+										<a class="s-buy" href="#">秒杀</a>
+									</div>                          	  
+								</div>								
+							</div>
+
+						</div>
+					</div>
+					<div class="clear "></div>
+					<!-- 楼层商品开始 -->
+					<foreach name="shop" item="shop" key="f">
+						<div class="f{$f}">
+							
+							<div class="am-container ">
+								<div class="shopTitle ">
+									<h4>{$shop.title}</h4>
+									<h3>{$shop.desc}</h3>
+									<div class="today-brands ">
+										<foreach name="$shop.cate2" item="cate2">
+											<a href="{$cate2.url}">{$cate2.title}</a>
+										</foreach>
+									</div>
+									<span class="more ">
+                    					<a class="more-link " href="{:url('index/shop/sort',array('pid'=>$cate2.pid))}" target="_blank">更多美味</a>
+                        			</span>
+                        		</div>
+                        	</div>
+
+							<div class="am-g am-g-fixed floodSix ">				
+								<foreach name="$shop.hot" item="hot" key="h">
+									<if condition="$h lt 1">
+										<div class="am-u-sm-7 am-u-md-5 am-u-lg-2 text-two big">
+											<div class="outer-con ">
+												<div class="title ">
+													{$hot.name}
+												</div>
+												<div class="sub-title ">
+													¥{$hot.price}
+												</div>
+
+											</div>
+											<a href="{:url('index/shop/introduction',array('id'=>$hot.id))}" target="_blank"><img src="__UPLOADS__/{$hot.cover}" /></a>						
+										</div>
+									</if>
+								</foreach>
+
+								<foreach name="$shop.children" item="children" key="k">
+									<if condition="$k lt 8">
+										<li>
+											<div class="am-u-md-2 am-u-lg-2 text-three">
+												<div class="boxLi"></div>
+												<div class="outer-con ">
+													<div class="title ">
+														{$children.name}
+													</div>								
+													<div class="sub-title ">
+														¥{$children.price}
+													</div>
+
+												</div>
+												<a href="{:url('index/shop/introduction',array('id'=>$children.id))}" target="_blank"><img src="__UPLOADS__/{$children.cover}" /></a>
+											</div>
+										</li>
+									</if>
+								</foreach>
+														
+							</div>
+
+							<div class="clear "></div>
+						</div>
+					</foreach>
+            		<!-- 楼层商品结束 -->
+					<!--底部-->
+					<include file="public/footer" /><!-- 包含底部模版footer -->
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--引导 -->
+	<include file="public/mobile" /><!-- 包含移动端导航模版mobile -->
+	<!--菜单 -->
+	<include file="public/right" /><!-- 包含右侧模版right -->
+
+	<script>
+	window.jQuery || document.write('<script src="__BASIC__/js/jquery.min.js "><\/script>');
+	</script>
+	<script type="text/javascript " src="__BASIC__/js/quick_links.js "></script>
+</body>
+
+</html>

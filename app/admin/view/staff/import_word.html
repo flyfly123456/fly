@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>导入电子档案</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="__ACSS__/font.css">
+    <link rel="stylesheet" href="__ACSS__/xadmin.css">
+    <script type="text/javascript" src="__AJS__/jquery.min.js"></script>
+    <script type="text/javascript" src="__LAYUI__/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="__AJS__/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  
+  <body class="layui-anim layui-anim-up">
+    <div class="x-nav">
+        <span class="layui-breadcrumb">
+            <a href="">首页</a>
+            <a href="">档案管理</a>
+            <a><cite>导入Word</cite></a>
+        </span>
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+            <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
+    </div>
+    <div class="x-body">
+        <form class="layui-form">
+            <div class="layui-form-item">
+                <label for="name" class="layui-form-label">
+                    <span class="x-red">*</span>名称</label>
+                <div class="layui-input-inline">
+                  <input type="text" id="name" name="full_name" required="" lay-verify="nikename" autocomplete="off" class="layui-input" value="{$rows.full_name}" disabled>
+                </div>
+            </div>
+            <div class="layui-form-item"> 
+                <label class="layui-form-label"><span class="x-red">*</span>Word档案</label> 
+                <div class="layui-input-inline"> 
+                    <input name="word" lay-verify="required" id="word" placeholder="文件地址" value="{$rows.word_path}" required="" autocomplete='off' class="layui-input" />
+                </div> 
+                <div class="layui-input-inline" style="width: auto;"> 
+                    <div class="layui-upload"> 
+                        <button type="button" class="layui-btn" id="up_word">上传文件</button>
+                        <button type="button" class="layui-btn" id="send_word">开始上传</button> 
+                    </div> 
+                </div> 
+            </div>
+            <div class="layui-form-item"> 
+                <div class="layui-upload-list" style="margin-left:66px"> 
+                    <img class="layui-upload-img" id="up_imgs" /> 
+                    <span id="up_text"></span> 
+                </div> 
+            </div>
+          <div class="layui-form-item">
+              <label for="" class="layui-form-label">
+              </label>
+              <button  class="layui-btn layui-btn-sm" lay-filter="add" lay-submit="">
+                    立即导入
+              </button>
+              <button  class="layui-btn layui-btn-warm layui-btn-sm" type="reset" lay-filter="">
+                    重置
+              </button>
+          </div>
+          <input type="hidden" name="id" value="{$id}">
+      </form>
+    </div>
+    <script>
+        layui.use(['form','layer','upload'], function(){
+            $ = layui.jquery
+            var form = layui.form
+            ,layer = layui.layer
+            ,upload = layui.upload;
+                
+            upload.render({
+                elem: '#up_word'
+                ,url: "{:url('admin/Staff/get_word_path')}"
+                ,accept: 'file' //视频
+                ,auto:false
+                ,size: 10240 //限制文件大小，单位 KB
+                ,bindAction: '#send_word'
+                ,before: function(obj){
+                    //预读本地文件示例，不支持ie8
+                    obj.preview(function(index, file, result){
+                        $('#up_imgs').attr('src', result); //图片链接（base64）
+                    });
+                    layer.msg('文件上传中...',{icon:1});
+                }
+                ,done: function(res){
+                    //如果上传失败
+                    if(res.code > 0){
+                        return layer.msg('上传失败！');
+                    }
+                    if(res.status==1){
+                        
+                        //上传成功
+                        setTimeout(function(){
+                            $("#word").val(res.message);
+                            layer.msg('文件上传成功...',{icon:1});
+                        },1000)
+                    }else{
+                        return layer.msg('上传失败！',{icon:1});
+                    }
+                    
+                }
+                ,error: function(){
+                    //演示失败状态，并实现重传
+                    var demoText = $('#up_text');
+                    demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-danger demo-reload">重试</a>');
+                    demoText.find('.demo-reload').on('click', function(){
+                        uploadInst.upload();
+                    });
+                }
+            });
+
+            //监听提交
+            form.on('submit(add)', function(data){
+
+                console.log(data.field);
+                //发异步，把数据提交给php
+                layer.msg('正在导入Word中...',{icon:1});
+                $.ajax({
+                    url: "{:url('admin/Staff/import_word')}",
+                    type: 'POST',
+                    dataType: 'json',
+                    data: data.field,
+                    success: function(res) {
+                        // console.log(res)
+                        //called when successful
+                        if(res.status=="1"){
+                            layer.alert(res.msg, {icon: 6},function () {
+                                layer.closeAll();
+                            });
+                        
+                        }else{
+                            layer.alert(res.msg, {icon: 5},function () {
+                                layer.closeAll();
+                            });
+                        }
+                    },
+                    error: function(res) {
+                        //called when there is an error
+                        layer.alert("网络异常，请稍后再试！", {icon: 5},function () {
+                            layer.closeAll();
+                        });
+                    }
+                });
+                
+                return false;
+            });
+          
+          
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=0">
+
+	<title>个人资料</title>
+
+	<link href="__AMAZE__/css/admin.css" rel="stylesheet" type="text/css">
+	<link href="__AMAZE__/css/amazeui.css" rel="stylesheet" type="text/css">
+
+	<link href="__ICSS__/personal.css" rel="stylesheet" type="text/css">
+	<link href="__ICSS__/infstyle.css" rel="stylesheet" type="text/css">
+	<script src="__AMAZE__/js/jquery.min.js"></script>
+	<script src="__AMAZE__/js/amazeui.js"></script>
+	<script src="__LAYER__/layer.js"></script>
+
+</head>
+
+<body>
+	<!--头 -->
+	<include file="public/header1" /><!-- 包含头部模版header1 -->
+    <include file="public/plug1" /><!-- 包含插件模版plug1 -->
+	<b class="line"></b>
+	<div class="center">
+		<div class="col-main">
+			<div class="main-wrap">
+				<div class="user-info">
+					<!--标题 -->
+					<div class="am-cf am-padding">
+						<div class="am-fl am-cf"><strong class="am-text-danger am-text-lg">个人中心</strong> / <small>个人资料 / 个人信息</small></div>
+					</div>
+					<hr/>
+
+					<!--头像 -->
+					<div class="user-infoPic">
+						<div class="filePic">
+							<input type="file" id="file" class="inputPic" allowexts="gif,jpeg,jpg,png,bmp" name="img" accept="image/*">
+							<if condition="$members.img">
+								<img class="am-circle am-img-thumbnail" src="__UPLOADS__/{$members.img}" alt="个人头像" />
+							<else />
+								<img class="am-circle am-img-thumbnail" src="__IIMG__/getAvatar.do.jpg" alt="个人头像" />
+							</if>
+						</div>
+
+						<p class="am-form-help">头像</p>
+
+						<div class="info-m">
+							<div><b>用户名：<i><if condition="$members.username">{$members.username}<else />小叮当</if></i></b></div>
+							<div class="vip">
+                        		<span></span><a href="#">VIP会员专享</a>
+							</div>
+						</div>
+					</div>
+
+					<!--个人信息 -->
+					<div class="info-main">
+						<form class="am-form am-form-horizontal" name="reg_testdate">
+							
+							<div class="am-form-group">
+								<label for="user-name2" class="am-form-label">昵称</label>
+								<div class="am-form-content">
+									<if condition="$members.username"><input type="text" id="user-name2" name="username" value="{$members.username}" autocomplete='off' placeholder="请输入昵称"><else />小叮当</if>
+									
+									<small>昵称长度不能超过40个汉字</small>
+								</div>
+							</div>
+
+							<div class="am-form-group">
+								<label for="user-name" class="am-form-label">姓名</label>
+								<div class="am-form-content">
+									<input type="text" id="user-name2" name="realname" value="{$members.realname}" placeholder="请输入姓名">
+								</div>
+							</div>
+
+							<div class="am-form-group">
+								<label class="am-form-label">性别</label>
+								<div class="am-form-content sex">
+									<if condition="$members.sex eq 0">
+										<label class="am-radio-inline">
+											<input type="radio" name="sex" value="0" data-am-ucheck checked> 男
+										</label>
+										<label class="am-radio-inline">
+											<input type="radio" name="sex" value="1" data-am-ucheck> 女
+										</label>
+										<label class="am-radio-inline">
+											<input type="radio" name="sex" value="2" data-am-ucheck> 保密
+										</label>
+									<elseif condition="$members.sex eq 1" />
+										<label class="am-radio-inline">
+											<input type="radio" name="sex" value="0" data-am-ucheck> 男
+										</label>
+										<label class="am-radio-inline">
+											<input type="radio" name="sex" value="1" data-am-ucheck checked> 女
+										</label>
+										<label class="am-radio-inline">
+											<input type="radio" name="sex" value="2" data-am-ucheck> 保密
+										</label>
+									<else />
+										<label class="am-radio-inline">
+											<input type="radio" name="sex" value="0" data-am-ucheck> 男
+										</label>
+										<label class="am-radio-inline">
+											<input type="radio" name="sex" value="1" data-am-ucheck> 女
+										</label>
+										<label class="am-radio-inline">
+											<input type="radio" name="sex" value="2" data-am-ucheck checked> 保密
+										</label>
+									</if>
+								</div>
+							</div>
+
+							<div class="am-form-group">
+								<label for="user-birth" class="am-form-label">生日</label>
+								<div class="am-form-content">
+									<div class="birth-select">
+										<select id="year" data-am-selected="{maxHeight: 150}" name="YYYY" onChange="YYYYDD(this.value)">
+										</select>
+									</div>
+									<div class="birth-select2">
+										<select id="month" data-am-selected="{maxHeight: 150}"  name="MM" onChange="MMDD(this.value)">
+										</select>
+									</div>
+									<div class="birth-select3">
+										<select id="day" data-am-selected="{maxHeight: 150}" name="DD">
+										</select>
+									</div>
+								</div>
+							</div>
+
+							<div class="am-form-group">
+								<label for="user-phone" class="am-form-label">电话</label>
+								<div class="am-form-content">
+									<input id="user-phone" placeholder="请输入电话号码" name="telephone" oninput="if(value.length>11)value=value.slice(0,11)" value="{$members.telephone}" type="tel">
+								</div>
+							</div>
+
+							<div class="am-form-group">
+								<label for="user-email" class="am-form-label">电子邮件</label>
+								<div class="am-form-content">
+									<input id="user-email" name="email" value="{$members.email}" autocomplete='off' placeholder="请输入电子邮箱" type="email">
+								</div>
+							</div>
+
+							<!-- <div class="am-form-group address">
+								<label for="user-address" class="am-form-label">收货地址</label>
+								<div class="am-form-content address">
+									<a href="address.html">
+										<p class="new-mu_l2cw">
+											<span class="province">湖北</span>省
+											<span class="city">武汉</span>市
+											<span class="dist">洪山</span>区
+											<span class="street">雄楚大道666号(中南财经政法大学)</span>
+											<span class="am-icon-angle-right"></span>
+										</p>
+									</a>
+								</div>
+							</div> -->
+
+							<div class="am-form-group safety">
+								<label for="user-safety" class="am-form-label">账号安全</label>
+								<div class="am-form-content safety">
+									<a href="{:url('index/person/safety')}">
+										<span class="am-icon-angle-right"></span>
+									</a>
+								</div>
+							</div>
+
+							<div class="info-btn">
+								<div class="am-btn am-btn-danger save">保存修改</div>
+							</div>
+						</form>
+					</div>
+
+				</div>
+
+			</div>
+			<!--底部-->
+			<include file="public/footer" /><!-- 包含底部模版footer -->
+		</div>
+
+		<include file="public/left" /><!-- 包含左侧菜单模版left -->
+	</div>
+
+</body>
+	<script>
+		$(function(){
+			var fileInput=$("#file");
+			fileInput.change(function(){
+
+				var file = $(this).files;
+
+				var formData = new FormData();
+
+				formData.append("img", file);
+
+				console.log(formData)
+
+				$.ajax({
+					url: "{:url('index/person/uploads')}",
+					type: 'POST',
+					data: formData,
+					success: function(res) {
+						//called when successful
+						if(res.status==1){
+							layer.msg(res.msg,{icon:6});
+						}else{
+							layer.msg(res.msg,{icon:5});
+						}
+					},
+					error: function(res) {
+						//called when there is an error
+						layer.msg("网络连接异常，请稍后再试");
+					}
+				});
+			})
+
+			$(".save").click(function(){
+				// var img=$("input[name=img]").val();
+
+				var username=$("input[name=username]").val();
+				var realname=$("input[name=realname]").val();
+				var sex=$("input[name='sex']:checked").val();
+				var year=$("#year option:selected").val()
+				var month=$("#month option:selected").val()
+				var day=$("#day option:selected").val()
+				var telephone=$("input[name=telephone]").val();
+				var email=$("input[name=email]").val();
+
+				var post={
+					// img:img,
+					username:username,
+					realname:realname,
+					sex:sex,
+					year:year,
+					month:month,
+					day:day,
+					telephone:telephone,
+					email:email
+				}
+
+				console.dir(post)
+
+				$.ajax({
+					url: "{:url('index/person/information')}",
+					type: 'POST',
+					dataType: 'json',
+					data: post,
+					success: function(res) {
+						//called when successful
+						if(res.status==1){
+							layer.msg(res.msg,{icon:6});
+						}else{
+							layer.msg(res.msg,{icon:5});
+						}
+					},
+					error: function(res) {
+						//called when there is an error
+						layer.msg("网络连接异常，请稍后再试");
+					}
+				});
+				
+			})
+		})
+
+		function YYYYMMDDstart() {
+			MonHead = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+
+			//先给年下拉框赋内容
+			var y  = new Date().getFullYear();
+			for (var i = (y - 50); i < (y + 50); i++) //以今年为准，前30年，后30年
+			   document.reg_testdate.YYYY.options.add(new Option(" " + i + " 年", i));
+
+
+			//赋月份的下拉框
+			for (var i = 1; i < 13; i++)   document.reg_testdate.MM.options.add(new Option(" " + i + " 月", i));
+
+
+			document.reg_testdate.YYYY.value = y;
+			document.reg_testdate.MM.value = new Date().getMonth() + 1;
+			var n = MonHead[new Date().getMonth()];
+			if (new Date().getMonth() == 1 && IsPinYear(YYYYvalue)) n++;
+			writeDay(n); //赋日期下拉框Author:meizz
+			document.reg_testdate.DD.value = new Date().getDate();
+		}
+		if (document.attachEvent)
+			window.attachEvent("onload", YYYYMMDDstart);
+		else
+			window.addEventListener('load', YYYYMMDDstart, false);
+
+		function YYYYDD(str) //年发生变化时日期发生变化(主要是判断闰平年)
+		{
+			var MMvalue = document.reg_testdate.MM.options[document.reg_testdate.MM.selectedIndex].value;
+			if (MMvalue == "") {
+				var e = document.reg_testdate.DD;
+				optionsClear(e);
+				return;
+			}
+			var n = MonHead[MMvalue - 1];
+			if (MMvalue == 2 && IsPinYear(str)) n++;
+
+			writeDay(n)
+		}
+
+		function MMDD(str)   //月发生变化时日期联动
+		{
+			var YYYYvalue = document.reg_testdate.YYYY.options[document.reg_testdate.YYYY.selectedIndex].value;
+			if (YYYYvalue == "") {
+				var e = document.reg_testdate.DD;
+				optionsClear(e);
+				return;
+			}
+			var n = MonHead[str - 1];
+			if (str == 2 && IsPinYear(YYYYvalue)) n++;
+			writeDay(n)
+		}
+
+		function writeDay(n)   //据条件写日期的下拉框
+		{
+			// var e = document.reg_testdate.DD; optionsClear(e);
+			// console.log(e)
+			for (var i = 1; i < (n + 1); i++)
+				document.reg_testdate.DD.options.add(new Option(" " + i + " 日", i));
+			// e.options.add(new Option(" "+ i + " 日", i));
+		}
+
+		function IsPinYear(year) //判断是否闰平年
+		{
+			return (0 == year % 4 && (year % 100 != 0 || year % 400 == 0));
+		}
+
+		function optionsClear(e) {
+			e.options.length = 1;
+		}		
+	</script>
+
+</html>

@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>{$web_info.web_title}</title>
+	<meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="__ACSS__/font.css">
+
+	<link rel="stylesheet" href="__ACSS__/xadmin.css">
+    <link rel="stylesheet" href="__ACSS__/themes/default.css" media="all" id="skin" kit-skin />
+    <script type="text/javascript" src="__AJS__/jquery.min.js"></script>
+    <script src="__LAYUI__/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="__AJS__/xadmin.js"></script>
+    
+</head>
+<body>
+    <!-- 顶部开始 -->
+    <include file="public/header" />
+    <!-- 顶部结束 -->
+    <!-- 中部开始 -->
+     <!-- 左侧菜单开始 -->
+    <include file="public/left" />
+    <!-- <div class="x-slide_left"></div> -->
+    <!-- 左侧菜单结束 -->
+    <!-- 右侧主体开始 -->
+    <div class="page-content" id="nav">
+        <div class="layui-tab tab" lay-filter="xbs_tab" lay-allowclose="false">
+          <ul class="layui-tab-title" id="xbs_tab">
+            <li class="home layui-this"><i class="layui-icon">&#xe68e;</i>我的桌面</li>
+          </ul>
+          <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <iframe src='__URL__/welcome' frameborder="0" scrolling="yes" class="x-iframe"></iframe>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="page-content-bg"></div>
+    <div class="container-bg">
+      <video autoplay loop id="bgvid">
+        <source src="__AIMG__/bg.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+      </video>
+    </div>
+    <!-- 右侧主体结束 -->
+    <!-- 中部结束 -->
+    <!-- 底部开始 -->
+    <!-- <include file="public/footer" /> -->
+    <!-- 底部结束 -->
+    
+    <script type="text/javascript">
+        // 登入超时自动退出
+        layui.use(['form','layer'], function(){
+          $ = layui.jquery;
+          var form = layui.form
+          ,layer = layui.layer;
+
+        var maxTime = "{$Request.session.login.sleep_timeout}"; // seconds
+        var time = maxTime;
+        $('body,html,window,document').on('keydown mousemove mousedown click', function(e){
+            time = maxTime; // reset
+        });
+        
+        var intervalId = setInterval(function(){
+            time--;
+            if(time <= 0) {
+                ShowInvalidLoginMessage()
+                clearInterval(intervalId);
+                //显示背景视频
+                $('.container-bg').css({'display':'block'});
+            }
+            //判断是否处于考试中
+            $.get("{:url('admin/Evaluation/stop_countdown')}", function(result){
+                if(result.status==1){
+                  clearInterval(intervalId);
+                  // console.log('ok');
+                }else{
+                  // console.log('no');
+
+                }
+              });
+
+        }, 1000)
+
+        function ShowInvalidLoginMessage(){
+
+            // 清除cookie、session
+            // 提示用户
+            $.ajax({
+              url: "{:url('admin/Index/max_time')}",
+              type: 'POST',
+              dataType: 'json',
+              data: {max_time: time},
+              success: function(res) {
+                //called when successful
+                if(res.status=="1"){
+                    layer.alert(res.msg, {icon: 5,title:'系统提示',closeBtn : 0},function () {
+                         layer.closeAll();
+                         window.location.href="{:url('admin/Login/index')}"
+                         
+                    });
+                    
+                }
+              },
+              error: function(res) {
+                //called when there is an error
+              }
+            });
+            
+        }
+
+        //隐藏背景视频
+        $('.container-bg').click(function(){
+          $(this).hide();
+        })
+
+    });
+    
+    </script>
+
+</body>
+</html>

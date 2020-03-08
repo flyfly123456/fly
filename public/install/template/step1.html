@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>flyfly安装程序</title>
+<script type="text/javascript" src="./lib/js/jquery-1.8.2.min.js"></script>
+<link rel="stylesheet" type="text/css" href="./lib/layui/css/layui.css">
+<script type="text/javascript" src="./lib/layui/layui.js"></script>
+<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<style>
+    html,body{
+        height:100%;
+        overflow-x: hidden;
+    }
+    .content-box{
+        width: 100%;
+        height: 100%; 
+        background-color: #F2F2F2;
+    }
+    .layui-card{
+        border: 1px solid #ccc;
+        border-radius:10px;
+    }
+</style>
+<body>
+    <div class="content-box">
+        <div style="padding: 20px; background-color: #F2F2F2;">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md8 layui-col-md-offset2">
+                    <div class="layui-card">
+                        <div class="layui-card-body">
+                            <div class="layui-card-header" style="margin-bottom:20px;"><h2>• 环境检测</h2></div>
+                            <div class="layui-form">
+                                <table class="layui-table" lay-skin="line">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:25%">坏境</th>
+                                            <th style="width:25%">最低配置</th>
+                                            <th style="width:25%">当前配置</th>
+                                            <th style="width:25%">是否符合</th>
+                                        </tr> 
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>操作系统</td>
+                                            <td>不限</td>
+                                            <td><?php echo php_uname('s'); ?></td>
+                                            <td class="path">√</td>
+                                        </tr>
+                                        <tr>
+                                            <td>PHP版本</td>
+                                            <td>&gt;=5.4</td>
+                                            <td><?php echo PHP_VERSION ?></td>
+                                            <?php
+                                                if(PHP_VERSION >= 5.4){
+                                                    echo "<td class='path'>√</td>";
+                                                }else{
+                                                    echo "<td>×</td>";
+                                                }
+                                            ?>
+                                            
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td>附件上传</td>
+                                            <td>不限</td>
+                                            <td><?php echo get_cfg_var ("upload_max_filesize") ?></td>
+                                            <td class="path">√</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td>GD库</td>
+                                            <td>2.0</td>
+                                            <td>
+                                                <?php
+                                                    $gd_info = function_exists('gd_info') ? gd_info() : array();
+                                                    echo $gd_info['GD Version'];
+                                                ?>
+                                            </td>
+                                            <?php
+
+                                                $gd_info = function_exists('gd_info') ? gd_info() : array();
+                                                $start=strpos($gd_info['GD Version'], "(");
+                                                $end=stripos($gd_info['GD Version'], " ");
+                                                $gd_version=substr($gd_info['GD Version'], $start+1,$end-1);
+                                                if($gd_version > 2.0){
+                                                    echo "<td class='path'>√</td>";
+                                                }else{
+                                                    echo "<td>×</td>";
+                                                }
+                                                
+                                            ?>
+                                        </tr>
+
+                                        <tr>
+                                            <td>磁盘空间</td>
+                                            <td>5M</td>
+                                            <td><?php echo floor(disk_free_space('./') / (1024*1024)).'M';?></td>
+                                            <?php
+                                                if(floor(disk_free_space('./') / (1024*1024)) > 5){
+                                                    echo "<td class='path'>√</td>";
+                                                }else{
+                                                    echo "<td>×</td>";
+                                                }
+                                            ?>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="layui-card-header" style="margin-bottom:20px;"><h2>• 依赖性检测</h2></div>
+                            <div class="layui-form">
+                                <table class="layui-table" lay-skin="line">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:25%">坏境</th>
+                                            <th style="width:25%">最低配置</th>
+                                            <th style="width:25%">当前配置</th>
+                                            <th style="width:25%">是否符合</th>
+                                        </tr> 
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>mysqli</td>
+                                            <td>支持</td>
+                                            <td>
+                                                <?php
+                                                    function mysqliinstalled(){
+                                                        if(function_exists ("mysqli_connect")){
+                                                            return true;
+                                                        }else{
+                                                            return false;
+                                                        }
+                                                    }
+                                                    
+                                                    if(mysqliinstalled()){
+                                                        echo "支持";
+                                                        $mysqli="true";
+                                                    }else{
+                                                        echo "不支持";
+                                                        $mysqli="false";
+                                                    }
+                                                ?>
+                                            </td>
+                                            
+                                            <?php
+                                                if($mysqli=="true"){
+                                                    echo "<td class='path'>√</td>";
+                                                }else{
+                                                    echo "<td>×</td>";
+                                                }
+                                            ?>
+                                        </tr>
+
+                                        <tr>
+                                            <td>pdo</td>
+                                            <td>支持</td>
+                                            <td>
+                                                <?php
+                                                    if(class_exists('pdo')){
+                                                        echo "支持";
+                                                        $pdo="true";
+                                                    }else{
+                                                        echo "不支持";
+                                                        $pod="false";
+                                                    }
+                                                    
+                                                ?>
+                                            </td>
+                                            <?php
+                                                if($pdo=="true"){
+                                                    echo "<td class='path'>√</td>";
+                                                }else{
+                                                    echo "<td>×</td>";
+                                                }
+                                            ?>
+                                        </tr>
+
+                                        <tr>
+                                            <td>pdo_mysql</td>
+                                            <td>支持</td>
+                                            <td>
+                                                <?php
+                                                    if(extension_loaded('pdo_mysql')){
+                                                        echo "支持";
+                                                        $pdo_mysql="true";
+                                                    }else{
+                                                        echo "不支持";
+                                                        $pdo_mysql="false";
+                                                    }
+                                                    
+                                                ?>
+                                            </td>
+                                            <?php
+                                                if($pdo_mysql=="true"){
+                                                    echo "<td class='path'>√</td>";
+                                                }else{
+                                                    echo "<td>×</td>";
+                                                }
+                                            ?>
+                                        </tr>
+                                        
+                                        <tr>
+                                            <td>curl</td>
+                                            <td>支持</td>
+                                            <td>
+                                                <?php
+                                                    if(class_exists("CURLFile")){
+                                                        echo '支持';
+                                                        $CURLFile="true";
+                                                    }else{
+                                                        echo '不支持';
+                                                        $CURLFile="false";
+                                                    }
+                                                    
+                                                ?>
+                                            </td>
+                                            <?php
+                                                if($CURLFile=="true"){
+                                                    echo "<td class='path'>√</td>";
+                                                }else{
+                                                    echo "<td>×</td>";
+                                                }
+                                            ?>
+                                        </tr>
+
+                                        <tr>
+                                            <td>MBstring</td>
+                                            <td>支持</td>
+                                            <td>
+                                                <?php
+                                                    if(function_exists("mb_substr")){
+                                                        echo '支持';
+                                                        $mb_substr="true";
+                                                    }else{
+                                                        echo '不支持';
+                                                        $mb_substr="false";
+                                                    }
+                                                    
+                                                ?>
+                                            </td>
+                                            <?php
+                                                if($mb_substr=="true"){
+                                                    echo "<td class='path'>√</td>";
+                                                }else{
+                                                    echo "<td>×</td>";
+                                                }
+                                            ?>
+                                        </tr>
+
+                                        <tr>
+                                            <td>file_get_contents</td>
+                                            <td>支持</td>
+                                            <td>
+                                                <?php
+                                                    if(function_exists("file_get_contents")){
+                                                        echo '支持';
+                                                        $file_get_contents="true";
+                                                    }else{
+                                                        echo '不支持';
+                                                        $file_get_contents="false";
+                                                    }
+                                                    
+                                                ?>
+                                            </td>
+                                            <?php
+                                                if($file_get_contents=="true"){
+                                                    echo "<td class='path'>√</td>";
+                                                }else{
+                                                    echo "<td>×</td>";
+                                                }
+                                            ?>
+                                        </tr>
+
+                                        <tr>
+                                            <td>Memcache</td>
+                                            <td>支持</td>
+                                            <td>
+                                                <?php
+                                                    if(class_exists("Memcache")){
+                                                        echo '支持';
+                                                        $Memcache="true";
+                                                    }else{
+                                                        echo '不支持';
+                                                        $Memcache="false";
+                                                    }
+                                                    
+                                                ?>
+                                            </td>
+                                            <?php
+                                                if($Memcache=="true"){
+                                                    echo "<td class='path'>√</td>";
+                                                }else{
+                                                    echo "<td>×</td>";
+                                                }
+                                            ?>
+                                        </tr>
+
+                                        <tr>
+                                            <td>COM组件扩展</td>
+                                            <td>支持</td>
+                                            <td>
+                                                <?php
+                                                    if(class_exists("COM")){
+                                                        echo '支持';
+                                                        $COM="true";
+                                                    }else{
+                                                        echo '不支持';
+                                                        $COM="false";
+                                                    }
+                                                    
+                                                ?>
+                                            </td>
+                                            <?php
+                                                if($COM=="true"){
+                                                    echo "<td class='path'>√</td>";
+                                                }else{
+                                                    echo "<td>×</td>";
+                                                }
+                                            ?>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                                
+                            <div class="layui-card-header" style="margin-bottom:20px;"><h2>• 目录权限</h2></div>
+                            <div class="layui-form">
+                                <table class="layui-table" lay-skin="line">
+                                    <thead>
+                                        <tr>
+                                            <th style="width:25%">坏境</th>
+                                            <th style="width:25%">最低配置</th>
+                                            <th style="width:25%">当前配置</th>
+                                            <th style="width:25%">是否符合</th>
+                                        </tr> 
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>./</td>
+                                            <td>可写</td>
+                                            <td>
+                                                <?php
+                                                    if(is_writable('../../')){
+                                                        echo "可写";
+                                                    }else{
+                                                        echo "不可写";
+                                                    }
+                                                ?>
+                                            </td>
+                                            <?php
+                                                if(is_writable('../../')){
+                                                    echo "<td class='path'>√</td>";
+                                                }else{
+                                                    echo "<td>×</td>";
+                                                } 
+                                            ?>
+                                        </tr>
+                                        <tr>
+                                            <td>./uploads</td>
+                                            <td>可写</td>
+                                            <td>
+                                                <?php
+                                                    if(is_writable('../uploads')){
+                                                        echo "可写";
+                                                    }else{
+                                                        echo "不可写";
+                                                    }
+                                                ?>
+                                            </td>
+                                            <?php
+                                                if(is_writable('../uploads')){
+                                                    echo "<td class='path'>√</td>";
+                                                }else{
+                                                    echo "<td>×</td>";
+                                                } 
+                                            ?>
+                                        </tr>
+                                        <tr>
+                                            <td>./runtime</td>
+                                            <td>可写</td>
+                                            <td>
+                                                <?php
+                                                    if(is_writable('../../runtime')){
+                                                        echo "可写";
+                                                    }else{
+                                                        echo "不可写";
+                                                    }
+                                                ?>
+                                            </td>
+                                            <?php
+                                                if(is_writable('../../runtime')){
+                                                    echo "<td class='path'>√</td>";
+                                                }else{
+                                                    echo "<td>×</td>";
+                                                } 
+                                            ?>
+                                        </tr>
+                                        <tr>
+                                            <td>./ueditor</td>
+                                            <td>可写</td>
+                                            <td>
+                                                <?php
+                                                    if(is_writable('../ueditor')){
+                                                        echo "可写";
+                                                    }else{
+                                                        echo "不可写";
+                                                    }
+                                                ?>
+                                            </td>
+                                            <?php
+                                                if(is_writable('../ueditor')){
+                                                    echo "<td class='path'>√</td>";
+                                                }else{
+                                                    echo "<td>×</td>";
+                                                } 
+                                            ?>
+                                        </tr>
+                                        <tr>
+                                            <td>./data</td>
+                                            <td>可写</td>
+                                            <td>
+                                                <?php
+                                                    if(is_writable('../../data')){
+                                                        echo "可写";
+                                                    }else{
+                                                        echo "不可写";
+                                                    }
+                                                ?>
+                                            </td>
+                                            <?php
+                                                if(is_writable('../../data')){
+                                                    echo "<td class='path'>√</td>";
+                                                }else{
+                                                    echo "<td>×</td>";
+                                                } 
+                                            ?>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div style="text-align:center;padding:20px;">
+                            <a href="./index.php?install=agreement" class="layui-btn layui-btn-sm layui-btn-primary">上一步</a>
+                            <a href="javascript:;" onclick="nex_step()" class="layui-btn layui-btn-sm">下一步</a>
+                        </div>
+                    </div>
+                    <?php require './template/footer.html'; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</body>
+<script>
+layui.use(['element','layer'], function(){
+    var $ = layui.jquery
+    ,element = layui.element
+    ,layer = layui.layer;
+
+});
+
+function nex_step(){
+    if($(".path").size()!=18){
+
+        layer.alert('您的配置或权限不符合要求',{icon: 2,title:'系统提示'});
+
+    }else{
+        location.href='./index.php?install=step2';
+    }
+}
+
+</script>
+</html>

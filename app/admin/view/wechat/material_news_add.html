@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head> 
+    <meta charset="UTF-8" /> 
+    <title>新增素材</title> 
+    <meta name="renderer" content="webkit" /> 
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" /> 
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" /> 
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" /> 
+    <link rel="stylesheet" href="__ACSS__/font.css" /> 
+    <link rel="stylesheet" href="__ACSS__/xadmin.css" /> 
+    <script type="text/javascript" src="__AJS__/jquery.min.js"></script> 
+    <script type="text/javascript" src="__LAYUI__/layui.js" charset="utf-8"></script> 
+    <script type="text/javascript" src="__AJS__/xadmin.js"></script> 
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 --> 
+    <!--[if lt IE 9]>
+        <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+        <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]--> 
+</head> 
+<body class="layui-anim layui-anim-up"> 
+    <div class="x-nav"> 
+        <span class="layui-breadcrumb">
+            <a href="">首页</a>
+            <a href="">微信管理</a>
+            <a><cite>新增素材</cite></a>
+        </span> 
+        <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新"> <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a> 
+    </div> 
+    <div class="x-body">
+        <blockquote class="layui-elem-quote">注意：封面图片必须使用素材管理中类型为缩略图的永久素材！</blockquote>
+        <form class="layui-form" enctype="multipart/form-data">
+            <div class="layui-form-item"> 
+                <label for="title" class="layui-form-label"> <span class="x-red">*</span>标题</label> 
+                <div class="layui-input-inline"> 
+                    <input type="text" id="title" name="title" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" /> 
+                </div> 
+                <div class="layui-form-mid layui-word-aux"> 
+                    <span class="x-red">*</span>图文素材的标题...
+                </div> 
+            </div>
+            <div class="layui-form-item"> 
+                <label for="thumb_media_id" class="layui-form-label"><span class="x-red">*</span>封面图片</label> 
+                <div class="layui-input-inline"> 
+                    <select name="thumb_media_id" lay-verify="required" id="thumb_media_id">
+                        <option value="">请选择素材封面图片</option>
+                        <volist name="rows" id="rows">
+                            <option value="{$rows.media_id}">{$rows.title}</option>
+                        </volist>
+                    </select>
+                </div> 
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="x-red">*</span>显示封面</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="show_cover_pic" value="1" lay-filter="" title="显示" checked>
+                    <input type="radio" name="show_cover_pic" value="0" lay-filter="" title="隐藏">
+                </div>
+            </div>
+            <div class="layui-form-item"> 
+                <label for="author" class="layui-form-label"> <span class="x-red">*</span>作者</label> 
+                <div class="layui-input-inline"> 
+                    <input type="text" id="author" name="author" required="" lay-verify="required" autocomplete="off" class="layui-input" value="" /> 
+                </div> 
+                <div class="layui-form-mid layui-word-aux"> 
+                    <span class="x-red">*</span>图文素材的作者...
+                </div> 
+            </div>
+            <div class="layui-form-item layui-form-text"> 
+                <label for="digest" class="layui-form-label"><span class="x-red">*</span>摘要</label> 
+                <div class="layui-input-block"> 
+                    <textarea name="digest" placeholder="请输入摘要，内容不能超过64个字符" class="layui-textarea" lay-verify="digest"></textarea> 
+                </div> 
+            </div>
+            <div class="layui-form-item layui-form-text"> 
+                <label for="content" class="layui-form-label"><span class="x-red">*</span>内容</label> 
+                <div class="layui-input-block"> 
+                    <textarea  required=""name="content" placeholder="请输入内容，内容不能超过20000个字符" class="layui-textarea" lay-verify="required"></textarea> 
+                </div> 
+            </div>
+            <div class="layui-form-item"> 
+                <label for="content_source_url" class="layui-form-label"> <span class="x-red">*</span>原文链接</label> 
+                <div class="layui-input-inline"> 
+                    <input type="text" id="content_source_url" name="content_source_url" required="" lay-verify="url" autocomplete="off" class="layui-input" value="" /> 
+                </div> 
+                <div class="layui-form-mid layui-word-aux"> 
+                    <span class="x-red">*</span>图文素材的标题...
+                </div> 
+            </div>
+            <div class="layui-form-item"> 
+                <label for="need_open_comment" class="layui-form-label"> <span class="x-red">*</span>评论</label> 
+                <div class="layui-input-block">
+                    <input type="radio" name="need_open_comment" value="1" lay-filter="" title="开启" checked>
+                    <input type="radio" name="need_open_comment" value="0" lay-filter="" title="关闭">
+                </div> 
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="x-red">*</span>评论对象</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="only_fans_can_comment" value="0" lay-filter="" title="所有人" checked>
+                    <input type="radio" name="only_fans_can_comment" value="1" lay-filter="" title="粉丝">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="push" class="layui-form-label">
+                </label>
+                <button class="layui-btn layui-btn-sm" id="send" lay-filter="send" lay-submit="">立即新增</button>
+                <button type="reset" class="layui-btn layui-btn-sm layui-btn-warm" lay-filter="">重置</button>
+            </div> 
+        </form> 
+    </div> 
+    <script>
+    layui.use(['form','layer'], function(){
+        $ = layui.jquery
+        var form = layui.form
+        ,layer = layui.layer;
+            
+        //监听提交
+        form.on('submit(send)', function(data){
+
+            console.log(data.field);
+            //发异步，把数据提交给php
+            layer.msg('正在新建素材中...',{icon:1});
+            $.ajax({
+                url: "{:url('admin/Wechat/material_news_add')}",
+                type: 'POST',
+                dataType: 'json',
+                data: data.field,
+                success: function(res) {
+                    console.log(res.errcode)
+                    console.log(res.errmsg)
+                    //called when successful
+                    
+                    if(res.status=="1"){
+                        layer.alert(res.msg, {icon: 6},function () {
+                            layer.closeAll();
+                        });
+                    
+                    }else{
+                        layer.alert(res.msg, {icon: 5},function () {
+                            layer.closeAll();
+                        });
+                    }
+                },
+                error: function(res) {
+                    //called when there is an error
+                    layer.alert("网络异常，请稍后再试！", {icon: 5},function () {
+                        layer.closeAll();
+                    });
+                }
+            });
+            
+            return false;
+        });
+      
+      
+    });
+
+    </script>
+
+</body>
+</html>

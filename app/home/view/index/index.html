@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>官网首页</title>
+	<!--/tags -->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="keywords" content="" />
+	<script type="application/x-javascript">
+		addEventListener("load", function () {
+			setTimeout(hideURLbar, 0);
+		}, false);
+
+		function hideURLbar() {
+			window.scrollTo(0, 1);
+		}
+	</script>
+	<!--//tags -->
+	<link href="__HCSS__/bootstrap.css" rel="stylesheet" type="text/css" media="all" />
+	<link href="__HCSS__/style.css" rel="stylesheet" type="text/css" media="all" />
+
+	<link href="__HCSS__/font-awesome.css" rel="stylesheet">
+	<!-- //for bootstrap working -->
+	<link href="__HCSS__/fonts.css" rel="stylesheet">
+	<link href='__HCSS__/css.css' rel='stylesheet' type='text/css'>
+
+	<!-- bxSlider CSS file -->
+	<link href="__BXSLIDER__/jquery.bxslider.css" rel="stylesheet" />
+
+</head>
+
+<body>
+	<!-- header -->
+	<div class="header" id="home">
+		<div class="content white agile-info">
+			<nav class="navbar navbar-default" role="navigation">
+				<div class="container">
+					<div class="logo" style="float:left;">
+						<a href="{:url('home/index/index')}"><img src="__UPLOADS__/logo/logo.jpg" alt="logo" class="img-rounded"></a>
+						<span class="title">自由飞翔，畅游天际</span>
+					</div>
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+					</div>
+
+					<!--/.navbar-header-->
+					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+						<nav class="link-effect-2" id="link-effect-2">
+							<ul class="nav navbar-nav">
+								<li class="active">
+									<a href="{:url('home/index/index')}" class="effect-3">官网首页</a>
+								</li>
+								<li>
+									<a href="{:url('home/about/index')}" class="effect-3">关于我们</a>
+								</li>
+								<li>
+									<a href="{:url('home/services/index')}" class="effect-3">服务范围</a>
+								</li>
+								
+								<li><a href="{:url('home/event/index')}" class="effect-3">新闻资讯</a></li>
+
+								<li><a href="{:url('home/contact/index')}" class="effect-3">联系我们</a></li>
+							</ul>
+						</nav>
+					</div>
+					<!--/.navbar-collapse-->
+					<!--/.navbar-->
+				</div>
+			</nav>
+		</div>
+	</div>
+	<!-- banner -->
+	<div class="m">
+		<ul class="bxslider">
+		  <li><img src="__HIMG__/banner1.jpg" /></li>
+		  <li><img src="__HIMG__/banner2.jpg" /></li>
+		  <li><img src="__HIMG__/banner3.jpg" /></li>
+		</ul>
+	</div>
+	<!--//banner -->
+
+	<!--/search_form -->
+	<div id="search_form" class="search_top">
+		<h2>Start your job search</h2>
+		<form action="#" method="post">
+			<input type="text" name="Enter Keyword(s)" placeholder="Enter Keyword(s)" required="">
+			<input class="email" name="Location" type="text" placeholder="Location" required="">
+			<select id="country12" onchange="change_country(this.value)" class="frm-field required">
+				<option value="null"> Select Category</option>
+				<option value="city">Banking</option>
+				<option value="city">Finance</option>
+				<option value="city">It</option>
+				<option value="city">Specialists</option>
+							
+			</select>
+			<input type="submit" value="Find Jobs">
+			<div class="clearfix"></div>
+		</form>
+	</div>
+	<!--//search_form -->
+	<div class="banner-bottom">
+		<div class="container">
+			<div class="tittle_head_w3ls">
+				<h3 class="tittle">About Us</h3>
+			</div>
+			<div class="inner_sec_grids_info_w3ls">
+				<div class="col-md-6 banner_bottom_left">
+					<h4>Employment opportunities for <span>Professionals</span></h4>
+					<p>Pellentesque convallis diam consequat magna vulputate malesuada. Cras a ornare elit. Nulla viverra pharetra sem, eget
+						pulvinar neque pharetra ac.</p>
+					<p>Lorem Ipsum convallis diam consequat magna vulputate malesuada. Cras a ornare elit. Nulla viverra pharetra sem, eget
+						pulvinar neque pharetra ac.</p>
+					<ul class="some_agile_facts">
+						<li><span class="fa fa-briefcase" aria-hidden="true"></span><label>80</label> Corporate Programs</li>
+						<li><span class="fa fa-graduation-cap" aria-hidden="true"></span><label>49</label> Training Courses</li>
+						<li><span class="fa fa-user" aria-hidden="true"></span><label>88</label> Strategic Partners</li>
+						<li><span class="fa fa-line-chart" aria-hidden="true"></span><label>436</label> Companies We Helped</li>
+					</ul>
+					<div class="clearfix"> </div>
+				</div>
+				<div class="col-md-6 banner_bottom_right">
+					<div class="agileits_w3layouts_banner_bottom_grid">
+						<img src="__HIMG__/ab.png" alt=" " class="img-responsive" />
+					</div>
+				</div>
+				<div class="clearfix"> </div>
+			</div>
+
+		</div>
+	</div>
+	<div class="tlinks">Collect from <a href="http://www.cssmoban.com/" >企业网站模板</a></div>
+	<!-- //banner-bottom -->
+	<div class="team_work_agile">
+		<h4>Whether we play a large or small role, by working together we achieve our objectives.</h4>
+	</div>
+	<!-- services -->
+	<div class="services" id="services">
+		<div class="container">
+			<div class="tittle_head_w3ls">
+				<h3 class="tittle">Selection Process</h3>
+			</div>
+			<div class="inner_sec_grids_info_w3ls">
+				<div class="col-md-3 services-left">
+					<div class="services-left-top">
+
+						<h5>Identify Need & Develop Position Description</h5>
+
+					</div>
+					<div class="services-left-top services-left-top1">
+
+						<h5>Recruitment Planning</h5>
+
+					</div>
+				</div>
+				<div class="col-md-6 services-middle">
+					<div class="services-middle-img">
+						<img src="__HIMG__/process.jpg" alt="" />
+					</div>
+					<div class="services-middle-grids">
+						<div class="col-md-6 services-middle-left">
+							<div class="services-left-top">
+
+								<h5>Sourcing & Advertising</h5>
+
+							</div>
+						</div>
+						<div class="col-md-6 services-middle-left">
+							<div class="services-left-top">
+
+								<h5>Assess & Interview Candidates</h5>
+
+							</div>
+						</div>
+						<div class="clearfix"> </div>
+					</div>
+				</div>
+				<div class="col-md-3 services-left">
+					<div class="services-left-top">
+
+						<h5>Offer for Student Employment</h5>
+
+					</div>
+					<div class="services-left-top services-left-top1">
+
+						<h5>Onboarding for Success</h5>
+
+					</div>
+				</div>
+				<div class="clearfix"> </div>
+			</div>
+		</div>
+	</div>
+	<!-- //services -->
+	<!-- /mid-services -->
+	<div class="mid_services">
+
+		<div class="col-md-6 according_inner_grids">
+			<h3 class="agile_heading two">Receiving a Job offer</h3>
+			<div class="according_info">
+				<div class="panel-group about_panel" id="accordion" role="tablist" aria-multiselectable="true">
+					<div class="panel panel-default">
+						<div class="panel-heading" role="tab" id="headingOne">
+							<h4 class="panel-title asd">
+								<a class="pa_italic" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true"
+								    aria-controls="collapseOne">
+							  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span><i class="glyphicon glyphicon-minus" aria-hidden="true"></i>assumenda est cliche voluptate
+							</a>
+							</h4>
+						</div>
+						<div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+							<div class="panel-body panel_text">
+								Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+								cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading" role="tab" id="headingTwo">
+							<h4 class="panel-title asd">
+								<a class="pa_italic collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false"
+								    aria-controls="collapseTwo">
+							  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span><i class="glyphicon glyphicon-minus" aria-hidden="true"></i>Itaque earum rerum
+							</a>
+							</h4>
+						</div>
+						<div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+							<div class="panel-body panel_text">
+								Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+								cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading" role="tab" id="headingThree">
+							<h4 class="panel-title asd">
+								<a class="pa_italic collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false"
+								    aria-controls="collapseThree">
+							  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span><i class="glyphicon glyphicon-minus" aria-hidden="true"></i>autem accusamus terry qui
+							</a>
+							</h4>
+						</div>
+						<div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+							<div class="panel-body panel_text">
+								Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+								cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+							</div>
+						</div>
+					</div>
+					<div class="panel panel-default">
+						<div class="panel-heading" role="tab" id="headingThree">
+							<h4 class="panel-title asd">
+								<a class="pa_italic collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false"
+								    aria-controls="collapseThree">
+							  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span><i class="glyphicon glyphicon-minus" aria-hidden="true"></i>autem accusamus terry qui
+							</a>
+							</h4>
+						</div>
+						<div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
+							<div class="panel-body panel_text">
+								Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
+								cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<div class="col-md-6 mid_services_img">
+		</div>
+		<div class="clearfix"> </div>
+	</div>
+	<!-- //mid-services -->
+	<div class="candidate_cv">
+		<div class="tittle_head_w3ls">
+			<h3 class="tittle two">Candidate Cv</h3>
+		</div>
+		<div class="inner_sec_grids_info login-form">
+			<form action="#" method="post">
+				<div class="col-md-6 form-left">
+					<div class="form-inputs email">
+						<p>Full name</p>
+						<i class="fa fa-user" aria-hidden="true"></i>
+						<input type="text" name="Name" placeholder="" required="" />
+					</div>
+					<div class="form-inputs name">
+						<p>Email</p>
+						<i class="fa fa-envelope" aria-hidden="true"></i>
+						<input type="email" name="Email" placeholder="" required="" />
+					</div>
+					<div class="form-inputs name">
+						<p>Phone</p>
+						<i class="fa fa-phone" aria-hidden="true"></i>
+						<input type="text" name="Phone" placeholder="" required="" />
+					</div>
+
+				</div>
+				<div class="col-md-6 form-right">
+					<div class="form-inputs name">
+						<p>Comment</p>
+						<i class="fa fa-comment" aria-hidden="true"></i>
+						<textarea name="Message" placeholder="" required></textarea>
+					</div>
+				</div>
+				<div class="clearfix"></div>
+				<div class="form-inputs">
+					<p>Specify your current employment status</p>
+					<ul>
+						<li>
+							<input type="radio" id="a-option" name="selector1">
+							<label for="a-option">Employed </label>
+							<div class="check"></div>
+						</li>
+						<li>
+							<input type="radio" id="b-option" name="selector1">
+							<label for="b-option">Unemployed</label>
+							<div class="check"></div>
+						</li>
+						<li>
+							<input type="radio" id="c-option" name="selector1">
+							<label for="c-option">Self-Employed</label>
+							<div class="check"></div>
+						</li>
+						<li>
+							<input type="radio" id="d-option" name="selector1">
+							<label for="d-option">Student</label>
+							<div class="check"></div>
+						</li>
+					</ul>
+					<div class="clearfix"></div>
+				</div>
+				<div class="form-inputs upload">
+					<p>Upload your resume</p>
+					<input type="file" id="fileselect" name="fileselect[]" multiple />
+					<div id="filedrag">Upload</div>
+				</div>
+				<input type="submit" value="Submit Cv">
+			</form>
+
+		</div>
+	</div>
+	<!-- //testimonials -->
+	<div class="testimonials_section">
+		<div class="container">
+			<div class="tittle_head_w3ls">
+				<h3 class="tittle">Testimonials</h3>
+			</div>
+			<div class="inner_sec_grids_info_w3ls">
+				<div id="Carousel" class="carousel slide two">
+
+					<ol class="carousel-indicators second">
+						<li data-target="#Carousel" data-slide-to="0" class="active"></li>
+						<li data-target="#Carousel" data-slide-to="1"></li>
+						<li data-target="#Carousel" data-slide-to="2"></li>
+					</ol>
+
+					<!-- Carousel items -->
+					<div class="carousel-inner">
+
+						<div class="item active">
+							<div class="testimonials_grid_wthree">
+								<img src="__HIMG__/test1.jpg" alt=" " class="img-responsive" />
+								<h4><i class="fa fa-quote-left" aria-hidden="true"></i> Nam libero tempore, cum soluta nobis est eligendi optio cumque
+									nihil impedit quo minus id quod maxime placeat facere possimus,Morbi viverra congue nisi vel pulvinar posuere sapien
+									eros. omnis voluptas.</h4>
+								<h5>Dan Adams</h5>
+
+							</div>
+
+						</div>
+						<!--.item-->
+						<div class="item">
+							<div class="testimonials_grid_wthree">
+								<img src="__HIMG__/test2.jpg" alt=" " class="img-responsive" />
+								<h4><i class="fa fa-quote-left" aria-hidden="true"></i> Nam libero tempore, cum soluta nobis est eligendi optio cumque
+									nihil impedit quo minus id quod maxime placeat facere possimus,Morbi viverra congue nisi vel pulvinar posuere sapien
+									eros. omnis voluptas.</h4>
+								<h5>Jessica Doe</h5>
+
+							</div>
+						</div>
+						<!--.item-->
+
+						<div class="item">
+							<div class="testimonials_grid_wthree">
+								<img src="__HIMG__/test3.jpg" alt=" " class="img-responsive" />
+								<h4><i class="fa fa-quote-left" aria-hidden="true"></i> Nam libero tempore, cum soluta nobis est eligendi optio cumque
+									nihil impedit quo minus id quod maxime placeat facere possimus,Morbi viverra congue nisi vel pulvinar posuere sapien
+									eros. omnis voluptas.</h4>
+								<h5>Michael Doe</h5>
+
+							</div>
+						</div>
+						<!--.item-->
+
+					</div>
+					<!--.carousel-inner-->
+
+				</div>
+				<!--.Carousel-->
+
+			</div>
+		</div>
+	</div>
+
+	<!-- footer -->
+	<include file="public/footer" />
+	<!-- //footer -->
+	<!-- js -->
+	<script type="text/javascript" src="__HJS__/jquery-2.1.4.min.js"></script>
+
+	<script type="text/javascript" src="__HJS__/bootstrap.js"></script>
+
+	<script type="text/javascript" src="__HJS__/gotop.js"></script>
+
+	<script src="__BXSLIDER__/jquery.bxslider.min.js"></script>
+
+
+	<script>
+	$(document).ready(function(){
+	  $('.bxslider').bxSlider({
+	  	mode: 'horizontal',                 // 'horizontal', 'vertical', 'fade' 定义slider滚动的方向，有三个值可供选择 
+	  	infiniteLoop: true,                 // true, false - display first slide after last 无限循环 
+	  	hideControlOnEnd: false,            // true, false - if true, will hide 'next' control on last slide and 'prev' control on first 如果设置true，将会在最后一个幻灯片隐藏“next”，在最前面的幻灯片因此“prev” 
+	  	controls: false,                     // true, false - previous and next controls 是否显示“previous”和“next”按钮 
+	  	speed: 700,                         // integer - in ms, duration of time slide transitions will occupy   速度，单位为毫秒 
+	  	easing: 'swing',                    // used with jquery.easing.1.3.js - see http://gsgd.co.uk/sandbox/jquery/easing/ for available options 
+	  	pager: true,                        // true / false - display a pager 
+	  	pagerSelector: null,                // jQuery selector - element to contain the pager. ex: '#pager' 
+	  	pagerType: 'full',                  // 'full', 'short' - if 'full' pager displays 1,2,3... if 'short' pager displays 1 / 4   如果设置full，将显示1，2，3……，如果设置short，将显示1/4 . 
+	  	pagerLocation: 'bottom',            // 'bottom', 'top' - location of pager 页码的位置 
+	  	pagerShortSeparator: '/',           // string - ex: 'of' pager would display 1 of 4 页面分隔符 
+	  	pagerActiveClass: 'pager-active',   // string - classname attached to the active pager link 当前页码的className 
+	  	nextText: 'next',                   // string - text displayed for 'next' control 下一页的文字 
+	  	nextImage: '',                      // string - filepath of image used for 'next' control. ex: 'images/next.jpg' 可以设置下一页为图片 
+	  	nextSelector: null,                 // jQuery selector - element to contain the next control. ex: '#next' 
+	  	prevText: 'prev',                   // string - text displayed for 'previous' control 上一页的文字 
+	  	prevImage: '',                      // string - filepath of image used for 'previous' control. ex: 'images/prev.jpg' 上一页的图片 
+	  	prevSelector: null,                 // jQuery selector - element to contain the previous control. ex: '#next' 
+	  	captions: false,                    // true, false - display image captions (reads the image 'title' tag) 是否显示图片的标题，读取图片的title属性的内容。 
+	  	  
+	  	captionsSelector: null,             // jQuery selector - element to contain the captions. ex: '#captions' 
+	  	auto: true,                        // true, false - make slideshow change automatically 幻灯片自动滚动 
+	  	autoDirection: 'next',              // 'next', 'prev' - direction in which auto show will traverse 自动滚动的顺序 
+	  	autoControls: false,                // true, false - show 'start' and 'stop' controls for auto show 自动滚动的控制键 
+	  	autoControlsSelector: null,         // jQuery selector - element to contain the auto controls. ex: '#auto-controls' 
+	  	autoStart: true,                    // true, false - if false show will wait for 'start' control to activate  
+	  	autoHover: false,                   // true, false - if true show will pause on mouseover 设置鼠标mouseover将会使自动滚动暂停 
+	  	autoDelay: 0,                       // integer - in ms, the amount of time before starting the auto show 
+	  	pause: 3000,                        // integer - in ms, the duration between each slide transition  过渡时间 
+	  	startText: 'start',                 // string - text displayed for 'start' control 开始按钮的文字 
+	  	startImage: '',                     // string - filepath of image used for 'start' control. ex: 'images/start.jpg' 开始按钮的图片 
+	  	stopText: 'stop',                   // string - text displayed for 'stop' control 停止按钮的文本 
+	  	stopImage: '',                      // string - filepath of image used for 'stop' control. ex: 'images/stop.jpg'   停止按钮的图片 
+	  	ticker: false,                      // true, false - continuous motion ticker mode (think news ticker) 
+	  	                                    // note: autoControls and autoControlsSelector apply to ticker! 
+	  	tickerSpeed: 5000,                  // integer - has an inverse effect on speed. therefore, a value of 10000 will  
+	  	                                    // scroll very slowly while a value of 50 will scroll very quickly. 
+	  	tickerDirection: 'next',            // 'next', 'prev' - direction in which ticker show will traverse 
+	  	tickerHover: false,                 // true, false - if true ticker will pause on mouseover 
+	  	wrapperClass: 'bx-wrapper',         // string - classname attached to the slider wraper 
+	  	startingSlide: 0,                   // integer - show will start on specified slide. note: slides are zero based! 
+	  	displaySlideQty: 1,                 // integer - number of slides to display at once 
+	  	moveSlideQty: 1,                    // integer - number of slides to move at once 
+	  	randomStart: false,                 // true, false - if true show will start on a random slide
+	  });
+	});
+	</script>
+</body>
+
+</html>

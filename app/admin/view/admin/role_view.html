@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="__ACSS__/font.css">
+    <link rel="stylesheet" href="__ACSS__/xadmin.css">
+    <script type="text/javascript" src="__AJS__/jquery.min.js"></script>
+    <script type="text/javascript" src="__LAYUI__/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="__AJS__/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  
+  <body class="layui-anim layui-anim-up">
+    <div class="x-body">
+        <form action="" method="post" class="layui-form layui-form-pane">
+                <div class="layui-form-item">
+                    <label for="name" class="layui-form-label">
+                        <span class="x-red">*</span>角色名
+                    </label>
+                    <div class="layui-input-inline">
+                        <input type="text" id="name" name="name" disabled="" required="" lay-verify="required"
+                        autocomplete="off" class="layui-input" value="{$rows.role_name?$rows.role_name:''}">
+                        <input type="hidden" name="id" disabled="" value="{$rows.id?$rows.id:''}">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">
+                        <span class="x-red">*</span>管理员必须拥有基础管理权限才能正常使用系统功能！
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">
+                      <span class="x-red">*</span>所属系统
+                    </label>
+                    <div class="layui-input-block">
+                      <volist name="system_sort" id="system_sort">
+                            <if condition="$system_sort.select eq 1">
+                                <input type="checkbox" lay-skin="primary" name="system_sort[]" value="{$system_sort.id}" title="{$system_sort.sort_name}" checked disabled="">
+                            <else />
+                                <input type="checkbox" lay-skin="primary" name="system_sort[]" value="{$system_sort.id}" title="{$system_sort.sort_name}" disabled="">
+                            </if>
+                      </volist>
+                    </div>
+                </div>
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label">
+                        <span class="x-red">*</span>拥有权限
+                    </label>
+                    <table  class="layui-table layui-input-block">
+                        <tbody>
+                            <if condition="$rows.acl eq 'all'">
+                                <volist name="acl" id="acl">
+                                    <tr>
+                                        <td class="super_author">
+                                            <input type="checkbox" checked="" name="superacl[]" lay-skin="primary" title="{$acl.name}" disabled="">
+                                        </td>
+                                        <td class="sub_author">
+                                            <div class="layui-input-block">
+                                                <volist name="$acl.sub" id="sub">
+                                                    <input name="acl[]" lay-skin="primary" type="checkbox" checked="" title="{$sub.name}" disabled="" value="{$sub.urls}@"> 
+                                                </volist>
+                                                
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </volist>
+                            <else />
+                                <volist name="acl" id="acl">
+                                    <if condition="$acl.author eq 1">
+                                        <tr>
+                                            <td class="super_author">
+                                                <input type="checkbox" checked="" disabled="" name="menu[]" lay-skin="primary" title="{$acl.name}">
+                                            </td>
+                                            <td  class="sub_author">
+                                                <div class="layui-input-block">
+                                                    <volist name="$acl.sub" id="sub">
+                                                        <if condition="$sub.author eq 1">
+                                                            <input name="acl[]" disabled="" lay-skin="primary" type="checkbox" checked="" title="{$sub.name}" value="{$sub.urls}@">
+                                                        <else />
+                                                            <input name="acl[]" disabled="" lay-skin="primary" type="checkbox" title="{$sub.name}" value="{$sub.urls}@">
+                                                        </if>
+                                                    </volist>
+                                                    
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <else />
+                                        <tr>
+                                            <td class="super_author">
+                                                <input type="checkbox" name="menu[]" lay-skin="primary" disabled="" title="{$acl.name}">
+                                            </td>
+                                            <td  class="sub_author">
+                                                <div class="layui-input-block">
+                                                    <volist name="$acl.sub" id="sub">
+                                                        <if condition="$sub.author eq 1">
+                                                            <input name="acl[]" disabled="" lay-skin="primary" type="checkbox" checked="" title="{$sub.name}" value="{$sub.urls}@">
+                                                        <else />
+                                                            <input name="acl[]" disabled="" lay-skin="primary" type="checkbox" title="{$sub.name}" value="{$sub.urls}@">
+                                                        </if>
+                                                    </volist>
+                                                    
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </if>
+                                </volist>
+                            </if>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="layui-form-item layui-form-text">
+                    <label for="desc" class="layui-form-label">
+                        描述
+                    </label>
+                    <div class="layui-input-block">
+                        <textarea placeholder="请输入内容" id="desc" name="desc" disabled="" class="layui-textarea">{$rows.desc?$rows.desc:''}</textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                <button class="layui-btn" lay-submit="" lay-filter="edit">确定</button>
+              </div>
+            </form>
+    </div>
+    <script>
+        layui.use(['form','layer'], function(){
+        $ = layui.jquery;
+          var form = layui.form
+          ,layer = layui.layer;
+        
+          //自定义验证规则
+          form.verify({
+            nikename: function(value){
+              if(value.length < 5){
+                return '昵称至少得5个字符啊';
+              }
+            }
+            ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+            ,repass: function(value){
+                if($('#L_pass').val()!=$('#L_repass').val()){
+                    return '两次密码不一致';
+                }
+            }
+          });
+
+          //监听提交
+          form.on('submit(edit)', function(data){
+            console.log(data.field);
+            
+            parent.layer.closeAll();
+            
+            return false;
+          });
+
+        //选择取消点击
+        $('.super_author').click(function(){
+            
+               if($(this).find('input').prop('checked')==true){
+                    $(this).next('td').find('input').next('div').addClass("layui-form-checked");
+                    $(this).next('td').find('input').prop('checked',true);
+               }else{
+                    $(this).next('td').find('input').next('div').removeClass("layui-form-checked");
+                    $(this).next('td').find('input').prop('checked',false);
+               }
+               
+        })
+
+        // $('.sub_author .layui-form-checkbox').click(function(){
+            
+        //        if($(this).parents('td').find('input').prop('checked')==true){
+        //             $(this).prev('input').prop('checked',true);
+        //             // find('input').next('div').addClass("layui-form-checked");
+        //        }else{
+        //             $(this).parents('td').find('input').prop('checked',true);
+        //             $(this).prev('input').prop('checked',true);
+        //             // $(this).next('td').find('input').next('div').removeClass("layui-form-checked");
+        //        }
+               
+        // })
+        
+
+          
+        });
+    </script>
+
+  </body>
+
+</html>

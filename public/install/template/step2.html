@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>flyfly安装程序</title>
+<script type="text/javascript" src="./lib/js/jquery-1.8.2.min.js"></script>
+<link rel="stylesheet" type="text/css" href="./lib/layui/css/layui.css">
+<script type="text/javascript" src="./lib/layui/layui.js"></script>
+<!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<style>
+    html,body{
+        height:100%;
+        overflow-x: hidden;
+    }
+    .content-box{
+        width: 100%;
+        height: 100%; 
+        background-color: #F2F2F2;
+    }
+    .content{
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        border-radius: 5px;
+        transform: translate(-50%, -50%);
+    }
+    .layui-form-label{
+        width: 90px;
+    }
+    .layui-card{
+        border: 1px solid #ccc;
+        border-radius:10px;
+    }
+</style>
+<body>
+    <div class="content-box">
+        <div style="padding: 20px; background-color: #F2F2F2;">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md8 layui-col-md-offset2">
+                    <div class="layui-card">
+                        <!-- <form class="layui-form" method="post" action="./index.php?install=step3"> -->
+                        <form class="layui-form">
+                            <div class="layui-card-body">
+
+                                <div class="layui-card-header" style="margin-bottom:20px;"><h2>• 数据库信息</h2></div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">数据库类型</label>
+                                    <div class="layui-input-inline">
+                                        <select name="type" lay-filter="">
+                                            <option value="mysql">mysql</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" for="service">数据库服务器</label>
+                                    <div class="layui-input-inline">
+                                      <input type="text" name="service" id="service" lay-verify="required" autocomplete="off" value="127.0.0.1" placeholder="" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-word-aux">
+                                        <span style="color:red">*</span>一般为 127.0.0.1
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" for="db_name">数据库名称</label>
+                                    <div class="layui-input-inline">
+                                      <input type="text" name="db_name" id="db_name" lay-verify="required" autocomplete="off" value="" placeholder="" class="layui-input">
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" for="port">数据库端口</label>
+                                    <div class="layui-input-inline">
+                                      <input type="text" name="port" id="port" lay-verify="required" autocomplete="off" value="3306" placeholder="" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-word-aux">
+                                        <span style="color:red">*</span>一般为 3306
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" for="recover">覆盖安装</label>
+                                    <div class="layui-input-inline">
+                                        <input type="checkbox" name="recover" id="recover" title="" lay-skin="primary">
+                                    </div>
+                                    <div class="layui-form-mid layui-word-aux">
+                                        <span style="color:red">*</span>勾选此项，会覆盖安装。否则存在相同数据库会提示并终止安装
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" for="db_username">数据库用户称</label>
+                                    <div class="layui-input-inline">
+                                      <input type="text" name="db_username" id="db_username" lay-verify="required" autocomplete="off" value="root" placeholder="" class="layui-input">
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" for="db_password">数据库密码</label>
+                                    <div class="layui-input-inline">
+                                      <input type="password" name="db_password" id="db_password" lay-verify="required" autocomplete="off" value="" placeholder="" class="layui-input">
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" for="prefix">数据库表前缀</label>
+                                    <div class="layui-input-inline">
+                                      <input type="text" name="prefix" id="prefix" lay-verify="required" autocomplete="off" value="f_" placeholder="" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-word-aux">
+                                        <span style="color:red">*</span>如果同一数据库中安装多个此项目时，建议修改后缀名，否则请使用默认后缀名
+                                    </div>
+                                </div>
+
+                                <div class="layui-card-header" style="margin-bottom:20px;"><h2>• 创始人账号信息</h2></div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" for="name">用户名</label>
+                                    <div class="layui-input-inline">
+                                      <input type="text" name="name" id="name" lay-verify="required" autocomplete="off" value="admin" placeholder="" class="layui-input">
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" for="pass">密码</label>
+                                    <div class="layui-input-inline">
+                                      <input type="password" required="" name="password" lay-verify="pass" id="pass" autocomplete="off" value="" placeholder="" class="layui-input">
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" for="repass">确认密码</label>
+                                    <div class="layui-input-inline">
+                                      <input type="password" required="" name="repassword" lay-verify="repass" id="repass" autocomplete="off" value="" placeholder="" class="layui-input">
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label" for="email">邮箱</label>
+                                    <div class="layui-input-inline">
+                                      <input type="email" name="email" id="email" lay-verify="email" autocomplete="off" value="" placeholder="" required="" class="layui-input">
+                                    </div>
+                                    <div class="layui-form-mid layui-word-aux">
+                                        <span style="color:red">*</span>请填写正确的邮箱便于收取提醒邮件
+                                    </div>
+                                </div>
+
+                                <div style="text-align:center;padding:20px;">
+                                    <a href="./index.php?install=step1" class="layui-btn layui-btn-sm layui-btn-primary">上一步</a>
+                                    <button class="layui-btn layui-btn-sm install" lay-filter="add" lay-submit="" lay-filter="">开始安装</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <?php require './template/footer.html'; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    layui.use(['element','layer','form'], function(){
+        var $ = layui.jquery
+        ,element = layui.element
+        ,layer = layui.layer
+        ,form = layui.form;
+
+        //自定义验证规则
+        form.verify({
+            nikename: function(value){
+                if(value.length < 5){
+                    return '昵称至少得5个字符啊';
+                }
+            }
+            ,pass: [/(.+){6,12}$/, '密码必须6到32位']
+            ,repass: function(value){
+                if($('#pass').val()!=$('#repass').val()){
+                    return '两次密码不一致';
+                }
+            }
+        });
+
+        //监听提交
+        form.on('submit(add)', function(data){
+            // console.log(data.field);
+            
+            layer.msg('正在创建数据库中...',{icon:6});
+            setTimeout(function(){
+                layer.msg("正在初始化数据中...", {icon: 6});
+            },5000)
+
+            $.ajaxSetup ({ cache: false });
+            //发异步，把数据提交给php
+            $.ajax({
+                url: "<?php echo $_SERVER['PHP_SELF']; ?>?install=step2",
+                type: 'POST',
+                dataType: "JSON",
+                data: data.field,
+                cache: false,
+                success: function(res) {
+                    //called when successful
+                    // console.log(res.status);
+                    // console.log(res.msg);
+                    // console.log(res);
+
+                    if(res==1){
+                        layer.alert("系统安装成功...",{icon: 6,title:'系统提示',closeBtn : 0},function(){
+                            layer.closeAll();
+                            location.href="./index.php?install=step3";
+                        });
+                    }else{
+                        layer.alert("数据库创建失败，请稍后重试...", {icon: 5});
+                    }
+                    
+                    // if(res.status=='1'){
+                    //     layer.msg("安装成功..."); 
+                    //     location.href="./index.php?install=step3";
+                    // }else{
+                    //     layer.alert("数据库创建失败，请稍后重试...", {icon: 5}); 
+                    // }
+                },
+                error: function(res) {
+                    //called when there is an error
+                    layer.alert("网络异常，请稍后再试...", {icon: 5});
+                }
+            });
+            return false;
+        });
+
+    });
+</script>
+</html>
